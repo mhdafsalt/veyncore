@@ -1,0 +1,106 @@
+/* MainCategories Styles - Exact Reference Replication */
+
+.main-categories {
+  width: 100%;
+  background-color: #ffffff;
+  position: relative;
+  z-index: 15;
+  box-sizing: border-box;
+}
+
+.main-categories__list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  background-color: #ffffff;
+  padding: 0 20px;
+  width: 100%;
+  margin: 0 auto;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+.main-categories__item {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  border-right: 1px solid #d4d4d4;
+  box-sizing: border-box;
+}
+
+.main-categories__item:last-child {
+  border-right: none;
+}
+
+.main-categories__link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 30px;
+  text-decoration: none;
+  color: #0a0a0a;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  position: relative;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* 60% Width Centered Bottom Indicator */
+.main-categories__link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: #000000;
+  transition: width 0.3s ease;
+}
+
+.main-categories__link:hover {
+  color: #000000;
+}
+
+.main-categories__link:hover::after {
+  width: 60%;
+}
+
+.main-categories__link--active {
+  color: #000000;
+  font-weight: 500;
+}
+
+.main-categories__link--active::after {
+  width: 60%;
+}
+
+/* Responsive Design for Laptop, Tablet, Mobile */
+@media screen and (max-width: 1024px) {
+  .main-categories__link {
+    padding: 9px 20px;
+    font-size: 13.5px;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .main-categories__list {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .main-categories__link {
+    padding: 8px 15px;
+    font-size: 12.6px;
+    letter-spacing: 0.8px;
+  }
+}

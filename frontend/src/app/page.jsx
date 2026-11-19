@@ -1,20 +1,26 @@
 'use client';
 
-import Container from '@/components/layout/Container';
-import Header from '@/components/common/Header';
-import StatusBadge from '@/components/common/StatusBadge';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import useHealthCheck from '@/hooks/useHealthCheck';
-import { API_BASE_URL, TECH_STACK } from '@/lib/constants';
-import { formatDate } from '@/lib/utils';
+import React, { useState } from 'react';
+import AnnouncementBar from '@/components/AnnouncementBar/AnnouncementBar';
+import Navbar from '@/components/Navbar/Navbar';
+import MainCategories from '@/components/MainCategories/MainCategories';
+import SubCategories from '@/components/SubCategories/SubCategories';
 
 export default function HomePage() {
-  const { data, loading, error, lastChecked, refetch } = useHealthCheck(true);
+  const [activeCategory, setActiveCategory] = useState('BLURG-SELECTS');
 
   return (
-   <>
-   
-   </>
+    <main>
+      <AnnouncementBar />
+      <Navbar
+        activeMainCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+      />
+      <MainCategories
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+      />
+      <SubCategories activeMainCategory={activeCategory} />
+    </main>
   );
 }
