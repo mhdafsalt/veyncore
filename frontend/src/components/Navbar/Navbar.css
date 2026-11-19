@@ -1,12 +1,25 @@
 /* Navbar Styles - Exact Reference Replication */
 
+:root {
+  --navbar-height: 56px;
+  --navbar-height-mobile: 50px;
+}
+
 .navbar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  height: var(--navbar-height);
   background-color: #ffffff;
   border-bottom: 1px solid #e5e5e5;
   width: 100%;
-  z-index: 20;
+  z-index: 100;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: var(--navbar-height-mobile);
+  }
 }
 
 .navbar:has(.navbar__drawer--open),
@@ -20,11 +33,11 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 8px 16px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 56px;
+  height: 100%;
   box-sizing: border-box;
 }
 
@@ -576,8 +589,8 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .navbar__container {
-    padding: 6px 12px;
-    min-height: 50px;
+    padding: 0 12px;
+    height: 100%;
   }
 
   .navbar__left-actions,

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="100%" height="100%">
+  <defs>
+    <radialGradient id="vignette-mb" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#1e1f24" stop-opacity="1" />
+      <stop offset="60%" stop-color="#0d0e12" stop-opacity="1" />
+      <stop offset="100%" stop-color="#050507" stop-opacity="1" />
+    </radialGradient>
+    <linearGradient id="glow-mb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15" />
+      <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </linearGradient>
+    <pattern id="grid-mb" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.04" />
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="1440" fill="url(#vignette-mb)" />
+  <rect width="1080" height="1440" fill="url(#glow-mb)" />
+  <rect width="1080" height="1440" fill="url(#grid-mb)" />
+
+  <!-- Framing Accents -->
+  <g opacity="0.15" stroke="#ffffff" stroke-width="1">
+    <line x1="40" y1="50" x2="1040" y2="50" />
+    <line x1="40" y1="1390" x2="1040" y2="1390" />
+    <line x1="40" y1="50" x2="40" y2="1390" />
+    <line x1="1040" y1="50" x2="1040" y2="1390" />
+    <circle cx="40" cy="50" r="4" fill="#ffffff" />
+    <circle cx="1040" cy="50" r="4" fill="#ffffff" />
+    <circle cx="40" cy="1390" r="4" fill="#ffffff" />
+    <circle cx="1040" cy="1390" r="4" fill="#ffffff" />
+  </g>
+
+  <!-- Center Editorial Fashion Graphics -->
+  <g transform="translate(540, 640)" text-anchor="middle">
+    <!-- Meta tag -->
+    <text y="-140" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" letter-spacing="8">
+      A/W 2026 // CAMPAIGN
+    </text>
+
+    <!-- Main Title -->
+    <text y="-30" fill="#ffffff" font-family="'Impact', 'Arial Black', -apple-system, BlinkMacSystemFont, sans-serif" font-size="88" font-weight="900" letter-spacing="12">
+      VEYNCORE
+    </text>
+
+    <!-- Sub-heading -->
+    <text y="40" fill="#e4e4e7" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400" letter-spacing="10">
+      ARCHIVAL DENIM
+    </text>
+
+    <!-- Details -->
+    <text y="90" fill="#71717a" font-family="monospace" font-size="13" letter-spacing="3">
+      LIMITED EDITION DROP
+    </text>
+  </g>
+</svg>

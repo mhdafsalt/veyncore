@@ -3,11 +3,19 @@
 .subcategories {
   width: 100%;
   background-color: #ffffff;
-  position: relative;
-  z-index: 50; /* Base stacking context above MainCategories and page contents */
+  position: sticky;
+  top: var(--navbar-height, 56px);
+  z-index: 90; /* Sticky below Navbar (z-index: 100) and above MainCategories & content */
   border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
   overflow: visible;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .subcategories {
+    top: var(--navbar-height-mobile, 50px);
+  }
 }
 
 /* Elevate z-index to 1000 whenever a dropdown is open or hovered */
