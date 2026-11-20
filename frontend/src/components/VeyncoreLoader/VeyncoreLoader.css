@@ -1,0 +1,60 @@
+.veyn-loader {
+  --veyn-bg: #f7f5f0;
+  --veyn-ink: #151515;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--veyn-bg);
+  color: var(--veyn-ink);
+  transition: opacity 0.42s ease, visibility 0.42s ease;
+  cursor: pointer;
+}
+
+.veyn-loader--fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.veyn-loader__content {
+  width: min(76vw, 430px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.veyn-loader__logo-wrap {
+  width: 100%;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  animation: veyn-logo-reveal 1.35s cubic-bezier(0.77, 0, 0.18, 1) 0.15s forwards;
+}
+
+.veyn-loader__logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: brightness(0);
+}
+
+@keyframes veyn-logo-reveal {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (max-width: 480px) {
+  .veyn-loader__content {
+    width: min(50vw, 320px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .veyn-loader__logo-wrap {
+    animation: none;
+    clip-path: none;
+  }
+}
