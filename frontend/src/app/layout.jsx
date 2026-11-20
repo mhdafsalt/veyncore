@@ -3,14 +3,25 @@ import { CartProvider } from '@/context/CartContext';
 import CartDrawer from '@/components/CartDrawer/CartDrawer';
 
 export const metadata = {
-  title: 'BLURG SELECTS – BLURGVILLAGE',
-  description: 'Official header, navigation and cart drawer of BLURGVILLAGE',
+  title: 'Veyncore',
+  description: 'Official Veyncore Store',
+  icons: {
+    icon: [
+      { url: '/icons/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icons/favicon.svg',
+    apple: '/icons/favicon.svg',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+        <link rel="shortcut icon" href="/icons/favicon.svg" />
+        <link rel="apple-touch-icon" href="/icons/favicon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
