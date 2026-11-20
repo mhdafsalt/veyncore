@@ -101,11 +101,18 @@
   width: auto;
   max-width: 210px;
   object-fit: contain;
-  transition: opacity 0.2s ease;
+  transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .navbar__logo:hover .navbar__logo-img {
   opacity: 0.82;
+}
+
+/* Scaled down logo when scrolling through content */
+.navbar__logo-img--small {
+  transform: scale(0.74);
 }
 
 .navbar__logo-text {

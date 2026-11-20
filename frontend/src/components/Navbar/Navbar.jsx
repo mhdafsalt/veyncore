@@ -48,8 +48,57 @@ export default function Navbar({ activeMainCategory = 'BLURG-SELECTS', onSelectC
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [isLogoSmall, setIsLogoSmall] = useState(false);
 
   const searchInputRef = useRef(null);
+  const lastScrollYRef = useRef(0);
+  const scrollDeltaRef = useRef(0);
+
+  // Smooth logo scaling on scroll
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY =
+            window.pageYOffset || document.documentElement.scrollTop || 0;
+          const lastScrollY = lastScrollYRef.current;
+          const diff = currentScrollY - lastScrollY;
+
+          // When near top of page, logo is always normal size
+          if (currentScrollY <= 20) {
+            setIsLogoSmall(false);
+            scrollDeltaRef.current = 0;
+          } else {
+            // Reset accumulator if reversing direction
+            if (
+              (diff > 0 && scrollDeltaRef.current < 0) ||
+              (diff < 0 && scrollDeltaRef.current > 0)
+            ) {
+              scrollDeltaRef.current = 0;
+            }
+            scrollDeltaRef.current += diff;
+
+            // When scrolling down past top banner zone: logo shrinks to small
+            if (scrollDeltaRef.current > 12 && currentScrollY > 40) {
+              setIsLogoSmall(true);
+            } else if (scrollDeltaRef.current < -12) {
+              // When scrolling back up: logo smoothly returns to normal size
+              setIsLogoSmall(false);
+            }
+          }
+
+          lastScrollYRef.current = Math.max(0, currentScrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Close drawers on Escape key
   useEffect(() => {
@@ -160,7 +209,9 @@ export default function Navbar({ activeMainCategory = 'BLURG-SELECTS', onSelectC
             <img
               src="/images/veyncoreLogo_black.svg"
               alt="veyncore"
-              className="navbar__logo-img"
+              className={`navbar__logo-img ${
+                isLogoSmall ? 'navbar__logo-img--small' : ''
+              }`}
               width="180"
               height="24"
             />
