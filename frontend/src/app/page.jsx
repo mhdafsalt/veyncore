@@ -8,6 +8,7 @@ import SubCategories from '@/components/SubCategories/SubCategories';
 import HeroSection from '@/components/HeroSection/HeroSection';
 import NewArrivals from '@/components/NewArrivals/NewArrivals';
 import CategoryFits from '@/components/CategoryFits/CategoryFits';
+import Footer from '@/components/Footer/Footer';
 import VeyncoreLoader from '@/components/VeyncoreLoader/VeyncoreLoader';
 
 export default function HomePage() {
@@ -51,6 +52,9 @@ export default function HomePage() {
 
         {/* 7. Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
         <CategoryFits />
+
+        {/* 8. Minimalist Accordion Footer (Quick Links, Policies, Channels & Copyright) */}
+        <Footer />
       </main>
     </>
   );

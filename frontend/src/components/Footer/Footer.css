@@ -1,0 +1,396 @@
+/* ==========================================================================
+   Modern Streetwear Luxury Footer - Pure Native CSS (White Background)
+   Humanized Semantic Classnames (Strictly No Tailwind / No TypeScript)
+   Designed for VEYNCORE High-End Streetwear & Tailored Raw Denim
+   ========================================================================== */
+
+.modern-footer {
+  width: 100%;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #e5e5e5;
+}
+
+.modern-footer * {
+  box-sizing: border-box;
+}
+
+.modern-footer__container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* --------------------------------------------------------------------------
+   1. Value Pillars / Trust Highlights
+   -------------------------------------------------------------------------- */
+.modern-footer__features-wrapper {
+  width: 100%;
+  padding: 40px 0;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #ffffff;
+}
+
+.modern-footer__features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.modern-footer__feature-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.modern-footer__feature-card:hover {
+  transform: translateY(-2px);
+}
+
+.modern-footer__feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #f7f7f8;
+  border: 1px solid #e5e5e7;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.modern-footer__feature-card:hover .modern-footer__feature-icon {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.modern-footer__feature-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modern-footer__feature-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.modern-footer__feature-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #666666;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   2. VIP Drop Newsletter Section
+   -------------------------------------------------------------------------- */
+.modern-footer__newsletter-wrapper {
+  width: 100%;
+  padding: 56px 0;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafb;
+}
+
+.modern-footer__newsletter-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.modern-footer__newsletter-copy {
+  max-width: 540px;
+}
+
+.modern-footer__newsletter-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #666666;
+  margin-bottom: 8px;
+}
+
+.modern-footer__newsletter-heading {
+  margin: 0 0 10px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.modern-footer__newsletter-subtext {
+  margin: 0;
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.6;
+}
+
+.modern-footer__newsletter-form-container {
+  width: 100%;
+  max-width: 480px;
+  flex-shrink: 0;
+}
+
+.modern-footer__newsletter-form {
+  display: flex;
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.modern-footer__newsletter-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 18px;
+  background-color: #ffffff;
+  border: 1px solid #d4d4d8;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: #000000;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.modern-footer__newsletter-input::placeholder {
+  color: #888888;
+}
+
+.modern-footer__newsletter-input:focus {
+  border-color: #000000;
+}
+
+.modern-footer__newsletter-button {
+  height: 52px;
+  padding: 0 24px;
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.modern-footer__newsletter-button:hover {
+  background-color: #262626;
+  border-color: #262626;
+  transform: translateY(-1px);
+}
+
+.modern-footer__newsletter-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 4px;
+  color: #059669;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   3. Monumental Brand Banner (Subtle Luxury Fashion Watermark)
+   -------------------------------------------------------------------------- */
+.modern-footer__banner-wrapper {
+  width: 100%;
+  padding: 40px 0 24px;
+  overflow: hidden;
+  user-select: none;
+  background-color: #ffffff;
+}
+
+.modern-footer__monogram {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modern-footer__monogram-img {
+  width: 80%;
+  max-width: 80%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modern-footer:hover .modern-footer__monogram-img {
+  opacity: 0.85;
+}
+
+/* --------------------------------------------------------------------------
+   5. Bottom Legal Bar
+   -------------------------------------------------------------------------- */
+.modern-footer__bottom-wrapper {
+  width: 100%;
+  padding: 24px 0 32px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #ffffff;
+}
+
+.modern-footer__bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+
+.modern-footer__bottom-left,
+.modern-footer__bottom-right {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.modern-footer__bottom-left {
+  justify-content: flex-start;
+}
+
+.modern-footer__bottom-right {
+  justify-content: flex-end;
+}
+
+.modern-footer__bottom-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 2;
+  text-align: center;
+}
+
+.modern-footer__bottom-link {
+  font-size: 12px;
+  color: #71717a;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.18s ease;
+  white-space: nowrap;
+}
+
+.modern-footer__bottom-link:hover {
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.modern-footer__copyright {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #71717a;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Adaptations
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 1024px) {
+  .modern-footer__features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .modern-footer__newsletter-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .modern-footer__newsletter-form-container {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .modern-footer__container {
+    padding: 0 16px;
+  }
+
+  .modern-footer__features-wrapper {
+    padding: 28px 0;
+  }
+
+  .modern-footer__features-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .modern-footer__newsletter-wrapper {
+    padding: 36px 0;
+  }
+
+  .modern-footer__newsletter-heading {
+    font-size: 20px;
+  }
+
+  .modern-footer__newsletter-form {
+    flex-direction: column;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  .modern-footer__newsletter-input {
+    border-radius: 4px;
+    border-right: 1px solid #d4d4d8;
+    margin-bottom: 8px;
+  }
+
+  .modern-footer__newsletter-button {
+    border-radius: 4px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modern-footer__banner-wrapper {
+    padding: 16px 0;
+  }
+
+  .modern-footer__bottom-inner {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .modern-footer__bottom-left,
+  .modern-footer__bottom-right,
+  .modern-footer__bottom-center {
+    justify-content: center;
+    width: 100%;
+  }
+}
