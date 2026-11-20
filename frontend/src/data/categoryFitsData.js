@@ -11,6 +11,25 @@ export const FIT_CATEGORIES = [
 export const CATEGORY_FITS_DATA = {
   baggy: [
     {
+      id: 'vexo-blue-baggy',
+      title: 'VEXO BLUE BAGGY',
+      handle: 'vexo-blue-baggy',
+      fit: 'baggy',
+      salePrice: 'Rs. 1,499.00',
+      regularPrice: 'Rs. 1,700.00',
+      price: 1499,
+      comparePrice: 1700,
+      badge: 'New',
+      images: [
+        'https://blurgvillage.com/cdn/shop/files/WEBP_File_6930.webp?v=1795179025&width=800',
+        'https://blurgvillage.com/cdn/shop/files/WEBP_File_6933.webp?v=1795179029&width=800',
+        'https://blurgvillage.com/cdn/shop/files/WEBP_File_6931.webp?v=1795179025&width=800',
+        'https://blurgvillage.com/cdn/shop/files/WEBP_File_6934.webp?v=1795179027&width=800',
+        'https://blurgvillage.com/cdn/shop/files/WEBP_File_6932.webp?v=1795179027&width=800'
+      ],
+      availableSizes: ['28', '30', '32', '34']
+    },
+    {
       id: 'nio-blue-baggy',
       title: 'NIO BLUE BAGGY',
       handle: 'nio-blue-baggy',

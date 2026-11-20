@@ -51,15 +51,17 @@ export function CartProvider({ children }) {
   const closeCart = () => setIsCartOpen(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
 
-  const addItem = (item) => {
+  const addItem = (item, quantity = 1) => {
     setCartItems((prevItems) => {
-      const existingIndex = prevItems.findIndex((i) => i.id === item.id);
+      const compositeId = item.id ? item.id : `${item.productId || 'item'}-${item.size || 'default'}`;
+      const addQty = item.quantity || quantity || 1;
+      const existingIndex = prevItems.findIndex((i) => i.id === compositeId);
       if (existingIndex > -1) {
         const updated = [...prevItems];
-        updated[existingIndex].quantity += 1;
+        updated[existingIndex].quantity += addQty;
         return updated;
       }
-      return [...prevItems, { ...item, quantity: 1 }];
+      return [...prevItems, { ...item, id: compositeId, quantity: addQty }];
     });
     setIsCartOpen(true);
   };

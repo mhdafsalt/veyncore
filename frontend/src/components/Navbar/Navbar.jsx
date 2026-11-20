@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import './Navbar.css';
 
 const POPULAR_SEARCHES = ['Baggy', 'Bootcut', 'Bracelet', 'Cargo', 'Denims', 'Raw Wide', 'Tops'];
@@ -44,6 +45,7 @@ const SEARCH_PRODUCTS = [
 
 export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCategory }) {
   const { openCart, totalCount } = useCart();
+  const { user, isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -222,25 +224,31 @@ export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCa
         <div className="navbar__actions">
           {/* Account Button */}
           <Link
-            href="#account"
+            href="/account/login"
             className="navbar__action-button navbar__action-button--account"
-            aria-label="My Account"
+            aria-label={isAuthenticated && user ? `My Account (${user.name})` : "My Account"}
           >
-            <svg
-              className="navbar__icon navbar__icon--account"
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="7" r="4.2" />
-              <path d="M5 21a7 7 0 0 1 14 0" />
-            </svg>
+            {isAuthenticated && user ? (
+              <span className="navbar__user-initial">
+                {user.firstName ? user.firstName[0].toUpperCase() : 'V'}
+              </span>
+            ) : (
+              <svg
+                className="navbar__icon navbar__icon--account"
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="7" r="4.2" />
+                <path d="M5 21a7 7 0 0 1 14 0" />
+              </svg>
+            )}
           </Link>
 
           {/* Cart Button with Count Badge */}
@@ -580,7 +588,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCa
 
         <div className="navbar__drawer-footer">
           <Link
-            href="#account"
+            href="/account/login"
             className="navbar__drawer-account-link"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -605,7 +613,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCa
                 strokeWidth="1.8"
               />
             </svg>
-            <span>Log in / Sign up</span>
+            <span>{isAuthenticated && user ? `MY ACCOUNT (${user.name})` : 'Log in / Sign up'}</span>
           </Link>
         </div>
       </nav>
