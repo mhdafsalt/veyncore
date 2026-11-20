@@ -1,9 +1,20 @@
 import mongoose from 'mongoose';
 
+let cachedConnection = null;
+
 /**
  * Connect to MongoDB Atlas using Mongoose
  */
 export const connectDB = async () => {
+  // Reuse existing connection if already established (serverless optimization)
+  if (mongoose.connection.readyState >= 1) {
+    return mongoose.connection;
+  }
+
+  if (cachedConnection) {
+    return cachedConnection;
+  }
+
   const uri = process.env.MONGODB_URI;
 
   // Verify connection string presence and placeholder status
@@ -18,6 +29,7 @@ export const connectDB = async () => {
 
   try {
     const conn = await mongoose.connect(uri);
+    cachedConnection = conn;
 
     // Mask credentials when logging host info
     console.log(`[Database] MongoDB Connected successfully: ${conn.connection.host}`);
