@@ -4,8 +4,8 @@ import React from 'react';
 import './MainCategories.css';
 
 const CATEGORIES = [
-  { id: 'BLURG-ORIGINALS', label: 'VEYN-SELECTS', href: '#blurg-originals' },
-  { id: 'BLURG-SELECTS', label: 'VEYN-OBJECTS', href: '#blurg-selects' }
+  { id: 'BLURG-ORIGINALS', label: 'VEYN-SELECTS', href: '#VEYN-SELECTS' },
+  { id: 'BLURG-SELECTS', label: 'VEYN-OBJECTS', href: '#VEYN-SELECTS' }
 ];
 
 export default function MainCategories({ activeCategory = 'BLURG-SELECTS', onSelectCategory }) {

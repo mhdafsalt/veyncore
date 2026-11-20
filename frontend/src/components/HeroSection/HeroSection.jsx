@@ -1,75 +1,252 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import './HeroSection.css';
 
-// Default images from blurgvillage reference
-const BLURG_DESKTOP_IMG =
-  './images/hero.jpg';
-const BLURG_MOBILE_IMG =
-  'https://blurgvillage.com/cdn/shop/files/IMG_8502.jpg?v=1793365621&width=1080';
-
-const LOCAL_FALLBACK_DESKTOP = '/images/hero-desktop.svg';
-const LOCAL_FALLBACK_MOBILE = '/images/hero-mobile.svg';
+const BASE_SLIDES = [
+  {
+    id: 'wide-leg',
+    title: 'Wide Leg Fit',
+    subtitle: 'Best Choice',
+    image: '/images/hero/hero-card-1.jpg',
+    href: '/collections/wide-leg',
+  },
+  {
+    id: 'blurg-selects',
+    title: 'Blurg Selects',
+    subtitle: 'Curated Denims',
+    image: '/images/hero/hero-card-2.jpg',
+    href: '/collections/blurg-selects',
+  },
+  {
+    id: 'baggy-fit',
+    title: 'Baggy Fit',
+    subtitle: 'Most Selling',
+    image: '/images/hero/hero-card-3.jpg',
+    href: '/collections/baggy',
+  },
+];
 
 export default function HeroSection({
-  desktopImage = BLURG_DESKTOP_IMG,
-  mobileImage = BLURG_MOBILE_IMG,
-  ctaText = 'EDGE',
-  ctaLink = '/collections/originals-edge',
-  alt = 'Veyncore Campaign Hero',
+  slides: initialSlides = BASE_SLIDES,
+  autoPlayInterval = 3500,
 }) {
-  const [desktopSrc, setDesktopSrc] = useState(desktopImage);
-  const [mobileSrc, setMobileSrc] = useState(mobileImage);
+  const baseCount = initialSlides.length;
 
-  const handleDesktopError = () => {
-    if (desktopSrc !== LOCAL_FALLBACK_DESKTOP) {
-      setDesktopSrc(LOCAL_FALLBACK_DESKTOP);
+  // Triplicate the slides [copy1, copy2, copy3] for an infinite continuous loop
+  const extendedSlides = useMemo(() => {
+    return [...initialSlides, ...initialSlides, ...initialSlides];
+  }, [initialSlides]);
+
+  // Start at the beginning of the middle set so we can loop infinitely in both directions
+  const [currentIndex, setCurrentIndex] = useState(baseCount);
+  const [enableTransition, setEnableTransition] = useState(true);
+  const [itemsPerView, setItemsPerView] = useState(3);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isTransitioningRef = useRef(false);
+  const touchStartXRef = useRef(0);
+  const touchEndXRef = useRef(0);
+
+  // Responsive items-per-view
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setItemsPerView(1); // Mobile: 1 box
+      } else if (window.innerWidth < 1024) {
+        setItemsPerView(2); // Tablet: 2 boxes
+      } else {
+        setItemsPerView(3); // Desktop/Laptop: 3 boxes
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Advance forward continuously (never rewind backwards)
+  const handleNext = useCallback(() => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    setEnableTransition(true);
+    setCurrentIndex((prev) => prev + 1);
+  }, []);
+
+  // Move backward
+  const handlePrev = useCallback(() => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    setEnableTransition(true);
+    setCurrentIndex((prev) => prev - 1);
+  }, []);
+
+  // Handle transition end: invisible teleport back into the middle set
+  const handleTransitionEnd = () => {
+    isTransitioningRef.current = false;
+
+    // If we passed the end of the middle set, teleport back to the equivalent position
+    if (currentIndex >= baseCount * 2) {
+      setEnableTransition(false);
+      setCurrentIndex((prev) => prev - baseCount);
+    } else if (currentIndex < baseCount) {
+      setEnableTransition(false);
+      setCurrentIndex((prev) => prev + baseCount);
     }
   };
 
-  const handleMobileError = () => {
-    if (mobileSrc !== LOCAL_FALLBACK_MOBILE) {
-      setMobileSrc(LOCAL_FALLBACK_MOBILE);
+  // Auto-play timer: always moves forward
+  useEffect(() => {
+    if (isHovered) return;
+
+    const timer = setInterval(() => {
+      handleNext();
+    }, autoPlayInterval);
+
+    return () => clearInterval(timer);
+  }, [isHovered, autoPlayInterval, handleNext]);
+
+  // Touch Swipe for mobile devices
+  const handleTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartXRef.current - touchEndXRef.current;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
     }
+    touchStartXRef.current = 0;
+    touchEndXRef.current = 0;
+  };
+
+  // Active dot index (0 to baseCount - 1)
+  const activeDotIndex = ((currentIndex % baseCount) + baseCount) % baseCount;
+
+  const handleDotClick = (dotIdx) => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    setEnableTransition(true);
+    setCurrentIndex(baseCount + dotIdx);
   };
 
   return (
-    <section className="hero-section" aria-label="Hero Banner">
-      <div className="hero-section__container">
-        {/* Desktop / Laptop Banner (Widescreen) */}
-        <img
-          className="hero-section__image hero-section__image--desktop"
-          src={desktopSrc}
-          alt={alt}
-          loading="eager"
-          fetchPriority="high"
-          onError={handleDesktopError}
-        />
+    <section
+      className="hero-carousel-section"
+      aria-label="Featured Collections Infinite Carousel"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="hero-carousel__container">
+        {/* Left Arrow Button (<) */}
+        <button
+          type="button"
+          className="hero-carousel__arrow hero-carousel__arrow--prev"
+          onClick={handlePrev}
+          aria-label="Previous slide"
+        >
+          <svg
+            className="hero-carousel__arrow-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
 
-        {/* Mobile Banner (Vertical / Portrait) */}
-        <img
-          className="hero-section__image hero-section__image--mobile"
-          src={mobileSrc}
-          alt={alt}
-          loading="eager"
-          fetchPriority="high"
-          onError={handleMobileError}
-        />
-
-        {/* Hero Overlay with Glassmorphic CTA Button */}
-        <div className="hero-section__overlay">
-          <div className="hero-section__button-group">
-            <Link
-              href={ctaLink}
-              className="hero-section__cta"
-              aria-label={ctaText}
-            >
-              <span className="hero-section__cta-text">{ctaText}</span>
-            </Link>
+        {/* Slider Viewport Window */}
+        <div
+          className="hero-carousel__viewport"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div
+            className={`hero-carousel__track ${
+              enableTransition ? 'hero-carousel__track--animated' : ''
+            }`}
+            style={{
+              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {extendedSlides.map((slide, idx) => (
+              <div
+                key={`${slide.id}-${idx}`}
+                className="hero-carousel__slide"
+                style={{
+                  flex: `0 0 ${100 / itemsPerView}%`,
+                  maxWidth: `${100 / itemsPerView}%`,
+                }}
+              >
+                <Link
+                  href={slide.href}
+                  className="hero-carousel__card-link"
+                  aria-label={`${slide.title} - ${slide.subtitle}`}
+                >
+                  <img
+                    src={slide.image}
+                    alt={`${slide.title} - ${slide.subtitle}`}
+                    className="hero-carousel__card-image"
+                    loading={
+                      idx >= baseCount && idx < baseCount + itemsPerView
+                        ? 'eager'
+                        : 'lazy'
+                    }
+                  />
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Right Arrow Button (>) */}
+        <button
+          type="button"
+          className="hero-carousel__arrow hero-carousel__arrow--next"
+          onClick={handleNext}
+          aria-label="Next slide"
+        >
+          <svg
+            className="hero-carousel__arrow-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Pagination Indicators / Dots */}
+      <div className="hero-carousel__pagination">
+        {Array.from({ length: baseCount }).map((_, dotIdx) => (
+          <button
+            key={`dot-${dotIdx}`}
+            type="button"
+            className={`hero-carousel__dot ${
+              activeDotIndex === dotIdx ? 'hero-carousel__dot--active' : ''
+            }`}
+            onClick={() => handleDotClick(dotIdx)}
+            aria-label={`Go to slide ${dotIdx + 1}`}
+          />
+        ))}
       </div>
     </section>
   );
