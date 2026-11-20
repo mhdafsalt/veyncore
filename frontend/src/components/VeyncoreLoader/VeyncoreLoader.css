@@ -20,7 +20,7 @@
 }
 
 .veyn-loader__content {
-  width: min(76vw, 430px);
+  width: min(60vw, 400px);
   display: flex;
   flex-direction: column;
   align-items: center;
