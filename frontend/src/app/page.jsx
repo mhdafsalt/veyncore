@@ -7,6 +7,7 @@ import MainCategories from '@/components/MainCategories/MainCategories';
 import SubCategories from '@/components/SubCategories/SubCategories';
 import HeroSection from '@/components/HeroSection/HeroSection';
 import NewArrivals from '@/components/NewArrivals/NewArrivals';
+import CategoryFits from '@/components/CategoryFits/CategoryFits';
 import VeyncoreLoader from '@/components/VeyncoreLoader/VeyncoreLoader';
 
 export default function HomePage() {
@@ -47,6 +48,9 @@ export default function HomePage() {
 
         {/* 6. Shop New Arrivals (Responsive 4-col/2-col grid with veyncult styling) */}
         <NewArrivals />
+
+        {/* 7. Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
+        <CategoryFits />
       </main>
     </>
   );
