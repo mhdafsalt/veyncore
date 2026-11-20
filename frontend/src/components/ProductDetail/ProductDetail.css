@@ -301,6 +301,64 @@
   object-position: center top;
 }
 
+/* Floating Mobile Share Button (Hidden on Desktop) */
+.product-gallery__mobile-share-btn {
+  display: none;
+}
+
+/* Mobile Responsive Gallery (Matches Image 1) */
+@media (max-width: 768px) {
+  /* 1. Remove bottom thumbnail images on mobile */
+  .product-gallery__thumbnails {
+    display: none !important;
+  }
+
+  /* 2. Hide side navigation arrows & zoom on mobile (gesture swipe enabled) */
+  .product-gallery__arrow,
+  .product-gallery__zoom-btn {
+    display: none !important;
+  }
+
+  /* 3. Floating share button on top right */
+  .product-gallery__mobile-share-btn {
+    display: flex;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 5;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: none;
+    color: #111111;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+
+  .product-gallery__mobile-share-btn:hover {
+    transform: scale(1.1);
+  }
+
+  /* 4. Reposition counter to bottom-left corner with white card badge */
+  .product-gallery__counter {
+    top: auto;
+    right: auto;
+    bottom: 14px;
+    left: 14px;
+    background-color: #ffffff;
+    color: #111111;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 5px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+}
+
 /* ==========================================================================
    RIGHT COLUMN: PRODUCT DETAILS & PURCHASING CONTROLS
    ========================================================================== */

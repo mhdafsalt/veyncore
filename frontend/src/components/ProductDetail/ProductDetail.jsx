@@ -159,6 +159,25 @@ export default function ProductDetail({ product }) {
     }
   };
 
+  // Mobile Native Share
+  const handleMobileShare = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: product.title,
+          text: `Check out ${product.title} on VEYNCORE`,
+          url: window.location.href,
+        });
+        return;
+      } catch (err) {
+        // user dismissed
+      }
+    }
+    handleCopyLink();
+  };
+
   const currentUrl = typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : '';
   const shareText = encodeURIComponent(`Check out ${product.title} on VEYNCORE`);
 
@@ -198,9 +217,26 @@ export default function ProductDetail({ product }) {
                   </div>
                 )}
 
+                {/* Mobile Floating Share Button */}
+                <button
+                  type="button"
+                  className="product-gallery__mobile-share-btn"
+                  onClick={handleMobileShare}
+                  aria-label="Share this product"
+                  title="Share"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                </button>
+
                 {/* Counter Pill */}
                 <div className="product-gallery__counter">
-                  {currentImageIndex + 1} / {images.length}
+                  {currentImageIndex + 1}/{images.length}
                 </div>
 
                 {/* Main Image */}
