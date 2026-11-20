@@ -83,7 +83,7 @@ export default function CartDrawer() {
   // Build WhatsApp order link
   const buildWhatsAppLink = () => {
     const lines = [
-      '*New Order Request - BLURGVILLAGE*',
+      '*New Order Request - VEYNCORE*',
       '--------------------------------',
       '*Items Ordered:*'
     ];

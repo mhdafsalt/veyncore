@@ -13,11 +13,11 @@ const BASE_SLIDES = [
     href: '/collections/wide-leg',
   },
   {
-    id: 'blurg-selects',
-    title: 'Blurg Selects',
+    id: 'veyn-selects',
+    title: 'Veyn Selects',
     subtitle: 'Curated Denims',
     image: '/images/hero/heroimg02.jpg',
-    href: '/collections/blurg-selects',
+    href: '/collections/veyn-selects',
   },
   {
     id: 'baggy-fit',

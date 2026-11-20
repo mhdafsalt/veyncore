@@ -4,11 +4,11 @@ import React from 'react';
 import './MainCategories.css';
 
 const CATEGORIES = [
-  { id: 'BLURG-ORIGINALS', label: 'VEYN-SELECTS', href: '#VEYN-SELECTS' },
-  { id: 'BLURG-SELECTS', label: 'VEYN-OBJECTS', href: '#VEYN-SELECTS' }
+  { id: 'VEYN-SELECTS', label: 'VEYN-SELECTS', href: '#VEYN-SELECTS' },
+  { id: 'VEYN-OBJECTS', label: 'VEYN-OBJECTS', href: '#VEYN-OBJECTS' }
 ];
 
-export default function MainCategories({ activeCategory = 'BLURG-SELECTS', onSelectCategory }) {
+export default function MainCategories({ activeCategory = 'VEYN-OBJECTS', onSelectCategory }) {
   const handleClick = (e, catId) => {
     e.preventDefault();
     if (onSelectCategory) {

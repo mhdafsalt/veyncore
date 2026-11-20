@@ -63,7 +63,7 @@ const SELECTS_SUBCATEGORIES = [
 ];
 
 const ORIGINALS_SUBCATEGORIES = [
-  { id: 'orig-home', label: 'ORIGINALS HOME', href: '#orig-home', hasDropdown: false },
+  { id: 'orig-home', label: 'SELECTS HOME', href: '#orig-home', hasDropdown: false },
   { id: 'orig-vault', label: 'ARCHIVE VAULT ⚡️', href: '#orig-vault', isGlow: true, hasDropdown: false },
   { id: 'orig-signature', label: 'SIGNATURE DROP', href: '#orig-signature', isGlow: true, hasDropdown: false },
   {
@@ -92,20 +92,20 @@ const ORIGINALS_SUBCATEGORIES = [
   { id: 'orig-lookbook', label: 'LOOKBOOK', href: '#orig-lookbook', hasDropdown: false }
 ];
 
-export default function SubCategories({ activeMainCategory = 'BLURG-SELECTS' }) {
+export default function SubCategories({ activeMainCategory = 'VEYN-OBJECTS' }) {
   const [activeSubId, setActiveSubId] = useState('home');
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const containerRef = useRef(null);
   const activeTabRef = useRef(null);
 
   const subcategories =
-    activeMainCategory === 'BLURG-ORIGINALS'
+    activeMainCategory === 'VEYN-SELECTS'
       ? ORIGINALS_SUBCATEGORIES
       : SELECTS_SUBCATEGORIES;
 
   // Reset active tab when parent main category changes
   useEffect(() => {
-    if (activeMainCategory === 'BLURG-ORIGINALS') {
+    if (activeMainCategory === 'VEYN-SELECTS') {
       setActiveSubId('orig-home');
     } else {
       setActiveSubId('home');

@@ -42,7 +42,7 @@ const SEARCH_PRODUCTS = [
   }
 ];
 
-export default function Navbar({ activeMainCategory = 'BLURG-SELECTS', onSelectCategory }) {
+export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCategory }) {
   const { openCart, totalCount } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -326,13 +326,13 @@ export default function Navbar({ activeMainCategory = 'BLURG-SELECTS', onSelectC
               <button
                 type="button"
                 className={`navbar__drawer-link navbar__drawer-link--button ${
-                  activeMainCategory === 'BLURG-ORIGINALS'
+                  activeMainCategory === 'VEYN-SELECTS'
                     ? 'navbar__drawer-link--active'
                     : ''
                 }`}
-                onClick={() => handleCategoryClick('BLURG-ORIGINALS')}
+                onClick={() => handleCategoryClick('VEYN-SELECTS')}
               >
-                BLURG-ORIGINALS
+                VEYN-SELECTS
               </button>
             </li>
 
@@ -340,13 +340,13 @@ export default function Navbar({ activeMainCategory = 'BLURG-SELECTS', onSelectC
               <button
                 type="button"
                 className={`navbar__drawer-link navbar__drawer-link--button ${
-                  activeMainCategory === 'BLURG-SELECTS'
+                  activeMainCategory === 'VEYN-OBJECTS'
                     ? 'navbar__drawer-link--active'
                     : ''
                 }`}
-                onClick={() => handleCategoryClick('BLURG-SELECTS')}
+                onClick={() => handleCategoryClick('VEYN-OBJECTS')}
               >
-                BLURG-SELECTS
+                VEYN-OBJECTS
               </button>
             </li>
 
