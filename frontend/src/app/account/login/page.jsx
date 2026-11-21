@@ -1,20 +1,18 @@
 'use client';
 
-import React from 'react';
-import AnnouncementBar from '@/components/AnnouncementBar/AnnouncementBar';
-import Navbar from '@/components/Navbar/Navbar';
-import AuthPage from '@/components/Account/AuthPage';
-import Footer from '@/components/Footer/Footer';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AccountLoginPage() {
-  return (
-    <>
-      <AnnouncementBar />
-      <Navbar />
-      <main>
-        <AuthPage />
-      </main>
-      <Footer />
-    </>
-  );
+  const router = useRouter();
+  const { openAuthModal } = useAuth();
+
+  useEffect(() => {
+    // No separate page for signup and login - redirect to home and pop open modal
+    router.replace('/');
+    openAuthModal('login');
+  }, [router, openAuthModal]);
+
+  return null;
 }

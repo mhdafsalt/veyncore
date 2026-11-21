@@ -1092,11 +1092,14 @@
   left: 10px;
   background-color: #000000;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 3px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
   border-radius: 2px;
 }
 

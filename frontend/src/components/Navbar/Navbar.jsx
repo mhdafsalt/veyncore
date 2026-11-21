@@ -45,7 +45,7 @@ const SEARCH_PRODUCTS = [
 
 export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCategory }) {
   const { openCart, totalCount } = useCart();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -223,10 +223,11 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
         {/* Right: Actions (Account & Cart) */}
         <div className="navbar__actions">
           {/* Account Button */}
-          <Link
-            href="/account/login"
+          <button
+            type="button"
+            onClick={() => openAuthModal(isAuthenticated ? 'account' : 'login')}
             className="navbar__action-button navbar__action-button--account"
-            aria-label={isAuthenticated && user ? `My Account (${user.name})` : "My Account"}
+            aria-label={isAuthenticated && user ? `My Account (${user.name})` : "Sign In / Sign Up"}
           >
             {isAuthenticated && user ? (
               <span className="navbar__user-initial">
@@ -249,7 +250,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 <path d="M5 21a7 7 0 0 1 14 0" />
               </svg>
             )}
-          </Link>
+          </button>
 
           {/* Cart Button with Count Badge */}
           <button
@@ -698,10 +699,13 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
         </div>
 
         <div className="navbar__drawer-footer">
-          <Link
-            href="/account/login"
+          <button
+            type="button"
             className="navbar__drawer-account-link"
-            onClick={() => setIsMenuOpen(false)}
+            onClick={() => {
+              setIsMenuOpen(false);
+              openAuthModal(isAuthenticated ? 'account' : 'login');
+            }}
           >
             <svg
               width="20"
@@ -725,7 +729,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               />
             </svg>
             <span>{isAuthenticated && user ? `MY ACCOUNT (${user.name})` : 'Log in / Sign up'}</span>
-          </Link>
+          </button>
         </div>
       </nav>
 

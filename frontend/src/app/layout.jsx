@@ -2,6 +2,7 @@ import './globals.css';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CartDrawer from '@/components/CartDrawer/CartDrawer';
+import AuthModal from '@/components/Account/AuthModal';
 
 export const metadata = {
   title: 'Veyncore',
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
           <CartProvider>
             {children}
             <CartDrawer />
+            <AuthModal />
           </CartProvider>
         </AuthProvider>
       </body>

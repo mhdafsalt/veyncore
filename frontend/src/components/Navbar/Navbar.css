@@ -394,6 +394,13 @@
   font-weight: 500;
   color: #111827;
   text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
 }
 
 .navbar__drawer-account-link:hover {

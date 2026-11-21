@@ -87,6 +87,23 @@ export function AuthProvider({ children }) {
   const [addresses, setAddresses] = useState(INITIAL_ADDRESSES);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Auth Modal State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login'); // 'login' | 'register' | 'forgot' | 'otp' | 'account'
+
+  const openAuthModal = (mode) => {
+    if (mode) {
+      setAuthModalMode(mode);
+    } else {
+      setAuthModalMode(user ? 'account' : 'login');
+    }
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
+
   // Initialize from localStorage if present
   useEffect(() => {
     try {
@@ -152,14 +169,29 @@ export function AuthProvider({ children }) {
   };
 
   // Register New Account
-  const register = async ({ firstName, lastName, email, phone, password }) => {
+  const register = async ({ firstName, lastName, fullName, email, phone, password }) => {
     await new Promise((resolve) => setTimeout(resolve, 700));
+
+    let fName = firstName;
+    let lName = lastName;
+    let computedName = fullName;
+
+    if (fullName && !firstName && !lastName) {
+      const parts = fullName.trim().split(/\s+/);
+      fName = parts[0] || 'Veyn';
+      lName = parts.slice(1).join(' ') || 'Member';
+      computedName = fullName.trim();
+    } else {
+      fName = firstName || 'Veyn';
+      lName = lastName || 'Member';
+      computedName = `${firstName || ''} ${lastName || ''}`.trim() || 'New Member';
+    }
 
     const newUser = {
       id: `usr_${Date.now()}`,
-      firstName: firstName || 'Veyn',
-      lastName: lastName || 'Member',
-      name: `${firstName || ''} ${lastName || ''}`.trim() || 'New Member',
+      firstName: fName,
+      lastName: lName,
+      name: computedName,
       email: email.trim(),
       phone: phone.trim() || '+91 99999 99999',
       vipTier: 'VIP Member',
@@ -180,6 +212,7 @@ export function AuthProvider({ children }) {
   // Logout
   const logout = () => {
     setUser(null);
+    setAuthModalMode('login');
     try {
       localStorage.removeItem('veyncore_user');
     } catch (e) {
@@ -204,7 +237,12 @@ export function AuthProvider({ children }) {
     loginWithOtp,
     register,
     logout,
-    requestPasswordReset
+    requestPasswordReset,
+    isAuthModalOpen,
+    authModalMode,
+    setAuthModalMode,
+    openAuthModal,
+    closeAuthModal
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
