@@ -821,43 +821,58 @@
 }
 
 /* ==========================================================================
-   Pagination & Load More
+   Automated Lazy Loading / Infinite Scroll
    ========================================================================== */
 
-.all-drops__pagination {
+.all-drops__lazy-loader {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  margin-top: 30px;
-  padding: 20px 0;
+  padding: 30px 0 60px 0;
+  width: 100%;
 }
 
-.all-drops__load-more-btn {
-  background: #000000;
-  color: #ffffff;
-  border: none;
-  padding: 13px 36px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+.all-drops__lazy-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.all-drops__lazy-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #000000;
+  border-radius: 50%;
+  animation: lazyDotPulse 1.2s infinite ease-in-out both;
+}
+
+.all-drops__lazy-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.all-drops__lazy-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes lazyDotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.all-drops__lazy-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.all-drops__load-more-btn:hover {
-  background: #222222;
-  transform: translateY(-1px);
-}
-
-.all-drops__pagination-progress {
-  font-size: 0.82rem;
-  font-weight: 500;
   color: #777777;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
 }
 
 /* ==========================================================================

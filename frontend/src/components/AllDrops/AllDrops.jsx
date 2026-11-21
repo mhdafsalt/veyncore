@@ -216,8 +216,10 @@ export default function AllDrops() {
   const [desktopColumns, setDesktopColumns] = useState('4'); // '4' or '2' for desktop
   const [mobileColumns, setMobileColumns] = useState('2'); // '2' or '1' for mobile
   const [displayCount, setDisplayCount] = useState(16);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const dropdownRef = useRef(null);
+  const sentinelRef = useRef(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -319,6 +321,45 @@ export default function AllDrops() {
 
   const visibleProducts = filteredProducts.slice(0, displayCount);
   const remainingCount = filteredProducts.length - visibleProducts.length;
+
+  // Reset display count when any filter changes
+  useEffect(() => {
+    setDisplayCount(16);
+  }, [selectedAvailability, minPrice, maxPrice, sortBy]);
+
+  // Automated Infinite Scroll / Lazy Loading via IntersectionObserver
+  useEffect(() => {
+    if (displayCount >= filteredProducts.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry && firstEntry.isIntersecting && !isLoadingMore) {
+          setIsLoadingMore(true);
+          setTimeout(() => {
+            setDisplayCount((prev) => Math.min(prev + 8, filteredProducts.length));
+            setIsLoadingMore(false);
+          }, 250);
+        }
+      },
+      {
+        root: null,
+        rootMargin: '250px',
+        threshold: 0.05
+      }
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [displayCount, filteredProducts.length, isLoadingMore]);
 
   const currentSortLabel =
     SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || 'Date, new to old';
@@ -675,19 +716,15 @@ export default function AllDrops() {
           </div>
         )}
 
-        {/* Load More Pagination */}
-        {remainingCount > 0 && (
-          <div className="all-drops__pagination">
-            <button
-              type="button"
-              className="all-drops__load-more-btn"
-              onClick={() => setDisplayCount((prev) => prev + 16)}
-            >
-              LOAD MORE ({remainingCount} REMAINING)
-            </button>
-            <span className="all-drops__pagination-progress">
-              Showing {visibleProducts.length} of {filteredProducts.length} products
-            </span>
+        {/* Automated Lazy Loading Sentinel (Infinite Scroll) */}
+        {displayCount < filteredProducts.length && (
+          <div ref={sentinelRef} className="all-drops__lazy-loader" aria-live="polite">
+            <div className="all-drops__lazy-dots">
+              <span className="all-drops__lazy-dot" />
+              <span className="all-drops__lazy-dot" />
+              <span className="all-drops__lazy-dot" />
+            </div>
+            <span className="all-drops__lazy-text">Loading more drops...</span>
           </div>
         )}
       </div>
