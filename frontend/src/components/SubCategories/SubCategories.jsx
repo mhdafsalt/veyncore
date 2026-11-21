@@ -6,8 +6,8 @@ import './SubCategories.css';
 const SELECTS_SUBCATEGORIES = [
   { id: 'home', label: 'HOME', href: '#home', hasDropdown: false },
   { id: 'flash-sale', label: 'FLASH SALE⚡️', href: '#flash-sale', isGlow: true, hasDropdown: false },
-  { id: 'new-drops', label: 'NEW DROPS', href: '#new-drops', isGlow: true, hasDropdown: false },
-  { id: 'all-drops', label: 'ALL DROPS', href: '#all-drops', hasDropdown: false },
+  { id: 'new-drops', label: 'NEW DROPS', href: '/collections/all-drops', isGlow: true, hasDropdown: false },
+  { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops', hasDropdown: false },
   {
     id: 'denims',
     label: 'DENIMS',

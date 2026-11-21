@@ -1,6 +1,5 @@
 import React from 'react';
-import AnnouncementBar from '@/components/AnnouncementBar/AnnouncementBar';
-import Navbar from '@/components/Navbar/Navbar';
+import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import ProductDetail from '@/components/ProductDetail/ProductDetail';
 import { getProductByHandle, getAllProductHandles } from '@/data/productsData';
@@ -51,16 +50,13 @@ export default async function ProductDetailPage({ params }) {
 
   return (
     <main className="product-page-wrapper">
-      {/* 1. Announcement Bar */}
-      <AnnouncementBar />
+      {/* 1. Header with AnnouncementBar, Navbar, MainCategories & SubCategories */}
+      <StoreHeader initialCategory={product.category || 'VEYN-SELECTS'} />
 
-      {/* 2. Primary Navigation */}
-      <Navbar activeMainCategory="VEYN-SELECTS" />
-
-      {/* 3. Product Details Component */}
+      {/* 2. Product Details Component */}
       <ProductDetail product={product} />
 
-      {/* 4. Modern VEYNCORE Footer */}
+      {/* 3. Modern VEYNCORE Footer */}
       <Footer />
     </main>
   );

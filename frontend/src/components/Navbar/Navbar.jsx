@@ -481,11 +481,11 @@ export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCa
 
             <li className="navbar__drawer-item">
               <Link
-                href="#new-drops"
+                href="/collections/all-drops"
                 className="navbar__drawer-link navbar__drawer-link--highlight"
                 onClick={() => setIsMenuOpen(false)}
               >
-                NEW DROPS
+                ALL DROPS ⚡️
               </Link>
             </li>
 

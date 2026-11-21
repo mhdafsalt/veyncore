@@ -6,6 +6,7 @@
 
 import { CATEGORY_FITS_DATA } from './categoryFitsData';
 import { NEW_ARRIVALS_PRODUCTS } from './newArrivalsData';
+import { ALL_DROPS_PRODUCTS } from './allDropsData';
 
 export const DEFAULT_MEASUREMENTS = {
   inches: [
@@ -247,7 +248,35 @@ export function getProductByHandle(handle) {
     };
   }
 
-  // 4. Fallback to vexo-blue-baggy
+  // 4. Check in ALL DROPS collection data
+  const dropProduct = ALL_DROPS_PRODUCTS.find(
+    (item) => item.handle === normalizedHandle || item.id === normalizedHandle
+  );
+  if (dropProduct) {
+    return {
+      id: dropProduct.id,
+      title: dropProduct.title,
+      handle: dropProduct.handle || dropProduct.id,
+      fit: dropProduct.fit ? `${dropProduct.fit.toUpperCase()} FIT` : 'WIDE FIT',
+      category: 'VEYN-SELECTS',
+      badge: dropProduct.badge || 'NEW',
+      price: dropProduct.price || 1149,
+      comparePrice: dropProduct.comparePrice || 1599,
+      salePrice: dropProduct.salePrice || `Rs. ${dropProduct.price || 1149}.00`,
+      regularPrice: dropProduct.regularPrice || `Rs. ${dropProduct.comparePrice || 1599}.00`,
+      discount: dropProduct.discount || 'Save 28%',
+      defaultSize: dropProduct.availableSizes?.[0] || '30',
+      availableSizes: dropProduct.availableSizes || ['28', '30', '32', '34'],
+      images: dropProduct.images && dropProduct.images.length > 0 ? dropProduct.images : ['https://blurgvillage.com/cdn/shop/files/WEBP_File_6930.webp?v=1795179025&width=1200'],
+      measurements: DEFAULT_MEASUREMENTS,
+      details: DEFAULT_DETAILS,
+      shipping: DEFAULT_SHIPPING,
+      selectStory: DEFAULT_SELECT_STORY,
+      relatedHandles: ['vexo-blue-baggy', 'tinted-blue-wide', 'nid-blue-wide', 'coal-blue-baggy']
+    };
+  }
+
+  // 5. Fallback to vexo-blue-baggy
   return PRODUCTS_DATA['vexo-blue-baggy'];
 }
 
@@ -264,6 +293,10 @@ export function getAllProductHandles() {
   }
 
   NEW_ARRIVALS_PRODUCTS.forEach((item) => {
+    if (item.handle) handles.add(item.handle);
+  });
+
+  ALL_DROPS_PRODUCTS.forEach((item) => {
     if (item.handle) handles.add(item.handle);
   });
 

@@ -1,0 +1,25 @@
+import React from 'react';
+import StoreHeader from '@/components/StoreHeader/StoreHeader';
+import Footer from '@/components/Footer/Footer';
+import AllDrops from '@/components/AllDrops/AllDrops';
+
+export const metadata = {
+  title: 'ALL COLLECTIONS | VEYNCORE - Contemporary Raw Denim & Streetwear',
+  description:
+    'Explore all exclusive denim drops by VEYNCORE. Structured silhouettes, baggy jeans, semi bootcut cuts, and premium streetwear denim craftsmanship.'
+};
+
+export default function AllCollectionsPage() {
+  return (
+    <main className="all-drops-page">
+      {/* 1. Header with AnnouncementBar, Navbar, MainCategories & SubCategories */}
+      <StoreHeader initialCategory="VEYN-OBJECTS" />
+
+      {/* 2. Collection View */}
+      <AllDrops />
+
+      {/* 3. Footer */}
+      <Footer />
+    </main>
+  );
+}
