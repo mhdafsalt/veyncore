@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import './Navbar.css';
@@ -44,6 +45,8 @@ const SEARCH_PRODUCTS = [
 ];
 
 export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCategory }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { openCart, totalCount } = useCart();
   const { user, isAuthenticated, openAuthModal } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -144,6 +147,20 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
       onSelectCategory(categoryName);
     }
     setIsMenuOpen(false);
+
+    if (categoryName === 'VEYN-OBJECTS') {
+      if (pathname !== '/veyn-objects') {
+        router.push('/veyn-objects');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else if (categoryName === 'VEYN-SELECTS') {
+      if (pathname !== '/') {
+        router.push('/');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
   };
 
   const filteredProducts = searchQuery.trim()
@@ -397,7 +414,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               >
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#denims"
+                    href="/#denims"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -406,7 +423,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#cargo"
+                    href="/#cargo"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -415,7 +432,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#baggy"
+                    href="/#baggy"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -424,7 +441,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#bootcut"
+                    href="/#bootcut"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -433,7 +450,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#wide"
+                    href="/#wide"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -442,7 +459,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#straight"
+                    href="/#straight"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -451,7 +468,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#tops"
+                    href="/#tops"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -460,7 +477,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#accessories"
+                    href="/#accessories"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -508,7 +525,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               >
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#bags"
+                    href="/veyn-objects#bags"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -517,7 +534,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#chains"
+                    href="/veyn-objects#chains"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -526,56 +543,29 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#belts"
+                    href="/veyn-objects#headwear"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    BELTS
+                    HEADWEAR & CAPS
                   </Link>
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#jewelry"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    JEWELRY
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="#wallets"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    WALLETS
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="#headwear"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    HEADWEAR
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="#eyewear"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    EYEWEAR
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="#hardware"
+                    href="/veyn-objects#hardware"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     HARDWARE
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="/collections/all-drops"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    VIEW ALL DROPS
                   </Link>
                 </li>
               </ul>

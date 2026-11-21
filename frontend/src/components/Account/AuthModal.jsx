@@ -229,6 +229,9 @@ export default function AuthModal() {
       aria-labelledby="auth-modal-title"
     >
       <div className="auth-modal__container" ref={modalRef}>
+        {/* Mobile top pull handle matching Image 2 */}
+        <div className="auth-modal__handle" />
+
         {/* Close Button */}
         <button
           type="button"
@@ -236,7 +239,7 @@ export default function AuthModal() {
           onClick={closeAuthModal}
           aria-label="Close authentication modal"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>

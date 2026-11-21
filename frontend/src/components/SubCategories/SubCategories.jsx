@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import './SubCategories.css';
 
 const SELECTS_SUBCATEGORIES = [
@@ -23,15 +24,14 @@ const OBJECTS_SUBCATEGORIES = [
   { id: 'obj-drops', label: 'OBJECT DROPS ⚡️', href: '#object-drops', isGlow: true },
   { id: 'bags', label: 'BAGS', href: '#bags' },
   { id: 'chains', label: 'CHAINS', href: '#chains' },
-  { id: 'belts', label: 'BELTS', href: '#belts' },
-  { id: 'jewelry', label: 'JEWELRY', href: '#jewelry' },
-  { id: 'wallets', label: 'WALLETS', href: '#wallets' },
-  { id: 'headwear', label: 'HEADWEAR', href: '#headwear' },
-  { id: 'eyewear', label: 'EYEWEAR', href: '#eyewear' },
-  { id: 'hardware', label: 'HARDWARE', href: '#hardware' }
+  { id: 'headwear', label: 'CAPS & HEADWEAR', href: '#headwear' },
+  { id: 'hardware', label: 'HARDWARE', href: '#hardware' },
+  { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops' }
 ];
 
 export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [activeSubId, setActiveSubId] = useState('home');
   const containerRef = useRef(null);
   const activeTabRef = useRef(null);
@@ -70,6 +70,35 @@ export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
 
   const handleTabClick = (e, item) => {
     setActiveSubId(item.id);
+
+    if (item.href.startsWith('#')) {
+      const hash = item.href.slice(1);
+      const isObjects = activeMainCategory === 'VEYN-OBJECTS';
+
+      if (isObjects) {
+        if (pathname === '/veyn-objects') {
+          const target = document.getElementById(hash);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else {
+          e.preventDefault();
+          router.push(`/veyn-objects#${hash}`);
+        }
+      } else {
+        if (pathname === '/') {
+          const target = document.getElementById(hash);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else {
+          e.preventDefault();
+          router.push(`/#${hash}`);
+        }
+      }
+    }
   };
 
   return (

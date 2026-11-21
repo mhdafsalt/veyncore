@@ -8,6 +8,7 @@ import SubCategories from '@/components/SubCategories/SubCategories';
 import HeroSection from '@/components/HeroSection/HeroSection';
 import NewArrivals from '@/components/NewArrivals/NewArrivals';
 import CategoryFits from '@/components/CategoryFits/CategoryFits';
+import VeynObjects from '@/components/VeynObjects/VeynObjects';
 import Footer from '@/components/Footer/Footer';
 import VeyncoreLoader from '@/components/VeyncoreLoader/VeyncoreLoader';
 
@@ -44,14 +45,21 @@ export default function HomePage() {
         {/* 4. SubCategories (Permanently Sticky directly below Navbar) */}
         <SubCategories activeMainCategory={activeCategory} />
 
-        {/* 5. Hero Section (3-box seamless auto/manual carousel) */}
-        <HeroSection />
+        {/* 5. Dynamic Content: VEYN-SELECTS vs VEYN-OBJECTS */}
+        {activeCategory === 'VEYN-OBJECTS' ? (
+          <VeynObjects />
+        ) : (
+          <>
+            {/* Hero Section (3-box seamless auto/manual carousel) */}
+            <HeroSection />
 
-        {/* 6. Shop New Arrivals (Responsive 4-col/2-col grid with veyncult styling) */}
-        <NewArrivals />
+            {/* Shop New Arrivals (Responsive 4-col/2-col grid with veyncult styling) */}
+            <NewArrivals />
 
-        {/* 7. Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
-        <CategoryFits />
+            {/* Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
+            <CategoryFits />
+          </>
+        )}
 
         {/* 8. Modern VEYNCORE Footer with Editorial Image Banner on Homepage */}
         <Footer showBanner={true} />

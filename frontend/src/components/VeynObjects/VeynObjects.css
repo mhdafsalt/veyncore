@@ -1,0 +1,11 @@
+/* ==========================================================================
+   Veyn Objects Home View Wrapper
+   ========================================================================== */
+
+.veyn-objects-home {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,575 @@
+/* ==========================================================================
+   Objects Category Drops - Swipeable Product Rows for VEYN-OBJECTS
+   Categories: BAGS & UTILITY, CHAINS & HARDWARE, CAPS & HEADWEAR
+   Humanized Semantic Classnames (Strictly No Tailwind / No TypeScript)
+   ========================================================================== */
+
+.objects-cat-drops {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 16px 0 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+.objects-cat-drops__container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Individual Category Row Section
+   -------------------------------------------------------------------------- */
+.objects-cat-drops__row {
+  margin-bottom: 36px;
+  position: relative;
+}
+
+.objects-cat-drops__row:last-child {
+  margin-bottom: 0;
+}
+
+/* Row Header */
+.objects-cat-drops__row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding: 0 2px;
+}
+
+.objects-cat-drops__row-heading {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #000000;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.objects-cat-drops__row-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: none;
+  transition: opacity 0.18s ease;
+}
+
+.objects-cat-drops__row-header-link:hover {
+  color: #000000;
+  opacity: 0.65;
+}
+
+.objects-cat-drops__row-header-link svg {
+  transition: transform 0.2s ease;
+}
+
+.objects-cat-drops__row-header-link:hover svg {
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   Slider Container & Track (Horizontal Swipeable Row)
+   -------------------------------------------------------------------------- */
+.objects-cat-drops__slider-container {
+  position: relative;
+  width: 100%;
+}
+
+.objects-cat-drops__slider-track {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 0 8px;
+  cursor: grab;
+}
+
+.objects-cat-drops__slider-track:active {
+  cursor: grabbing;
+}
+
+.objects-cat-drops__slider-track::-webkit-scrollbar {
+  display: none;
+}
+
+.objects-cat-drops__slider-item {
+  flex: 0 0 calc((100% - (3 * 12px)) / 4);
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+.objects-cat-drops__slider-item--view-all {
+  display: flex;
+}
+
+/* --------------------------------------------------------------------------
+   Row Navigation Arrows (Floating Prev / Next)
+   -------------------------------------------------------------------------- */
+.objects-cat-drops__nav-button {
+  position: absolute;
+  top: 42%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  opacity: 0.95;
+}
+
+.objects-cat-drops__nav-button:hover:not(:disabled) {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
+.objects-cat-drops__nav-button--prev {
+  left: -12px;
+}
+
+.objects-cat-drops__nav-button--next {
+  right: -12px;
+}
+
+.objects-cat-drops__nav-button--disabled {
+  opacity: 0 !important;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* --------------------------------------------------------------------------
+   Individual Object Product Card
+   -------------------------------------------------------------------------- */
+.obj-drop-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.obj-drop-card__gallery {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: #f6f6f6;
+  overflow: hidden;
+  user-select: none;
+}
+
+.obj-drop-card__link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.obj-drop-card__image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.obj-drop-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.obj-drop-card:hover .obj-drop-card__image {
+  transform: scale(1.035);
+}
+
+.obj-drop-card__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 7px;
+  border-radius: 2px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Quick Add Button / Docked Size Drawer */
+.obj-drop-card__quick-add {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.obj-drop-card__choose-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 18px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 9999px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s ease, background-color 0.18s ease;
+  pointer-events: auto;
+}
+
+.obj-drop-card:hover .obj-drop-card__choose-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.obj-drop-card__choose-button:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.obj-drop-card__choose-button--added {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+.obj-drop-card__choose-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+/* In-Card Size Drawer (Desktop) */
+.obj-drop-card__quick-add--open {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: auto;
+}
+
+.obj-drop-card__size-drawer {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 10px 12px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  animation: objDrawerSlideUp 0.22s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes objDrawerSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.obj-drop-card__size-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.obj-drop-card__size-label {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #000000;
+}
+
+.obj-drop-card__size-close {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #666666;
+  cursor: pointer;
+  padding: 0;
+}
+
+.obj-drop-card__size-close:hover {
+  color: #000000;
+}
+
+.obj-drop-card__size-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.obj-drop-card__size-button {
+  flex: 1;
+  min-width: 38px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  font-weight: 600;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.obj-drop-card__size-button:hover {
+  border-color: #000000;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Card Details (Title & Price) */
+.obj-drop-card__details {
+  padding: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.obj-drop-card__title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.obj-drop-card__title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.obj-drop-card__title-link:hover .obj-drop-card__title {
+  color: #555555;
+}
+
+.obj-drop-card__pricing {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.obj-drop-card__sale-price {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e02424;
+  letter-spacing: -0.01em;
+}
+
+.obj-drop-card__regular-price {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
+  font-weight: 400;
+  color: #888888;
+  text-decoration: line-through;
+}
+
+/* End-of-Row "View" Card */
+.obj-drop-card--view-all {
+  height: 100%;
+}
+
+.obj-drop-card__view-all-link {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.obj-drop-card__view-all-box {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: #f6f6f6;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.obj-drop-card__view-all-box:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.obj-drop-card__view-all-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: inherit;
+}
+
+.obj-drop-card__view-all-arrow {
+  transition: transform 0.2s ease;
+}
+
+.obj-drop-card__view-all-box:hover .obj-drop-card__view-all-arrow {
+  transform: translateX(4px);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Adaptations
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 1024px) {
+  .objects-cat-drops__slider-item {
+    flex: 0 0 calc((100% - (2 * 10px)) / 3);
+  }
+  .objects-cat-drops__slider-track {
+    gap: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .objects-cat-drops {
+    padding: 12px 0 32px;
+  }
+
+  .objects-cat-drops__container {
+    padding: 0 12px;
+  }
+
+  .objects-cat-drops__row {
+    margin-bottom: 28px;
+  }
+
+  .objects-cat-drops__row-heading {
+    font-size: 14.5px;
+  }
+
+  .objects-cat-drops__slider-track {
+    gap: 8px;
+  }
+
+  .objects-cat-drops__slider-item {
+    flex: 0 0 calc((100% - 8px) / 2);
+  }
+
+  /* Floating arrows on mobile hidden (swipe with finger) */
+  .objects-cat-drops__nav-button {
+    display: none;
+  }
+
+  /* Circular Quick-Add button on mobile matching Reference Image 2 */
+  .obj-drop-card__quick-add {
+    bottom: 8px;
+    right: 8px;
+    left: auto;
+    width: auto;
+    pointer-events: auto;
+  }
+
+  .obj-drop-card__choose-button {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    padding: 0;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    background-color: #ffffff;
+    border: none;
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .obj-drop-card__choose-button span {
+    display: none;
+  }
+
+  .obj-drop-card__choose-icon {
+    width: 17px;
+    height: 17px;
+    color: #000000;
+  }
+
+  .obj-drop-card__choose-button:hover,
+  .obj-drop-card__choose-button:active {
+    background-color: #ffffff;
+    border: none;
+    color: #000000;
+    transform: scale(1.06);
+  }
+
+  .obj-drop-card__title {
+    font-size: 11.5px;
+  }
+
+  .obj-drop-card__sale-price {
+    font-size: 12px;
+  }
+
+  .obj-drop-card__regular-price {
+    font-size: 11px;
+  }
+}
