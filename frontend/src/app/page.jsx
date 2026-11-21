@@ -12,7 +12,7 @@ import Footer from '@/components/Footer/Footer';
 import VeyncoreLoader from '@/components/VeyncoreLoader/VeyncoreLoader';
 
 export default function HomePage() {
-  const [activeCategory, setActiveCategory] = useState('VEYN-OBJECTS');
+  const [activeCategory, setActiveCategory] = useState('VEYN-SELECTS');
   const [isLoading, setIsLoading] = useState(true);
 
   return (

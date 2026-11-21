@@ -13,7 +13,7 @@ export default function AllCollectionsPage() {
   return (
     <main className="all-drops-page">
       {/* 1. Header with AnnouncementBar, Navbar, MainCategories & SubCategories */}
-      <StoreHeader initialCategory="VEYN-OBJECTS" />
+      <StoreHeader initialCategory="VEYN-SELECTS" />
 
       {/* 2. Collection View */}
       <AllDrops />

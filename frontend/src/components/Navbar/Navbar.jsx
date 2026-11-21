@@ -43,7 +43,7 @@ const SEARCH_PRODUCTS = [
   }
 ];
 
-export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCategory }) {
+export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCategory }) {
   const { openCart, totalCount } = useCart();
   const { user, isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -464,6 +464,117 @@ export default function Navbar({ activeMainCategory = 'VEYN-OBJECTS', onSelectCa
                     onClick={() => setIsMenuOpen(false)}
                   >
                     ACCESSORIES
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
+            {/* Accordion: OBJECTS (Bags, Chains, Belts, Jewelry, etc.) */}
+            <li className="navbar__drawer-item navbar__drawer-item--accordion">
+              <button
+                type="button"
+                className="navbar__drawer-accordion-header"
+                onClick={() => toggleSubmenu('objects')}
+                aria-expanded={openSubmenu === 'objects'}
+              >
+                <span>OBJECTS</span>
+                <svg
+                  className={`navbar__drawer-chevron ${
+                    openSubmenu === 'objects'
+                      ? 'navbar__drawer-chevron--rotated'
+                      : ''
+                  }`}
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                >
+                  <path
+                    d="M1 1L5 5L9 1"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <ul
+                className={`navbar__drawer-submenu ${
+                  openSubmenu === 'objects'
+                    ? 'navbar__drawer-submenu--open'
+                    : ''
+                }`}
+              >
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#bags"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    BAGS
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#chains"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    CHAINS
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#belts"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    BELTS
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#jewelry"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    JEWELRY
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#wallets"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    WALLETS
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#headwear"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    HEADWEAR
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#eyewear"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    EYEWEAR
+                  </Link>
+                </li>
+                <li className="navbar__drawer-subitem">
+                  <Link
+                    href="#hardware"
+                    className="navbar__drawer-sublink"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    HARDWARE
                   </Link>
                 </li>
               </ul>

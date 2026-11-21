@@ -8,7 +8,7 @@ const CATEGORIES = [
   { id: 'VEYN-OBJECTS', label: 'VEYN-OBJECTS', href: '#VEYN-OBJECTS' }
 ];
 
-export default function MainCategories({ activeCategory = 'VEYN-OBJECTS', onSelectCategory }) {
+export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSelectCategory }) {
   const handleClick = (e, catId) => {
     e.preventDefault();
     if (onSelectCategory) {

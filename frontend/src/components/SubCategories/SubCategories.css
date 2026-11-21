@@ -1,28 +1,19 @@
-/* SubCategories Styles - Exact Reference Replication with Proper Z-Index */
+/* SubCategories Styles - Pure Minimal Tabs (No Dropdowns) */
 
 .subcategories {
   width: 100%;
   background-color: #ffffff;
   position: sticky;
   top: var(--navbar-height, 56px);
-  z-index: 90; /* Sticky below Navbar (z-index: 100) and above MainCategories & content */
+  z-index: 90; /* Sticky below Navbar (z-index: 100) and above content */
   border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
-  overflow: visible;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 768px) {
   .subcategories {
     top: var(--navbar-height-mobile, 50px);
   }
-}
-
-/* Elevate z-index to 1000 whenever a dropdown is open or hovered */
-.subcategories--open,
-.subcategories:hover,
-.subcategories:has(.subcategories__dropdown--open) {
-  z-index: 1000;
 }
 
 .subcategories__wrap {
@@ -32,7 +23,6 @@
   padding: 0 16px;
   box-sizing: border-box;
   position: relative;
-  overflow: visible; /* Never clip dropdown menus */
 }
 
 .subcategories__list {
@@ -40,37 +30,29 @@
   align-items: stretch;
   width: 100%;
   gap: 0;
-  overflow: visible; /* CRITICAL FIX: visible on desktop so dropdowns are not clipped */
   box-sizing: border-box;
 }
 
-/* Individual Tab Item */
+/* Individual Tab Item - Even Distribution Across Desktop */
 .subcategories__item {
   flex: 1 1 0%;
   min-width: 0;
   position: relative;
   display: flex;
   align-items: stretch;
+  justify-content: center;
   box-sizing: border-box;
-  z-index: 1;
-}
-
-/* When hovered or opened, elevate above sibling tabs */
-.subcategories__item:hover,
-.subcategories__item--open {
-  z-index: 1001;
+  text-align: center;
 }
 
 .subcategories__link {
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   background: none;
   border: none;
-  border-bottom: 1px solid transparent;
-  margin-bottom: -1px;
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 12px;
+  padding: 10px 4px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11.5px;
   font-weight: 500;
   line-height: 1.4;
   color: #6b7280;
@@ -80,10 +62,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.2s ease;
   position: relative;
-  overflow: hidden;
   box-sizing: border-box;
   user-select: none;
 }
@@ -91,6 +71,7 @@
 .subcategories__label {
   position: relative;
   z-index: 2;
+  letter-spacing: 0.04em;
 }
 
 /* Hover state */
@@ -98,17 +79,20 @@
   color: #000000;
 }
 
-/* Active tab */
+/* Active tab state */
 .subcategories__link--active {
   color: #000000;
   font-weight: 600;
 }
 
+/* Centered underline indicator */
 .subcategories__link--active::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 12px);
+  max-width: 56px;
   bottom: 0;
   height: 2px;
   background: #000000;
@@ -116,21 +100,9 @@
   z-index: 3;
 }
 
-/* Chevron indicator for dropdowns */
-.subcategories__chevron {
-  display: inline-block;
-  transition: transform 0.2s ease;
-  position: relative;
-  z-index: 2;
-}
-
-.subcategories__chevron--rotated {
-  transform: rotate(180deg);
-}
-
 /* =========================================================
    Shimmer Sweep Glow Animation for Promotional Tabs
-   (e.g., FLASH SALE⚡️ and NEW DROPS)
+   (e.g., FLASH SALE⚡️ and NEW DROPS / OBJECT DROPS ⚡️)
    ========================================================= */
 
 @keyframes subcategories-glow-sweep {
@@ -145,8 +117,8 @@
 .subcategories__link--glow {
   position: relative;
   isolation: isolate;
-  color: #000000;
-  font-weight: 600;
+  color: #374151;
+  font-weight: 500;
 }
 
 .subcategories__link--glow::before {
@@ -165,170 +137,25 @@
   z-index: 1;
 }
 
-/* When glowing tab is active */
-.subcategories__item--glow .subcategories__link--active {
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.08);
-}
-
-/* =========================================================
-   Dropdown System (Desktop)
-   ========================================================= */
-
-.subcategories__dropdown {
-  position: absolute;
-  top: calc(100% + 1px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background-color: #ffffff;
-  min-width: 190px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 6px 0;
-  z-index: 1002; /* Float firmly above everything */
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-}
-
-.subcategories__dropdown--open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* Align to right for items near right edge so dropdown doesn't clip off screen */
-.subcategories__dropdown--align-right {
-  left: auto;
-  right: 0;
-  transform: translateX(0) translateY(4px);
-}
-
-.subcategories__dropdown--align-right.subcategories__dropdown--open {
-  transform: translateX(0) translateY(0);
-}
-
-.subcategories__dropdown-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.subcategories__dropdown-item {
-  margin: 0;
-}
-
-.subcategories__dropdown-link {
-  display: block;
-  padding: 9px 18px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #374151;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.subcategories__dropdown-link:hover {
-  background-color: #f3f4f6;
+.subcategories__link--glow:hover {
   color: #000000;
 }
 
-/* =========================================================
-   Mobile / Tablet Subcategories Dropdown Panel
-   (Appears below category bar to prevent scroll clipping)
-   ========================================================= */
-
-.subcategories__mobile-panel {
-  display: none;
-  width: 100%;
-  background-color: #f9fafb;
-  border-top: 1px solid #e5e7eb;
-  padding: 10px 16px;
-  box-sizing: border-box;
-  position: relative;
-  z-index: 999;
-  animation: subcategories-panel-slide 0.2s ease;
-}
-
-@keyframes subcategories-panel-slide {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.subcategories__mobile-panel-inner {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.subcategories__mobile-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.subcategories__mobile-panel-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #6b7280;
-  text-transform: uppercase;
-}
-
-.subcategories__mobile-panel-close {
-  background: none;
-  border: none;
-  font-size: 14px;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 2px 6px;
-}
-
-.subcategories__mobile-panel-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.subcategories__mobile-panel-chip {
-  display: inline-block;
-  padding: 6px 12px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #111827;
-  text-decoration: none;
-  transition: all 0.15s ease;
-}
-
-.subcategories__mobile-panel-chip:hover,
-.subcategories__mobile-panel-chip:active {
-  background-color: #000000;
-  color: #ffffff;
-  border-color: #000000;
+/* When glowing tab is active */
+.subcategories__item--glow .subcategories__link--active {
+  color: #000000;
+  font-weight: 600;
 }
 
 /* =========================================================
-   Responsive Design (Tablet & Mobile)
+   Responsive Design (Tablet & Mobile Horizontal Scrolling)
    ========================================================= */
 
-@media (max-width: 1024px) {
+@media (max-width: 1080px) {
   .subcategories__wrap {
     padding: 0 12px;
   }
 
-  /* On tablet/mobile, enable horizontal scrolling for the tab list */
   .subcategories__list {
     overflow-x: auto;
     overflow-y: hidden;
@@ -348,17 +175,14 @@
   }
 
   .subcategories__link {
-    padding: 8px 14px;
+    width: auto;
+    padding: 9px 14px;
     font-size: 12px;
   }
 
-  /* Hide floating dropdown on touch/mobile to prevent overflow clipping; use mobile panel instead */
-  .subcategories__dropdown {
-    display: none !important;
-  }
-
-  .subcategories__mobile-panel {
-    display: block;
+  .subcategories__link--active::after {
+    width: calc(100% - 16px);
+    max-width: none;
   }
 }
 
@@ -367,14 +191,8 @@
     padding: 0 8px;
   }
 
-  .subcategories__item {
-    flex: 0 0 auto;
-    min-width: max-content;
-  }
-
   .subcategories__link {
-    font-size: 12px;
+    font-size: 11.5px;
     padding: 8px 12px;
-    gap: 4px;
   }
 }
