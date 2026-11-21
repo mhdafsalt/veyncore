@@ -148,17 +148,19 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
     }
     setIsMenuOpen(false);
 
-    if (categoryName === 'VEYN-OBJECTS') {
-      if (pathname !== '/veyn-objects') {
+    const isStorefront = pathname === '/' || pathname === '/veyn-objects';
+
+    if (isStorefront) {
+      const targetUrl = categoryName === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
+      if (typeof window !== 'undefined' && window.location.pathname !== targetUrl) {
+        window.history.replaceState(null, '', targetUrl);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      if (categoryName === 'VEYN-OBJECTS') {
         router.push('/veyn-objects');
       } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else if (categoryName === 'VEYN-SELECTS') {
-      if (pathname !== '/') {
         router.push('/');
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   };

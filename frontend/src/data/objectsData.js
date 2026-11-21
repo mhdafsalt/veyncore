@@ -37,7 +37,7 @@ export const OBJECTS_PRODUCTS = [
     regularPrice: 'Rs. 1,999.00',
     discount: 'Save 25%',
     availableSizes: ['50CM', '55CM', '60CM'],
-    images: ['/images/hero/hero-card-3.jpg', '/images/products/obg02.jpg'],
+    images: ['/images/hero/ObjectHero03.jpg', '/images/products/obg02.jpg'],
     description: 'Solid surgical-grade 316L stainless steel curb link chain with custom industrial clasp. Scratch-resistant, hypoallergenic, water-proof.'
   },
   {
@@ -112,7 +112,7 @@ export const OBJECTS_PRODUCTS = [
     regularPrice: 'Rs. 2,799.00',
     discount: 'Save 21%',
     availableSizes: ['ONE SIZE'],
-    images: ['/images/hero/hero-card-2.jpg'],
+    images: ['/images/hero/ObjectHero03.jpg'],
     description: 'Constructed from 1000D ballistic nylon with matte black zinc alloy carabiners, multi-pocket modular compartments, and adjustable seatbelt webbing strap.'
   }
 ];
@@ -171,7 +171,7 @@ export const OBJECTS_CATEGORY_DATA = {
       salePrice: 'Rs. 2,199.00',
       regularPrice: 'Rs. 2,799.00',
       availableSizes: ['ONE SIZE'],
-      images: ['/images/hero/hero-card-2.jpg']
+      images: ['/images/hero/ObjectHero03.jpg']
     },
     {
       id: 'cat-bag-4',
@@ -204,7 +204,7 @@ export const OBJECTS_CATEGORY_DATA = {
       salePrice: 'Rs. 1,999.00',
       regularPrice: 'Rs. 2,599.00',
       availableSizes: ['ONE SIZE'],
-      images: ['/images/hero/hero-card-2.jpg']
+      images: ['/images/hero/ObjectHero03.jpg']
     }
   ],
   chains: [
@@ -217,7 +217,7 @@ export const OBJECTS_CATEGORY_DATA = {
       salePrice: 'Rs. 1,499.00',
       regularPrice: 'Rs. 1,999.00',
       availableSizes: ['50CM', '55CM', '60CM'],
-      images: ['/images/hero/hero-card-3.jpg']
+      images: ['/images/hero/ObjectHero03.jpg']
     },
     {
       id: 'cat-chain-2',
@@ -239,7 +239,7 @@ export const OBJECTS_CATEGORY_DATA = {
       salePrice: 'Rs. 1,599.00',
       regularPrice: 'Rs. 2,099.00',
       availableSizes: ['50CM', '55CM', '60CM'],
-      images: ['/images/hero/hero-card-3.jpg']
+      images: ['/images/hero/ObjectHero03.jpg']
     },
     {
       id: 'cat-chain-4',
@@ -261,7 +261,7 @@ export const OBJECTS_CATEGORY_DATA = {
       salePrice: 'Rs. 1,399.00',
       regularPrice: 'Rs. 1,799.00',
       availableSizes: ['45CM', '50CM'],
-      images: ['/images/hero/hero-card-3.jpg']
+      images: ['/images/hero/ObjectHero03.jpg']
     },
     {
       id: 'cat-chain-6',

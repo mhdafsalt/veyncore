@@ -40,21 +40,23 @@
   width: 100%;
   text-align: center;
   padding: 11px 24px;
-  text-decoration: none;
+  background-color: transparent;
+  border: none;
+  outline: none;
   color: #6b7280;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 13.5px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: color 0.25s ease;
-  background-color: transparent;
+  transition: color 0.18s ease;
   position: relative;
   box-sizing: border-box;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Tasteful Centered Active / Hover Underline matching the text width */
+/* Base underline element (width 0 by default) */
 .main-categories__link::after {
   content: '';
   position: absolute;
@@ -64,26 +66,28 @@
   width: 0;
   max-width: 120px;
   height: 2px;
-  background-color: #000000;
+  background-color: transparent;
   border-radius: 2px 2px 0 0;
-  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease;
 }
 
-.main-categories__link:hover {
-  color: #000000;
+/* Hover: subtle color darkening only on desktop devices with real mouse pointer.
+   NEVER draw an underline on hover so two underlines never appear simultaneously! */
+@media (hover: hover) and (pointer: fine) {
+  .main-categories__link:hover:not(.main-categories__link--active) {
+    color: #111111;
+  }
 }
 
-.main-categories__link:hover::after {
-  width: 110px;
-}
-
+/* Strictly ONLY the single active category gets the bold text and active black underline */
 .main-categories__link--active {
-  color: #000000;
-  font-weight: 600;
+  color: #000000 !important;
+  font-weight: 600 !important;
 }
 
 .main-categories__link--active::after {
-  width: 110px;
+  width: 110px !important;
+  background-color: #000000 !important;
 }
 
 /* Responsive Design for Laptop, Tablet, Mobile */
@@ -101,13 +105,12 @@
   }
 
   .main-categories__link {
-    padding: 9px 12px;
-    font-size: 12px;
+    padding: 10px 12px;
+    font-size: 12.5px;
     letter-spacing: 0.06em;
   }
 
-  .main-categories__link--active::after,
-  .main-categories__link:hover::after {
-    width: 90px;
+  .main-categories__link--active::after {
+    width: 90px !important;
   }
 }

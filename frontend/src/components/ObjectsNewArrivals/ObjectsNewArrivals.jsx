@@ -198,6 +198,13 @@ export default function ObjectsNewArrivals() {
             <ObjectCard key={product.id} product={product} />
           ))}
         </div>
+
+        {/* Centered Minimalist "View all" Action */}
+        <div className="objects-drops__footer">
+          <Link href="/collections/all-drops" className="objects-drops__view-all-button">
+            View all
+          </Link>
+        </div>
       </div>
     </section>
   );

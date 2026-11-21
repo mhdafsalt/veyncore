@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import './MainCategories.css';
 
@@ -9,36 +9,44 @@ const CATEGORIES = [
   { id: 'VEYN-OBJECTS', label: 'VEYN-OBJECTS', path: '/veyn-objects' }
 ];
 
-export default function MainCategories({ activeCategory, onSelectCategory }) {
+export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSelectCategory }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [selectedCat, setSelectedCat] = useState(activeCategory);
 
-  // Active category determination:
-  // If activeCategory prop is passed, use it; otherwise detect from URL pathname
-  const currentCategory = activeCategory || (
-    pathname && pathname.startsWith('/veyn-objects')
-      ? 'VEYN-OBJECTS'
-      : 'VEYN-SELECTS'
-  );
+  // Keep selectedCat synchronized with incoming activeCategory prop
+  useEffect(() => {
+    if (activeCategory) {
+      setSelectedCat(activeCategory);
+    }
+  }, [activeCategory]);
 
   const handleClick = (e, cat) => {
     e.preventDefault();
 
+    // 1. Instantly move the active indicator on click
+    setSelectedCat(cat.id);
+
+    // 2. Notify parent state handler immediately
     if (onSelectCategory) {
       onSelectCategory(cat.id);
     }
 
-    if (cat.id === 'VEYN-OBJECTS') {
-      if (pathname !== '/veyn-objects') {
+    const isStorefront = pathname === '/' || pathname === '/veyn-objects';
+
+    if (isStorefront) {
+      // Instant in-place state switch without page reload or remount
+      const newPath = cat.id === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
+      if (typeof window !== 'undefined' && window.location.pathname !== newPath) {
+        window.history.replaceState(null, '', newPath);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // From PDP or collection catalog, navigate to destination
+      if (cat.id === 'VEYN-OBJECTS') {
         router.push('/veyn-objects');
       } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else if (cat.id === 'VEYN-SELECTS') {
-      if (pathname !== '/') {
         router.push('/');
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   };
@@ -47,7 +55,7 @@ export default function MainCategories({ activeCategory, onSelectCategory }) {
     <nav className="main-categories" aria-label="Main category navigation">
       <div className="main-categories__list" role="tablist">
         {CATEGORIES.map((cat) => {
-          const isActive = currentCategory === cat.id;
+          const isActive = selectedCat === cat.id;
           return (
             <div
               key={cat.id}
@@ -56,8 +64,8 @@ export default function MainCategories({ activeCategory, onSelectCategory }) {
               }`}
               role="presentation"
             >
-              <a
-                href={cat.path}
+              <button
+                type="button"
                 className={`main-categories__link ${
                   isActive ? 'main-categories__link--active' : ''
                 }`}
@@ -66,7 +74,7 @@ export default function MainCategories({ activeCategory, onSelectCategory }) {
                 onClick={(e) => handleClick(e, cat)}
               >
                 {cat.label}
-              </a>
+              </button>
             </div>
           );
         })}

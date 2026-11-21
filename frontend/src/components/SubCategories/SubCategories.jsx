@@ -73,30 +73,15 @@ export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
 
     if (item.href.startsWith('#')) {
       const hash = item.href.slice(1);
-      const isObjects = activeMainCategory === 'VEYN-OBJECTS';
+      const target = document.getElementById(hash);
 
-      if (isObjects) {
-        if (pathname === '/veyn-objects') {
-          const target = document.getElementById(hash);
-          if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth' });
-          }
-        } else {
-          e.preventDefault();
-          router.push(`/veyn-objects#${hash}`);
-        }
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
       } else {
-        if (pathname === '/') {
-          const target = document.getElementById(hash);
-          if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth' });
-          }
-        } else {
-          e.preventDefault();
-          router.push(`/#${hash}`);
-        }
+        const isObjects = activeMainCategory === 'VEYN-OBJECTS';
+        e.preventDefault();
+        router.push(isObjects ? `/veyn-objects#${hash}` : `/#${hash}`);
       }
     }
   };
