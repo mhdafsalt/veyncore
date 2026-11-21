@@ -1,119 +1,92 @@
-/* AnnouncementBar Styles - Exact Reference Replication */
+/* AnnouncementBar Styles - Infinite Moving Ticker / Marquee */
 
 .announcement-bar {
   background-color: #000000;
   color: #ffffff;
   width: 100%;
+  overflow: hidden;
   position: relative;
   z-index: 10;
+  height: 34px;
+  display: flex;
+  align-items: center;
   box-sizing: border-box;
+  user-select: none;
 }
 
-.announcement-bar__container {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  min-height: 33px;
-  padding: 5px 16px;
+.announcement-bar__track {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  box-sizing: border-box;
+  width: max-content;
+  animation: announcement-marquee 28s linear infinite;
+  will-change: transform;
 }
 
-@media (min-width: 576px) {
-  .announcement-bar__slider {
-    width: 70%;
-    max-width: 44rem;
-  }
+/* Pause marquee when hovered on desktop for easy readability */
+.announcement-bar:hover .announcement-bar__track {
+  animation-play-state: paused;
 }
 
-.announcement-bar__slider {
-  width: 100%;
-  overflow: hidden;
-  height: 23px;
-  position: relative;
+.announcement-bar__group {
   display: flex;
   align-items: center;
-  justify-content: center;
+  flex-shrink: 0;
 }
 
-.announcement-bar__message-track {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.announcement-bar__message-track--animating {
-  opacity: 0.1;
-  transform: translateY(-4px);
-}
-
-.announcement-bar__message {
-  margin: 0;
-  padding: 0;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #ffffff;
-  text-align: center;
-  line-height: 23px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.announcement-bar__button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #ffffff;
-  opacity: 0.6;
-  padding: 4px 8px;
+.announcement-bar__item {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 2;
+  white-space: nowrap;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+  padding: 0 24px;
 }
 
-.announcement-bar__button:hover {
-  opacity: 1;
+.announcement-bar__text {
+  display: inline-block;
+  line-height: 1;
 }
 
-.announcement-bar__button--prev {
-  margin-right: 8px;
+.announcement-bar__separator {
+  display: inline-block;
+  margin-left: 24px;
+  font-size: 9px;
+  color: #888888;
+  opacity: 0.6;
 }
 
-.announcement-bar__button--next {
-  margin-left: 8px;
-}
-
-.announcement-bar__icon {
-  display: block;
+/* Seamless infinite scroll animation (-50% shifts exactly one full group) */
+@keyframes announcement-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 /* Responsive adjustments */
-@media (max-width: 575px) {
-  .announcement-bar__container {
-    padding: 5px 10px;
-    min-height: 30px;
+@media (max-width: 768px) {
+  .announcement-bar {
+    height: 30px;
   }
 
-  .announcement-bar__message {
-    font-size: 11px;
-    letter-spacing: 0.04em;
+  .announcement-bar__track {
+    animation-duration: 22s;
   }
 
-  .announcement-bar__button {
-    padding: 2px 4px;
+  .announcement-bar__item {
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    padding: 0 16px;
+  }
+
+  .announcement-bar__separator {
+    margin-left: 16px;
+    font-size: 8px;
   }
 }
