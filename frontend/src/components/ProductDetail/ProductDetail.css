@@ -404,17 +404,28 @@
   margin-bottom: 6px;
 }
 
+.product-details__pricing {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  white-space: nowrap !important;
+}
+
 .product-details__sale-price {
   font-size: 20px;
   font-weight: 700;
   color: #000000;
   letter-spacing: 0.02em;
+  white-space: nowrap !important;
 }
 
 .product-details__compare-price {
   font-size: 15px;
   color: #888888;
   text-decoration: line-through;
+  white-space: nowrap !important;
 }
 
 .product-details__discount-badge {

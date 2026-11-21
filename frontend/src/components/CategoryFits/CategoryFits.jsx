@@ -7,6 +7,11 @@ import { FIT_CATEGORIES, CATEGORY_FITS_DATA } from '@/data/categoryFitsData';
 import './CategoryFits.css';
 
 /**
+ * Format price to ensure Rs. and amount stay joined by non-breaking space
+ */
+const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
+
+/**
  * Individual Fit Product Card with image slideshow, touch gestures,
  * size selection drawer, and cart drawer integration.
  */
@@ -301,9 +306,9 @@ function FitProductCard({ product }) {
           <h3 className="fit-card__title">{product.title}</h3>
         </Link>
         <div className="fit-card__pricing">
-          <span className="fit-card__sale-price">{product.salePrice}</span>
+          <span className="fit-card__sale-price">{formatPrice(product.salePrice)}</span>
           {product.regularPrice && (
-            <span className="fit-card__regular-price">{product.regularPrice}</span>
+            <span className="fit-card__regular-price">{formatPrice(product.regularPrice)}</span>
           )}
         </div>
       </div>

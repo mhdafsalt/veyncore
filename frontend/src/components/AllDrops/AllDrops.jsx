@@ -7,6 +7,11 @@ import { ALL_DROPS_PRODUCTS, SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data
 import './AllDrops.css';
 
 /**
+ * Format price to ensure Rs. and amount stay joined by non-breaking space
+ */
+const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
+
+/**
  * Individual Product Card for ALL DROPS Collection
  */
 function DropsProductCard({ product }) {
@@ -236,9 +241,9 @@ function DropsProductCard({ product }) {
         </h3>
 
         <div className="all-drops-card__price-row">
-          <span className="all-drops-card__sale-price">{product.salePrice}</span>
+          <span className="all-drops-card__sale-price">{formatPrice(product.salePrice)}</span>
           {product.comparePrice > product.price && (
-            <span className="all-drops-card__compare-price">{product.regularPrice}</span>
+            <span className="all-drops-card__compare-price">{formatPrice(product.regularPrice)}</span>
           )}
         </div>
       </div>

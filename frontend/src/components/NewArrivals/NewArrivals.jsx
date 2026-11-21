@@ -7,6 +7,11 @@ import { NEW_ARRIVALS_PRODUCTS } from '@/data/newArrivalsData';
 import './NewArrivals.css';
 
 /**
+ * Format price to ensure Rs. and amount stay joined by non-breaking space
+ */
+const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
+
+/**
  * Individual Product Card with image slideshow, size selection, and quick-add
  */
 function ProductCard({ product }) {
@@ -310,9 +315,9 @@ function ProductCard({ product }) {
           <h3 className="product-card__title">{product.title}</h3>
         </Link>
         <div className="product-card__pricing">
-          <span className="product-card__sale-price">{product.salePrice}</span>
+          <span className="product-card__sale-price">{formatPrice(product.salePrice)}</span>
           {product.regularPrice && (
-            <span className="product-card__regular-price">{product.regularPrice}</span>
+            <span className="product-card__regular-price">{formatPrice(product.regularPrice)}</span>
           )}
         </div>
       </div>

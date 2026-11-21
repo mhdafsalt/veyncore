@@ -7,6 +7,11 @@ import { getProductByHandle } from '@/data/productsData';
 import './ProductDetail.css';
 
 /**
+ * Format price to ensure Rs. and amount stay joined by non-breaking space
+ */
+const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
+
+/**
  * High-performance Product Details Page (PDP) Component
  * Humanized BEM classnames, responsive media gallery, size chart modal,
  * pincode estimator, collapsible accordions, social sharing, and related denims.
@@ -339,9 +344,9 @@ export default function ProductDetail({ product }) {
 
               {/* Pricing Row */}
               <div className="product-details__pricing">
-                <span className="product-details__sale-price">{product.salePrice}</span>
+                <span className="product-details__sale-price">{formatPrice(product.salePrice)}</span>
                 {product.comparePrice && (
-                  <span className="product-details__compare-price">{product.regularPrice}</span>
+                  <span className="product-details__compare-price">{formatPrice(product.regularPrice)}</span>
                 )}
                 {product.discount && (
                   <span className="product-details__discount-badge">{product.discount}</span>
