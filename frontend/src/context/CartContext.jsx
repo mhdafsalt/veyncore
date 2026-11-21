@@ -11,33 +11,33 @@ export const DEFAULT_INITIAL_ITEM = {
   price: 1599,
   comparePrice: 1800,
   quantity: 1,
-  image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=400&q=80'
+  image: '/images/products/core-blue-wide.jpg'
 };
 
 export const UPSELL_PRODUCTS = [
   {
-    id: 'nb-dark-wide',
-    title: 'NB DARK WIDE',
+    id: 'brick-dark-wide',
+    title: 'BRICK DARK WIDE',
     size: '30',
     price: 1499,
     comparePrice: 1700,
-    image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=400&q=80'
+    image: '/images/products/brick-dark-wide.jpg'
   },
   {
-    id: 'beige-pleated-trousers',
-    title: 'BEIGE PLEATED TROUSERS',
+    id: 'artic-blue-wide',
+    title: 'ARTIC BLUE WIDE',
     size: '30',
     price: 1899,
     comparePrice: 2100,
-    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=400&q=80'
+    image: '/images/products/artic-blue-wide.jpg'
   },
   {
-    id: 'arctic-monkeys-tee',
-    title: 'ARCTIC MONKEYS VINTAGE TEE',
-    size: 'M',
-    price: 999,
-    comparePrice: 1299,
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=80'
+    id: 'cloud-blue-wide',
+    title: 'CLOUD BLUE WIDE',
+    size: '32',
+    price: 1699,
+    comparePrice: 1999,
+    image: '/images/products/cloud-blue-wide.jpg'
   }
 ];
 

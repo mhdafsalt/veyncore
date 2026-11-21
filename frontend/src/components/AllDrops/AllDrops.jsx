@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { ALL_DROPS_PRODUCTS, SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
 import './AllDrops.css';
 
@@ -18,6 +19,7 @@ function DropsProductCard({ product }) {
   const { addItem, openCart } = useCart();
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
   const [showSizes, setShowSizes] = useState(false);
+  const [isMobileQuickBuyOpen, setIsMobileQuickBuyOpen] = useState(false);
   const [addedStatus, setAddedStatus] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -143,12 +145,26 @@ function DropsProductCard({ product }) {
         )}
 
         {/* Quick Add Button / Trigger */}
-        <div className="all-drops-card__quick-actions">
+        <div className={`all-drops-card__quick-actions ${showSizes ? 'all-drops-card__quick-actions--open' : ''}`}>
           {showSizes ? (
             <div className="all-drops-card__sizes-overlay" onClick={(e) => e.stopPropagation()}>
-              <span className="all-drops-card__sizes-label">SELECT SIZE:</span>
+              <div className="all-drops-card__sizes-header">
+                <span className="all-drops-card__sizes-label">SELECT SIZE:</span>
+                <button
+                  type="button"
+                  className="all-drops-card__sizes-close"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSizes(false);
+                  }}
+                  aria-label="Close size chooser"
+                >
+                  ✕
+                </button>
+              </div>
               <div className="all-drops-card__sizes-list">
-                {product.availableSizes.map((sz) => (
+                {(product.availableSizes || ['28', '30', '32', '34', '36']).map((sz) => (
                   <button
                     key={sz}
                     type="button"
@@ -159,17 +175,6 @@ function DropsProductCard({ product }) {
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                className="all-drops-card__sizes-close"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSizes(false);
-                }}
-                aria-label="Close size chooser"
-              >
-                ✕
-              </button>
             </div>
           ) : (
             <button
@@ -180,7 +185,11 @@ function DropsProductCard({ product }) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setShowSizes(true);
+                if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+                  setIsMobileQuickBuyOpen(true);
+                } else {
+                  setShowSizes(true);
+                }
               }}
             >
               {addedStatus ? (
@@ -247,6 +256,13 @@ function DropsProductCard({ product }) {
           )}
         </div>
       </div>
+
+      {/* Mobile Quick Buy Bottom Sheet Modal */}
+      <MobileQuickBuyDrawer
+        isOpen={isMobileQuickBuyOpen}
+        onClose={() => setIsMobileQuickBuyOpen(false)}
+        product={product}
+      />
     </article>
   );
 }

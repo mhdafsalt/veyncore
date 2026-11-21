@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { FaInstagram, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import './Footer.css';
 
@@ -175,36 +176,36 @@ export default function Footer({ showBanner = false }) {
               </button>
               {openSections.channels && (
                 <div className="modern-footer__accordion-content">
-                  <ul className="modern-footer__accordion-list">
-                    <li>
-                      <a
-                        href="https://instagram.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="modern-footer__accordion-link"
-                      >
-                        INSTAGRAM
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="https://wa.me/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="modern-footer__accordion-link"
-                      >
-                        WHATSAPP SUPPORT
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="mailto:support@veyncore.com"
-                        className="modern-footer__accordion-link"
-                      >
-                        EMAIL: SUPPORT@VEYNCORE.COM
-                      </a>
-                    </li>
-                  </ul>
+                  <div className="modern-footer__channels-icons" role="list">
+                    <a
+                      href="https://instagram.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="modern-footer__channel-icon-btn"
+                      aria-label="Instagram"
+                      title="Instagram"
+                    >
+                      <FaInstagram size={18} aria-hidden="true" />
+                    </a>
+                    <a
+                      href="https://wa.me/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="modern-footer__channel-icon-btn"
+                      aria-label="WhatsApp Support"
+                      title="WhatsApp Support"
+                    >
+                      <FaWhatsapp size={19} aria-hidden="true" />
+                    </a>
+                    <a
+                      href="mailto:support@veyncore.com"
+                      className="modern-footer__channel-icon-btn"
+                      aria-label="Email Support"
+                      title="support@veyncore.com"
+                    >
+                      <FaEnvelope size={17} aria-hidden="true" />
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
@@ -225,27 +226,13 @@ export default function Footer({ showBanner = false }) {
         </div>
       </div>
 
-      {/* 4. Bottom Copyright Bar (Terms & Conditions Left | Copyright Center | Privacy Policy Right) */}
+      {/* 4. Bottom Copyright Bar */}
       <div className="modern-footer__bottom-wrapper">
         <div className="modern-footer__container">
           <div className="modern-footer__bottom-inner">
-            <div className="modern-footer__bottom-left">
-              <Link href="/pages/terms-of-service" className="modern-footer__bottom-link">
-                Terms &amp; Conditions
-              </Link>
-            </div>
-
-            <div className="modern-footer__bottom-center">
-              <p className="modern-footer__copyright">
-                &copy; {new Date().getFullYear()} VEYNCORE. ALL RIGHTS RESERVED.
-              </p>
-            </div>
-
-            <div className="modern-footer__bottom-right">
-              <Link href="/pages/privacy-policy" className="modern-footer__bottom-link">
-                Privacy Policy
-              </Link>
-            </div>
+            <p className="modern-footer__copyright">
+              &copy; {new Date().getFullYear()} VEYNCORE. ALL RIGHTS RESERVED.
+            </p>
           </div>
         </div>
       </div>

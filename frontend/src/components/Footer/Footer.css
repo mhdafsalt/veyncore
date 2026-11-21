@@ -330,6 +330,42 @@
   text-underline-offset: 3px;
 }
 
+/* Channels Social & Contact Icons */
+.modern-footer__channels-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.modern-footer__channel-icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #e5e5e5;
+  background-color: #ffffff;
+  color: #111111;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.modern-footer__channel-icon-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+
+.modern-footer__channel-icon-btn:active {
+  transform: translateY(0);
+}
+
 /* --------------------------------------------------------------------------
    3. Monumental Brand Banner (Subtle Luxury Fashion Watermark)
    -------------------------------------------------------------------------- */
@@ -377,9 +413,9 @@
 .modern-footer__bottom-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
-  gap: 16px;
+  text-align: center;
 }
 
 .modern-footer__bottom-left,
@@ -493,15 +529,7 @@
   }
 
   .modern-footer__bottom-inner {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
-
-  .modern-footer__bottom-left,
-  .modern-footer__bottom-right,
-  .modern-footer__bottom-center {
     justify-content: center;
-    width: 100%;
+    text-align: center;
   }
 }

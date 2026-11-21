@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useCart, UPSELL_PRODUCTS, DEFAULT_INITIAL_ITEM } from '@/context/CartContext';
 import './CartDrawer.css';
 
@@ -8,20 +10,20 @@ const TRENDING_COLLECTIONS = [
   {
     id: 'denims',
     title: 'DENIMS',
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80',
-    href: '#denims'
+    image: '/images/hero/hero-card-1.jpg',
+    href: '/collections/all-drops'
   },
   {
     id: 'tops',
     title: 'TOPS',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
-    href: '#tops'
+    image: '/images/hero/hero-card-2.jpg',
+    href: '/collections/all-drops'
   },
   {
     id: 'accessories',
     title: 'ACCESSORIES',
-    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80',
-    href: '#accessories'
+    image: '/images/hero/hero-card-3.jpg',
+    href: '/collections/all-drops'
   }
 ];
 
@@ -123,7 +125,7 @@ export default function CartDrawer() {
         {/* Header */}
         <div className="cart-drawer__header">
           <div className="cart-drawer__title-wrap">
-            <h2 className="cart-drawer__title">Your Cart</h2>
+            <h2 className="cart-drawer__title">CART</h2>
             <span className="cart-drawer__count-badge">{totalCount}</span>
           </div>
 
@@ -377,15 +379,15 @@ export default function CartDrawer() {
                ========================================= */
             <div className="cart-drawer__empty">
               <div className="cart-drawer__empty-content">
-                <h3 className="cart-drawer__empty-title">Your cart is empty.</h3>
+                <h3 className="cart-drawer__empty-title">YOUR CART IS EMPTY</h3>
                 <p className="cart-drawer__empty-subtitle">
-                  Find trending collection, products right below!
+                  Find trending collections and products right below
                 </p>
 
                 {/* Trending Collections */}
                 <div className="cart-drawer__empty-collections">
                   {TRENDING_COLLECTIONS.map((col) => (
-                    <a
+                    <Link
                       key={col.id}
                       href={col.href}
                       className="cart-drawer__empty-collection-card"
@@ -415,32 +417,16 @@ export default function CartDrawer() {
                           </span>
                         </div>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
-
-                {/* Show All Products Button (also allows re-adding item for quick demo) */}
-                <button
-                  type="button"
-                  className="cart-drawer__empty-show-all-btn"
-                  onClick={() => {
-                    addItem(DEFAULT_INITIAL_ITEM);
-                  }}
-                >
-                  Show All Products
-                </button>
-
-                {/* Policy Notice */}
-                <p className="cart-drawer__empty-policy">
-                  • DELIVERY IN 7-9 WORKING DAYS • FREE SHIPPING ALL OVER INDIA • RETURN & EXCHANGES AVAILABLE • CHECK & CONFORM THE SIZE & SIZE CHART BEFORE PURCHASING.
-                </p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer (Only rendered when cart has items) */}
-        {cartItems.length > 0 && (
+        {/* Footer */}
+        {cartItems.length > 0 ? (
           <div className="cart-drawer__footer">
             <div className="cart-drawer__total-row">
               <span className="cart-drawer__total-label">Total:</span>
@@ -462,27 +448,26 @@ export default function CartDrawer() {
                 className="cart-drawer__whatsapp-btn"
                 aria-label="Direct WhatsApp Order"
               >
-                {/* Official WhatsApp SVG Icon */}
-                <svg
-                  className="cart-drawer__whatsapp-icon"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.17L2.05 21.46a.75.75 0 0 0 .918.918l4.35-1.39A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm-1.07 5.75c.23-.52.54-.53.79-.54h.67c.23 0 .54.08.77.62.27.63.89 2.18.97 2.34.08.16.13.35.03.55-.1.2-.15.32-.3.5-.15.17-.32.39-.46.52-.15.15-.31.32-.13.63.18.31.8 1.32 1.72 2.14 1.18 1.05 2.18 1.38 2.49 1.53.31.16.49.14.67-.07.19-.21.78-.91.99-1.22.21-.31.42-.26.7-.16.29.11 1.83.86 2.14 1.02.31.16.52.23.6.35.08.12.08.69-.19 1.46-.27.76-1.57 1.49-2.17 1.54-.58.05-1.32.08-4.22-1.07-3.48-1.38-5.71-4.9-5.88-5.13-.17-.23-1.42-1.89-1.42-3.6 0-1.72.9-2.56 1.22-2.91Z"
-                    fill="currentColor"
-                  />
-                </svg>
+                {/* Official WhatsApp React Icon */}
+                <FaWhatsapp className="cart-drawer__whatsapp-icon" size={24} aria-hidden="true" />
                 <span className="cart-drawer__whatsapp-btn-text">
                   Direct WhatsApp Order
                 </span>
               </a>
             </div>
+          </div>
+        ) : (
+          <div className="cart-drawer__empty-footer">
+            <span className="cart-drawer__empty-shipping-note">
+              FREE SHIPPING ALL OVER INDIA
+            </span>
+            <Link
+              href="/collections/all-drops"
+              className="cart-drawer__empty-show-all-btn"
+              onClick={closeCart}
+            >
+              EXPLORE ALL DROPS
+            </Link>
           </div>
         )}
       </div>

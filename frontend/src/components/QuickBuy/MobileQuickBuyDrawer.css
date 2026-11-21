@@ -1,0 +1,317 @@
+/* ==========================================================================
+   Mobile Quick Buy Drawer (Bottom Sheet Modal)
+   Matches Reference: Slide-up bottom sheet with thumbnail, price, pill sizes,
+   quantity stepper, Add to cart, and Buy it now buttons.
+   ========================================================================== */
+
+.mobile-quick-buy {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Dimmed backdrop */
+.mobile-quick-buy__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1;
+  animation: mobileQuickBuyFadeIn 0.22s ease-out forwards;
+}
+
+@keyframes mobileQuickBuyFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide-up Bottom Drawer */
+.mobile-quick-buy__drawer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 520px;
+  background-color: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 12px 18px 24px;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.25);
+  animation: mobileQuickBuySlideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@keyframes mobileQuickBuySlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Small pull bar indicator at top */
+.mobile-quick-buy__handle {
+  width: 38px;
+  height: 4px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Header: Thumbnail + Title + Price + Close Button
+   -------------------------------------------------------------------------- */
+.mobile-quick-buy__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f1f1;
+  margin-bottom: 16px;
+}
+
+.mobile-quick-buy__thumbnail-wrapper {
+  width: 54px;
+  height: 68px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f6f6f6;
+  flex-shrink: 0;
+}
+
+.mobile-quick-buy__thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.mobile-quick-buy__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-quick-buy__title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #111111;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.mobile-quick-buy__pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.mobile-quick-buy__sale-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #b91c1c; /* Reference red sale price */
+}
+
+.mobile-quick-buy__regular-price {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #71717a;
+  text-decoration: line-through;
+}
+
+.mobile-quick-buy__close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #111111;
+  background-color: #ffffff;
+  color: #111111;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.mobile-quick-buy__close-btn:hover {
+  background-color: #111111;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   Size Section: Pill Buttons with Active State
+   -------------------------------------------------------------------------- */
+.mobile-quick-buy__size-section {
+  margin-bottom: 20px;
+}
+
+.mobile-quick-buy__size-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111111;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.mobile-quick-buy__size-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mobile-quick-buy__size-pill {
+  height: 42px;
+  min-width: 58px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  border: 1.5px solid #111111;
+  background-color: #ffffff;
+  color: #111111;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.mobile-quick-buy__size-pill:hover {
+  border-color: #000000;
+}
+
+.mobile-quick-buy__size-pill--selected {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Actions Row: Quantity Stepper + Add To Cart
+   -------------------------------------------------------------------------- */
+.mobile-quick-buy__actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.mobile-quick-buy__quantity {
+  height: 48px;
+  width: 110px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  background-color: #ffffff;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.mobile-quick-buy__qty-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  font-weight: 500;
+  color: #111111;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 4px;
+}
+
+.mobile-quick-buy__qty-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.mobile-quick-buy__qty-value {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #111111;
+  min-width: 20px;
+  text-align: center;
+}
+
+.mobile-quick-buy__add-cart-btn {
+  height: 48px;
+  flex: 1;
+  border-radius: 8px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+  padding: 0 16px;
+}
+
+.mobile-quick-buy__add-cart-btn:hover {
+  background-color: #1f2937;
+}
+
+.mobile-quick-buy__add-cart-icon {
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Buy It Now Full-Width Button
+   -------------------------------------------------------------------------- */
+.mobile-quick-buy__buy-now-btn {
+  height: 48px;
+  width: 100%;
+  border-radius: 8px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.mobile-quick-buy__buy-now-btn:hover {
+  background-color: #1f2937;
+}
+
+.mobile-quick-buy__buy-now-btn:active,
+.mobile-quick-buy__add-cart-btn:active {
+  transform: scale(0.99);
+}

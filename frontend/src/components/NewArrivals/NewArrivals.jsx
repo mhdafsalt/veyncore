@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { NEW_ARRIVALS_PRODUCTS } from '@/data/newArrivalsData';
 import './NewArrivals.css';
 
@@ -15,9 +16,10 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  * Individual Product Card with image slideshow, size selection, and quick-add
  */
 function ProductCard({ product }) {
-  const { addItem } = useCart();
+  const { addItem, openCart } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showSizes, setShowSizes] = useState(false);
+  const [isMobileQuickBuyOpen, setIsMobileQuickBuyOpen] = useState(false);
   const [addedStatus, setAddedStatus] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showMobileControls, setShowMobileControls] = useState(false);
@@ -111,7 +113,11 @@ function ProductCard({ product }) {
   const handleQuickAddClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setShowSizes((prev) => !prev);
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setIsMobileQuickBuyOpen(true);
+    } else {
+      setShowSizes((prev) => !prev);
+    }
   };
 
   const handleSelectSize = (e, size) => {
@@ -130,6 +136,7 @@ function ProductCard({ product }) {
 
     setAddedStatus(true);
     setShowSizes(false);
+    openCart();
     setTimeout(() => setAddedStatus(false), 2200);
   };
 
@@ -240,10 +247,24 @@ function ProductCard({ product }) {
         )}
 
         {/* Quick Add "Choose" Pill Button */}
-        <div className="product-card__quick-add">
+        <div className={`product-card__quick-add ${showSizes ? 'product-card__quick-add--open' : ''}`}>
           {showSizes ? (
-            <div className="product-card__size-drawer">
-              <span className="product-card__size-label">Select Size:</span>
+            <div className="product-card__size-drawer" onClick={(e) => e.stopPropagation()}>
+              <div className="product-card__size-drawer-header">
+                <span className="product-card__size-label">SELECT SIZE:</span>
+                <button
+                  type="button"
+                  className="product-card__size-close"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSizes(false);
+                  }}
+                  aria-label="Close size chooser"
+                >
+                  ✕
+                </button>
+              </div>
               <div className="product-card__size-list">
                 {(product.availableSizes || ['28', '30', '32', '34', '36']).map((size) => (
                   <button
@@ -326,6 +347,13 @@ function ProductCard({ product }) {
           )}
         </div>
       </div>
+
+      {/* Mobile Quick Buy Bottom Sheet Modal */}
+      <MobileQuickBuyDrawer
+        isOpen={isMobileQuickBuyOpen}
+        onClose={() => setIsMobileQuickBuyOpen(false)}
+        product={product}
+      />
     </article>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { FIT_CATEGORIES, CATEGORY_FITS_DATA } from '@/data/categoryFitsData';
 import './CategoryFits.css';
 
@@ -16,9 +17,10 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  * size selection drawer, and cart drawer integration.
  */
 function FitProductCard({ product }) {
-  const { addItem } = useCart();
+  const { addItem, openCart } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showSizes, setShowSizes] = useState(false);
+  const [isMobileQuickBuyOpen, setIsMobileQuickBuyOpen] = useState(false);
   const [addedStatus, setAddedStatus] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showMobileControls, setShowMobileControls] = useState(false);
@@ -104,7 +106,11 @@ function FitProductCard({ product }) {
   const handleQuickAddClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setShowSizes((prev) => !prev);
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setIsMobileQuickBuyOpen(true);
+    } else {
+      setShowSizes((prev) => !prev);
+    }
   };
 
   const handleSelectSize = (e, size) => {
@@ -123,6 +129,7 @@ function FitProductCard({ product }) {
 
     setAddedStatus(true);
     setShowSizes(false);
+    openCart();
     setTimeout(() => setAddedStatus(false), 2200);
   };
 
@@ -231,10 +238,24 @@ function FitProductCard({ product }) {
         )}
 
         {/* Quick Add "Choose" Pill Button */}
-        <div className="fit-card__quick-add">
+        <div className={`fit-card__quick-add ${showSizes ? 'fit-card__quick-add--open' : ''}`}>
           {showSizes ? (
-            <div className="fit-card__size-drawer">
-              <span className="fit-card__size-label">Select Size:</span>
+            <div className="fit-card__size-drawer" onClick={(e) => e.stopPropagation()}>
+              <div className="fit-card__size-drawer-header">
+                <span className="fit-card__size-label">SELECT SIZE:</span>
+                <button
+                  type="button"
+                  className="fit-card__size-close"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSizes(false);
+                  }}
+                  aria-label="Close size chooser"
+                >
+                  ✕
+                </button>
+              </div>
               <div className="fit-card__size-list">
                 {(product.availableSizes || ['28', '30', '32', '34', '36']).map((size) => (
                   <button
@@ -317,34 +338,41 @@ function FitProductCard({ product }) {
           )}
         </div>
       </div>
+
+      {/* Mobile Quick Buy Bottom Sheet Modal */}
+      <MobileQuickBuyDrawer
+        isOpen={isMobileQuickBuyOpen}
+        onClose={() => setIsMobileQuickBuyOpen(false)}
+        product={product}
+      />
     </article>
   );
 }
 
 /**
- * End-of-row "View All" card that sits directly after the 6th card in the swipe row
+ * End-of-row "View" card that sits directly after the 6th card in the swipe row
  */
 function ViewAllEndCard({ fitLabel, collectionPath }) {
   return (
     <article className="fit-card fit-card--view-all">
       <Link href={collectionPath} className="fit-card__view-all-link" aria-label={`View all ${fitLabel}`}>
         <div className="fit-card__view-all-box">
-          <div className="fit-card__view-all-circle">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </div>
-          <span className="fit-card__view-all-action">View all</span>
-          <span className="fit-card__view-all-label">{fitLabel}</span>
+          <span className="fit-card__view-all-text">View</span>
+          <svg
+            className="fit-card__view-all-arrow"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <polyline points="13 5 20 12 13 19" />
+          </svg>
         </div>
       </Link>
     </article>
@@ -419,10 +447,21 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
       {/* Row Header with Fit Name and Link */}
       <header className="category-fits__row-header">
         <h2 className="category-fits__row-heading">{fitLabel}</h2>
-        <Link href={collectionPath} className="category-fits__row-header-link">
-          <span>View all</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="9 18 15 12 9 6" />
+        <Link href={collectionPath} className="category-fits__row-header-link" aria-label={`View ${fitLabel}`}>
+          <span>View</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <polyline points="13 5 20 12 13 19" />
           </svg>
         </Link>
       </header>
