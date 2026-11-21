@@ -53,8 +53,8 @@ export default function HomePage() {
         {/* 7. Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
         <CategoryFits />
 
-        {/* 8. Minimalist Accordion Footer (Quick Links, Policies, Channels & Copyright) */}
-        <Footer />
+        {/* 8. Modern VEYNCORE Footer with Editorial Image Banner on Homepage */}
+        <Footer showBanner={true} />
       </main>
     </>
   );

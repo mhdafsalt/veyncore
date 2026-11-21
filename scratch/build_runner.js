@@ -4,33 +4,43 @@ const { execSync } = require('child_process');
 
 const baseDir = 'c:/afsall/All_Projects/veyncore/frontend';
 
-const dirs = [
-  '.next/static/chunks/app/collections/all-drops',
-  '.next/static/chunks/app/collections/all',
-  '.next/static/chunks/app/products/[handle]',
-  '.next/static/chunks/app/account/login',
-  '.next/static/chunks/pages',
-  '.next/static/css',
-  '.next/static/media',
-  '.next/server/app/collections/all-drops',
-  '.next/server/app/collections/all',
-  '.next/server/app/products/[handle]',
-  '.next/server/app/account/login',
-  '.next/server/chunks',
-  '.next/server/vendor-chunks',
-  '.next/server/pages',
-  '.next/types/app/collections/all-drops',
-  '.next/types/app/collections/all',
-  '.next/types/app/products/[handle]',
-  '.next/types/app/account/login',
+// Clean out any stale .next/server/pages and pages chunks
+const pagesDir = path.join(baseDir, '.next/server/pages');
+if (fs.existsSync(pagesDir)) {
+  fs.rmSync(pagesDir, { recursive: true, force: true });
+}
+const pagesChunksDir = path.join(baseDir, '.next/static/chunks/pages');
+if (fs.existsSync(pagesChunksDir)) {
+  fs.rmSync(pagesChunksDir, { recursive: true, force: true });
+}
+
+const routes = [
+  'account/login',
+  'collections',
+  'collections/all',
+  'collections/all-drops',
+  'products',
+  'products/[handle]'
 ];
 
-dirs.forEach(d => {
-  const full = path.join(baseDir, d);
-  fs.mkdirSync(full, { recursive: true });
+const prefixes = [
+  '.next/static/chunks/app',
+  '.next/server/app',
+  '.next/types/app'
+];
+
+prefixes.forEach(prefix => {
+  routes.forEach(r => {
+    const full = path.join(baseDir, prefix, r);
+    fs.mkdirSync(full, { recursive: true });
+  });
 });
 
-console.log('Skeleton directories ready.');
+['.next/static/css', '.next/static/media', '.next/server/chunks', '.next/server/vendor-chunks'].forEach(extra => {
+  fs.mkdirSync(path.join(baseDir, extra), { recursive: true });
+});
+
+console.log('All route skeletons ready.');
 
 try {
   const out = execSync('npx next build --no-lint', {

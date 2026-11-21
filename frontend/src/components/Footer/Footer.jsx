@@ -5,7 +5,7 @@ import Link from 'next/link';
 import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import './Footer.css';
 
-export default function Footer({ showBanner = true }) {
+export default function Footer({ showBanner = false }) {
   return (
     <footer className="modern-footer" id="modern-footer">
       {/* 1. Image Banner Section (at the top of the footer) */}
