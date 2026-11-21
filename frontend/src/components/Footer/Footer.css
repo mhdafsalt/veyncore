@@ -225,15 +225,121 @@
 }
 
 /* --------------------------------------------------------------------------
+   2. Collapsible Footer Accordion Navigation (QUICK LINKS, POLICIES, CHANNELS)
+   Positioned directly at the top of the Monumental Monogram Banner
+   -------------------------------------------------------------------------- */
+.modern-footer__nav-wrapper {
+  width: 100%;
+  padding: 24px 0 8px;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e5e5;
+}
+
+.modern-footer__accordions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modern-footer__accordion {
+  width: 100%;
+  border-top: 1px solid #e5e5e5;
+}
+
+.modern-footer__accordion:last-child {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.modern-footer__accordion-trigger {
+  width: 100%;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
+}
+
+.modern-footer__accordion-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111111;
+  transition: color 0.2s ease;
+}
+
+.modern-footer__accordion-trigger:hover .modern-footer__accordion-title {
+  color: #000000;
+}
+
+.modern-footer__accordion-chevron {
+  color: #111111;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.modern-footer__accordion-chevron--rotated {
+  transform: rotate(180deg);
+}
+
+.modern-footer__accordion-content {
+  padding-bottom: 20px;
+  animation: footerAccordionFade 0.22s ease-out;
+}
+
+@keyframes footerAccordionFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modern-footer__accordion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modern-footer__accordion-link {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666666;
+  text-decoration: none;
+  transition: color 0.18s ease;
+  display: inline-block;
+}
+
+.modern-footer__accordion-link:hover {
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
    3. Monumental Brand Banner (Subtle Luxury Fashion Watermark)
    -------------------------------------------------------------------------- */
 .modern-footer__banner-wrapper {
   width: 100%;
-  padding: 40px 0 24px;
+  padding: 36px 0 24px;
   overflow: hidden;
   user-select: none;
   background-color: #ffffff;
-  border-top: 1px solid #f0f0f0;
+  border-top: none;
 }
 
 .modern-footer__monogram {
