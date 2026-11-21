@@ -6,7 +6,7 @@
 .new-arrivals {
   width: 100%;
   background-color: #ffffff;
-  padding: 44px 0 64px;
+  padding: 16px 0 16px;
 }
 
 .new-arrivals__container {
@@ -20,7 +20,7 @@
    Header
    -------------------------------------------------------------------------- */
 .new-arrivals__header {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .new-arrivals__heading {
@@ -404,7 +404,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 48px;
+  margin-top: 20px;
 }
 
 .new-arrivals__view-all-button {
@@ -437,7 +437,7 @@
    -------------------------------------------------------------------------- */
 @media screen and (max-width: 768px) {
   .new-arrivals {
-    padding: 32px 0 48px;
+    padding: 12px 0 16px;
   }
 
   .new-arrivals__container {
@@ -528,7 +528,7 @@
   }
 
   .new-arrivals__footer {
-    margin-top: 36px;
+    margin-top: 18px;
   }
 
   .new-arrivals__view-all-button {

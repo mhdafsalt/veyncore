@@ -6,7 +6,7 @@
   position: relative;
   width: 100%;
   background-color: #ffffff;
-  padding: 0 0 16px;
+  padding: 0 0 6px;
   overflow: hidden;
   user-select: none;
   box-sizing: border-box;
@@ -147,7 +147,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .hero-carousel__dot {
@@ -188,7 +188,7 @@
 
 @media (max-width: 767px) {
   .hero-carousel-section {
-    padding: 0 0 12px;
+    padding: 0 0 6px;
   }
 
   .hero-carousel__arrow {

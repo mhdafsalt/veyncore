@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   width: max-content;
-  animation: announcement-marquee 28s linear infinite;
+  animation: announcement-marquee 56s linear infinite;
   will-change: transform;
 }
 
@@ -76,7 +76,7 @@
   }
 
   .announcement-bar__track {
-    animation-duration: 22s;
+    animation-duration: 44s;
   }
 
   .announcement-bar__item {

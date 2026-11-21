@@ -47,7 +47,10 @@ while (attempt < maxAttempts && !success) {
       console.error('Build error:\n', err.stderr || err.message);
       process.exit(1);
     } else {
-      console.log(`Build attempt ${attempt} encountered transient Windows lock (${err.message.split('\n')[0]}). Retrying...`);
+      console.log(`Build attempt ${attempt} encountered transient Windows lock (${err.message.split('\n')[0]}). Cleaning .next and retrying...`);
+      try {
+        fs.rmSync(path.join(baseDir, '.next'), { recursive: true, force: true });
+      } catch (e) {}
     }
   }
 }
