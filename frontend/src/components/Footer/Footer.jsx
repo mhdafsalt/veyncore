@@ -2,12 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
+import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import './Footer.css';
 
-export default function Footer() {
+export default function Footer({ showBanner = true }) {
   return (
     <footer className="modern-footer" id="modern-footer">
-      {/* Monumental Large Brand Banner */}
+      {/* 1. Image Banner Section (at the top of the footer) */}
+      {showBanner && <ImageBanner />}
+
+      {/* 2. Monumental Large Brand Banner */}
       <div className="modern-footer__banner-wrapper">
         <div className="modern-footer__container">
           <div className="modern-footer__monogram">
@@ -20,7 +24,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Copyright Bar (Terms & Conditions Left | Copyright Center | Privacy Policy Right) */}
+      {/* 3. Bottom Copyright Bar (Terms & Conditions Left | Copyright Center | Privacy Policy Right) */}
       <div className="modern-footer__bottom-wrapper">
         <div className="modern-footer__container">
           <div className="modern-footer__bottom-inner">
