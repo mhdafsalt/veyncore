@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
+import { FiTrash2 } from 'react-icons/fi';
 import { useCart, UPSELL_PRODUCTS, DEFAULT_INITIAL_ITEM } from '@/context/CartContext';
 import './CartDrawer.css';
 
@@ -187,21 +188,7 @@ export default function CartDrawer() {
                           onClick={() => removeItem(item.id)}
                           aria-label={`Remove ${item.title} from cart`}
                         >
-                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                            <path
-                              d="M3 5h14M8 5V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2m3 0v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5h10Z"
-                              stroke="currentColor"
-                              strokeWidth="1.6"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M9 9v6M11 9v6"
-                              stroke="currentColor"
-                              strokeWidth="1.6"
-                              strokeLinecap="round"
-                            />
-                          </svg>
+                          <FiTrash2 size={16} aria-hidden="true" />
                         </button>
                       </div>
 
