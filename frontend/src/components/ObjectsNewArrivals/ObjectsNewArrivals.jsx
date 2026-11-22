@@ -349,13 +349,9 @@ export default function ObjectsNewArrivals() {
   return (
     <section className="new-arrivals" id="object-drops">
       <div className="new-arrivals__container">
-        {/* Header exact like VEYN-SELECTS row header */}
-        <header className="objects-drops__header">
+        {/* Section Header (Exact like SHOP NEW ARRIVALS) */}
+        <header className="new-arrivals__header">
           <h2 className="new-arrivals__heading">OBJECT DROPS</h2>
-          <Link href="/collections/objects-drops" className="objects-drops__view-all" aria-label="View all drops">
-            <span>VIEW ALL DROPS</span>
-            <span className="objects-drops__view-all-arrow">→</span>
-          </Link>
         </header>
 
         {/* 4-col desktop / 2-col mobile Grid */}
