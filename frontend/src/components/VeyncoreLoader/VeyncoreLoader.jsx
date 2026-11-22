@@ -5,16 +5,25 @@ import "./VeyncoreLoader.css";
 
 /**
  * Full-screen Veyncore intro loader.
- * Usage: <VeyncoreLoader onComplete={() => setIsLoading(false)} duration={3000} />
+ * Usage: <VeyncoreLoader onComplete={() => setIsLoading(false)} duration={1800} />
  */
-export default function VeyncoreLoader({ onComplete, duration = 3000 }) {
+export default function VeyncoreLoader({ onComplete, duration = 1800 }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
+
+  // Lock body scroll while loader is visible
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   const handleFinish = useCallback(() => {
     setIsFadingOut(true);
     const completeTimer = setTimeout(() => {
       if (onComplete) onComplete();
-    }, 420);
+    }, 450);
     return () => clearTimeout(completeTimer);
   }, [onComplete]);
 
@@ -38,8 +47,8 @@ export default function VeyncoreLoader({ onComplete, duration = 3000 }) {
             alt="Veyncore"
           />
         </div>
+       
       </div>
-
     </div>
   );
 }

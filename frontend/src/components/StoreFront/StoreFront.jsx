@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import AnnouncementBar from '@/components/AnnouncementBar/AnnouncementBar';
 import Navbar from '@/components/Navbar/Navbar';
 import MainCategories from '@/components/MainCategories/MainCategories';
@@ -12,35 +12,21 @@ import VeynObjects from '@/components/VeynObjects/VeynObjects';
 import Footer from '@/components/Footer/Footer';
 import VeyncoreLoader from '@/components/VeyncoreLoader/VeyncoreLoader';
 
+// In-memory flag: prevents re-triggering loader during in-page tab switches,
+// but runs cleanly on initial page entry and page refresh
+let hasIntroPlayed = false;
+
 /**
  * Unified StoreFront Component
  * Drives both VEYN-SELECTS and VEYN-OBJECTS with instant in-place tab switching (zero refresh)
  */
 export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Check intro loader: only run ONCE per browser session so it never flashes on category switch
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const hasSeenIntro = sessionStorage.getItem('veyncore_intro_seen');
-        if (!hasSeenIntro) {
-          setIsLoading(true);
-        }
-      } catch (e) {
-        setIsLoading(false);
-      }
-    }
-  }, []);
+  const [isLoading, setIsLoading] = useState(() => !hasIntroPlayed);
 
   const handleLoaderComplete = useCallback(() => {
+    hasIntroPlayed = true;
     setIsLoading(false);
-    if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.setItem('veyncore_intro_seen', 'true');
-      } catch (e) {}
-    }
   }, []);
 
   // Seamless zero-refresh in-place tab switch
@@ -59,7 +45,7 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
       {/* Veyncore Full-Screen Intro Loader - Only plays once on initial site entry */}
       {isLoading && (
         <VeyncoreLoader
-          duration={2200}
+          duration={1800}
           onComplete={handleLoaderComplete}
         />
       )}
