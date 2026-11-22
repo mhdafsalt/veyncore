@@ -2,8 +2,16 @@
  * Application Constants
  */
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://veyncore.vercel.app';
+export const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    }
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 export const APP_METADATA = {
   title: 'Veyncore Full-Stack Application',

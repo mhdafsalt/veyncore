@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import './AuthPage.css';
 
 export default function AuthPage() {
+  const router = useRouter();
   const {
     user,
     isAuthenticated,
@@ -63,7 +65,12 @@ export default function AuthPage() {
     }
     setSubmitting(true);
     try {
-      await login(loginEmail, loginPassword);
+      const res = await login(loginEmail, loginPassword);
+      if (res?.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       setError(err?.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -76,7 +83,12 @@ export default function AuthPage() {
     setError('');
     setSubmitting(true);
     try {
-      await loginDemo();
+      const res = await loginDemo();
+      if (res?.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       setError('Demo login failed. Please try again.');
     } finally {
@@ -92,15 +104,31 @@ export default function AuthPage() {
       setError('Please provide at least your email and a password.');
       return;
     }
+    if (regPassword.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
     setSubmitting(true);
     try {
-      await register({
-        firstName,
-        lastName,
+      const fullName = `${firstName || ''} ${lastName || ''}`.trim() || 'Veyn Member';
+      const res = await register({
+        name: fullName,
         email: regEmail,
-        phone: regPhone,
-        password: regPassword
+        mobileNumber: regPhone,
+        password: regPassword,
+        vipNotifications: subscribeNewsletter
       });
+      setFirstName('');
+      setLastName('');
+      setRegEmail('');
+      setRegPhone('');
+      setRegPassword('');
+      setSubscribeNewsletter(false);
+      if (res?.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       setError(err?.message || 'Failed to create your account.');
     } finally {
@@ -192,14 +220,9 @@ export default function AuthPage() {
           <div className="auth-dashboard__header">
             <div className="auth-dashboard__user-info">
               <div className="auth-dashboard__avatar">
-                {user.firstName ? user.firstName[0].toUpperCase() : 'V'}
-                {user.lastName ? user.lastName[0].toUpperCase() : 'C'}
+                {user.name?.trim()?.[0]?.toUpperCase() || user.firstName?.trim()?.[0]?.toUpperCase() || user.email?.trim()?.[0]?.toUpperCase() || 'V'}
               </div>
               <div className="auth-dashboard__details">
-                <div className="auth-dashboard__badge">
-                  <span className="auth-dashboard__badge-dot" />
-                  <span>{user.vipTier || 'VIP SYNDICATE'}</span>
-                </div>
                 <h1 className="auth-dashboard__greeting">
                   WELCOME, {user.name.toUpperCase()}
                 </h1>
@@ -500,7 +523,7 @@ export default function AuthPage() {
              MODE 1: LOGIN FORM
              ============================================================== */}
           {mode === 'login' && (
-            <form className="auth-form" onSubmit={handleLoginSubmit}>
+            <form noValidate className="auth-form" onSubmit={handleLoginSubmit}>
               <div className="auth-form__header">
                 <h2 className="auth-form__title">SIGN IN TO YOUR ACCOUNT</h2>
                 <p className="auth-form__subtitle">
@@ -617,7 +640,7 @@ export default function AuthPage() {
              MODE 2: REGISTER FORM
              ============================================================== */}
           {mode === 'register' && (
-            <form className="auth-form" onSubmit={handleRegisterSubmit}>
+            <form noValidate className="auth-form" onSubmit={handleRegisterSubmit}>
               <div className="auth-form__header">
                 <h2 className="auth-form__title">JOIN THE VEYNCORE SYNDICATE</h2>
                 <p className="auth-form__subtitle">
@@ -750,7 +773,7 @@ export default function AuthPage() {
              MODE 3: FORGOT PASSWORD
              ============================================================== */}
           {mode === 'forgot' && (
-            <form className="auth-form" onSubmit={handleForgotSubmit}>
+            <form noValidate className="auth-form" onSubmit={handleForgotSubmit}>
               <div className="auth-form__header">
                 <h2 className="auth-form__title">RESET YOUR PASSWORD</h2>
                 <p className="auth-form__subtitle">

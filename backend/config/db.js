@@ -1,4 +1,14 @@
+import dns from 'node:dns';
+import dotenv from 'dotenv';
+import path from 'node:path';
 import mongoose from 'mongoose';
+
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {}
+
+dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), 'backend/.env') });
 
 let cachedConnection = null;
 

@@ -1,20 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/lib/constants';
 
 const AuthContext = createContext(null);
-
-const DEMO_USER = {
-  id: 'usr_veyncore_01',
-  firstName: 'Alex',
-  lastName: 'Veyn',
-  name: 'Alex Veyn',
-  email: 'vip@veyncore.com',
-  phone: '+91 98765 43210',
-  vipTier: 'VIP Syndicate',
-  joinDate: 'November 2026',
-  avatarUrl: null
-};
 
 const INITIAL_ORDERS = [
   {
@@ -33,7 +22,7 @@ const INITIAL_ORDERS = [
         size: '32',
         qty: 1,
         price: 2499,
-        image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=300&q=80'
+        image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=300&q=80',
       },
       {
         title: 'Veyncore Heavy Rib Beanie',
@@ -41,9 +30,9 @@ const INITIAL_ORDERS = [
         size: 'OS',
         qty: 1,
         price: 599,
-        image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=300&q=80'
-      }
-    ]
+        image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=300&q=80',
+      },
+    ],
   },
   {
     id: 'VC-87109',
@@ -61,10 +50,10 @@ const INITIAL_ORDERS = [
         size: '30',
         qty: 1,
         price: 2799,
-        image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=300&q=80'
-      }
-    ]
-  }
+        image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=300&q=80',
+      },
+    ],
+  },
 ];
 
 const INITIAL_ADDRESSES = [
@@ -77,12 +66,13 @@ const INITIAL_ADDRESSES = [
     state: 'Maharashtra',
     postalCode: '400050',
     country: 'India',
-    phone: '+91 98765 43210'
-  }
+    phone: '+91 98765 43210',
+  },
 ];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [addresses, setAddresses] = useState(INITIAL_ADDRESSES);
   const [isLoading, setIsLoading] = useState(true);
@@ -104,60 +94,164 @@ export function AuthProvider({ children }) {
     setIsAuthModalOpen(false);
   };
 
-  // Initialize from localStorage if present
+  // Initialize and verify authentication state on mount
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('veyncore_user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    const initializeAuth = async () => {
+      try {
+        const storedToken = localStorage.getItem('veyncore_token');
+        const storedUser = localStorage.getItem('veyncore_user');
+
+        if (storedToken) {
+          setToken(storedToken);
+          if (storedUser) {
+            try {
+              setUser(JSON.parse(storedUser));
+            } catch (parseErr) {}
+          }
+
+          // Fetch fresh verified user data from backend to ensure roles are not tampered
+          try {
+            const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+              },
+            });
+            const data = await res.json();
+            if (res.ok && data.success && data.user) {
+              setUser(data.user);
+              localStorage.setItem('veyncore_user', JSON.stringify(data.user));
+            } else if (res.status === 401) {
+              // Token expired or invalid
+              localStorage.removeItem('veyncore_token');
+              localStorage.removeItem('veyncore_user');
+              setToken(null);
+              setUser(null);
+            }
+          } catch (apiErr) {
+            // Keep cached user if network temporarily unreachable
+            console.warn('[Auth] Live /api/auth/me check warning:', apiErr.message);
+          }
+        }
+      } catch (e) {
+        console.warn('Could not read user/token from localStorage', e);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (e) {
-      console.warn('Could not read user from localStorage', e);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Standard Email / Password Login
-  const login = async (email, password) => {
-    // Simulated network delay
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    const loggedUser = {
-      ...DEMO_USER,
-      email: email.trim(),
-      name: email.split('@')[0].toUpperCase() || 'VIP MEMBER'
     };
 
-    setUser(loggedUser);
+    initializeAuth();
+  }, []);
+
+  // Standard MongoDB Email / Password Login
+  const login = async (email, password) => {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.trim(),
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Login failed. Please check your credentials.');
+    }
+
+    setToken(data.token);
+    setUser(data.user);
+
     try {
-      localStorage.setItem('veyncore_user', JSON.stringify(loggedUser));
+      localStorage.setItem('veyncore_token', data.token);
+      localStorage.setItem('veyncore_user', JSON.stringify(data.user));
     } catch (e) {
       console.warn('Could not save user to localStorage', e);
     }
 
-    return { success: true, user: loggedUser };
+    return data;
+  };
+
+  // Register New Account in MongoDB
+  const register = async ({
+    name,
+    fullName,
+    email,
+    mobileNumber,
+    phone,
+    password,
+    vipNotifications,
+    subscribeNewsletter,
+  }) => {
+    const resolvedName = (name || fullName || '').trim();
+    const resolvedMobile = (mobileNumber || phone || '').trim();
+    const resolvedVip =
+      typeof vipNotifications === 'boolean'
+        ? vipNotifications
+        : Boolean(subscribeNewsletter);
+
+    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: resolvedName,
+        email: email.trim(),
+        mobileNumber: resolvedMobile,
+        password,
+        vipNotifications: resolvedVip,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Failed to create account. Please try again.');
+    }
+
+    setToken(data.token);
+    setUser(data.user);
+
+    try {
+      localStorage.setItem('veyncore_token', data.token);
+      localStorage.setItem('veyncore_user', JSON.stringify(data.user));
+    } catch (e) {
+      console.warn('Could not save user to localStorage', e);
+    }
+
+    return data;
   };
 
   // Instant Demo Quick Login
   const loginDemo = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setUser(DEMO_USER);
+    const demoUser = {
+      id: 'usr_demo_member',
+      name: 'Veyn Member',
+      email: 'member@veyncore.com',
+      role: 'user',
+      mobileNumber: '+91 98765 43210',
+      vipNotifications: true,
+    };
+    setUser(demoUser);
     try {
-      localStorage.setItem('veyncore_user', JSON.stringify(DEMO_USER));
-    } catch (e) {
-      console.warn('Could not save demo user', e);
-    }
-    return { success: true, user: DEMO_USER };
+      localStorage.setItem('veyncore_user', JSON.stringify(demoUser));
+    } catch (e) {}
+    return { success: true, user: demoUser };
   };
 
   // Mobile OTP Login
   const loginWithOtp = async (phone, otp) => {
     await new Promise((resolve) => setTimeout(resolve, 600));
     const otpUser = {
-      ...DEMO_USER,
-      phone: phone,
-      name: 'VERIFIED MEMBER'
+      id: `usr_${Date.now()}`,
+      name: 'VERIFIED MEMBER',
+      email: `${phone.replace(/\D/g, '')}@veyncore.member`,
+      mobileNumber: phone,
+      role: 'user',
+      vipNotifications: true,
     };
     setUser(otpUser);
     try {
@@ -168,55 +262,16 @@ export function AuthProvider({ children }) {
     return { success: true, user: otpUser };
   };
 
-  // Register New Account
-  const register = async ({ firstName, lastName, fullName, email, phone, password }) => {
-    await new Promise((resolve) => setTimeout(resolve, 700));
-
-    let fName = firstName;
-    let lName = lastName;
-    let computedName = fullName;
-
-    if (fullName && !firstName && !lastName) {
-      const parts = fullName.trim().split(/\s+/);
-      fName = parts[0] || 'Veyn';
-      lName = parts.slice(1).join(' ') || 'Member';
-      computedName = fullName.trim();
-    } else {
-      fName = firstName || 'Veyn';
-      lName = lastName || 'Member';
-      computedName = `${firstName || ''} ${lastName || ''}`.trim() || 'New Member';
-    }
-
-    const newUser = {
-      id: `usr_${Date.now()}`,
-      firstName: fName,
-      lastName: lName,
-      name: computedName,
-      email: email.trim(),
-      phone: phone.trim() || '+91 99999 99999',
-      vipTier: 'VIP Member',
-      joinDate: 'Just Now',
-      avatarUrl: null
-    };
-
-    setUser(newUser);
-    try {
-      localStorage.setItem('veyncore_user', JSON.stringify(newUser));
-    } catch (e) {
-      console.warn('Could not save user', e);
-    }
-
-    return { success: true, user: newUser };
-  };
-
   // Logout
   const logout = () => {
     setUser(null);
+    setToken(null);
     setAuthModalMode('login');
     try {
+      localStorage.removeItem('veyncore_token');
       localStorage.removeItem('veyncore_user');
     } catch (e) {
-      console.warn('Could not remove user', e);
+      console.warn('Could not remove user from localStorage', e);
     }
   };
 
@@ -228,7 +283,9 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
-    isAuthenticated: !!user,
+    token,
+    isAuthenticated: Boolean(user),
+    isAdmin: user?.role === 'admin',
     isLoading,
     orders,
     addresses,
@@ -242,7 +299,7 @@ export function AuthProvider({ children }) {
     authModalMode,
     setAuthModalMode,
     openAuthModal,
-    closeAuthModal
+    closeAuthModal,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

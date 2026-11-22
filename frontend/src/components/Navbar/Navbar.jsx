@@ -250,7 +250,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
           >
             {isAuthenticated && user ? (
               <span className="navbar__user-initial">
-                {user.firstName ? user.firstName[0].toUpperCase() : 'V'}
+                {user.name?.trim()?.[0]?.toUpperCase() || user.firstName?.trim()?.[0]?.toUpperCase() || user.email?.trim()?.[0]?.toUpperCase() || 'V'}
               </span>
             ) : (
               <svg

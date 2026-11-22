@@ -197,6 +197,31 @@
   flex-direction: column;
 }
 
+/* Custom Validation Error States */
+.auth-modal__floating-field--error .auth-modal__floating-input {
+  border-color: #dc2626 !important;
+}
+
+.auth-modal__floating-field--error .auth-modal__floating-input:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+.auth-modal__floating-field--error .auth-modal__floating-label {
+  color: #dc2626 !important;
+}
+
+.auth-modal__field-error {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #dc2626;
+  margin-top: 5px;
+  padding-left: 2px;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
 .auth-modal__floating-input {
   width: 100%;
   height: 52px;

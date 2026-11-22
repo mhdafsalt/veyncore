@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import './AuthModal.css';
 
 export default function AuthModal() {
+  const router = useRouter();
   const {
     user,
     isAuthenticated,
@@ -34,7 +36,7 @@ export default function AuthModal() {
   const [regPhone, setRegPhone] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
-  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true);
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(false);
 
   // Forgot password
   const [forgotEmail, setForgotEmail] = useState('');
@@ -48,6 +50,7 @@ export default function AuthModal() {
 
   // Status
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   const modalRef = useRef(null);
@@ -75,6 +78,7 @@ export default function AuthModal() {
   // Reset errors when mode changes
   useEffect(() => {
     setError('');
+    setFieldErrors({});
     setForgotSuccess('');
   }, [authModalMode]);
 
@@ -100,14 +104,43 @@ export default function AuthModal() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!loginEmail || !loginPassword) {
-      setError('Please enter both your email address and password.');
+
+    const errors = {};
+    if (!loginEmail.trim()) {
+      errors.loginEmail = 'Email Address is required';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(loginEmail.trim())) {
+        errors.loginEmail = 'Please enter a valid email address';
+      }
+    }
+
+    if (!loginPassword) {
+      errors.loginPassword = 'Password is required';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
+
+    setFieldErrors({});
     setSubmitting(true);
     try {
-      await login(loginEmail, loginPassword);
+      const res = await login(loginEmail.trim(), loginPassword);
+      setLoginEmail('');
+      setLoginPassword('');
+      setShowLoginPassword(false);
       closeAuthModal();
+
+      // Role-Based Navigation
+      if (res?.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+          router.push('/');
+        }
+      }
     } catch (err) {
       setError(err?.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -120,8 +153,11 @@ export default function AuthModal() {
     setError('');
     setSubmitting(true);
     try {
-      await loginDemo();
+      const res = await loginDemo();
       closeAuthModal();
+      if (res?.user?.role === 'admin') {
+        router.push('/admin');
+      }
     } catch (err) {
       setError('Demo login failed. Please try again.');
     } finally {
@@ -133,19 +169,60 @@ export default function AuthModal() {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!regEmail || !regPassword) {
-      setError('Please provide at least your email address and a password.');
+
+    const errors = {};
+
+    if (!fullName.trim()) {
+      errors.fullName = 'Full Name is required';
+    }
+
+    if (!regEmail.trim()) {
+      errors.regEmail = 'Email Address is required';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(regEmail.trim())) {
+        errors.regEmail = 'Please provide a valid email address';
+      }
+    }
+
+    if (!regPassword) {
+      errors.regPassword = 'Password is required';
+    } else if (regPassword.length < 6) {
+      errors.regPassword = 'Password must be at least 6 characters';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
+
+    setFieldErrors({});
     setSubmitting(true);
     try {
-      await register({
-        fullName,
-        email: regEmail,
-        phone: regPhone,
-        password: regPassword
+      const res = await register({
+        name: fullName.trim(),
+        email: regEmail.trim(),
+        mobileNumber: regPhone.trim(),
+        password: regPassword,
+        vipNotifications: subscribeNewsletter
       });
+
+      // Clear all registration input boxes immediately
+      setFullName('');
+      setRegEmail('');
+      setRegPhone('');
+      setRegPassword('');
+      setShowRegPassword(false);
+      setSubscribeNewsletter(false);
+
       closeAuthModal();
+
+      // Role-Based Navigation: regular user stays/redirects to homepage
+      if (res?.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       setError(err?.message || 'Failed to create account. Please try again.');
     } finally {
@@ -157,13 +234,26 @@ export default function AuthModal() {
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!forgotEmail) {
-      setError('Please enter your registered email address.');
+
+    const errors = {};
+    if (!forgotEmail.trim()) {
+      errors.forgotEmail = 'Registered Email is required';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(forgotEmail.trim())) {
+        errors.forgotEmail = 'Please provide a valid email address';
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
+
+    setFieldErrors({});
     setSubmitting(true);
     try {
-      const res = await requestPasswordReset(forgotEmail);
+      const res = await requestPasswordReset(forgotEmail.trim());
       setForgotSuccess(res?.message || 'Password reset link sent to your email.');
     } catch (err) {
       setError('Could not process reset request. Please check email address.');
@@ -284,15 +374,10 @@ export default function AuthModal() {
           <div className="auth-modal__account-view">
             <div className="auth-modal__user-card">
               <div className="auth-modal__avatar">
-                {user.firstName ? user.firstName[0].toUpperCase() : 'V'}
-                {user.lastName ? user.lastName[0].toUpperCase() : 'C'}
+                {user.name?.trim()?.[0]?.toUpperCase() || user.firstName?.trim()?.[0]?.toUpperCase() || user.email?.trim()?.[0]?.toUpperCase() || 'V'}
               </div>
               <div className="auth-modal__user-meta">
-                <div className="auth-modal__vip-badge">
-                  <span className="auth-modal__vip-dot" />
-                  <span>{user.vipTier || 'VIP SYNDICATE'}</span>
-                </div>
-                <h3 className="auth-modal__greeting">WELCOME, {user.name.toUpperCase()}</h3>
+                <h3 className="auth-modal__greeting">WELCOME, {(user.name || 'MEMBER').toUpperCase()}</h3>
                 <p className="auth-modal__user-email">{user.email}</p>
               </div>
             </div>
@@ -332,6 +417,18 @@ export default function AuthModal() {
 
             {/* Account Actions */}
             <div className="auth-modal__account-actions">
+              {user.role === 'admin' && (
+                <button
+                  type="button"
+                  className="auth-modal__btn auth-modal__btn--primary"
+                  onClick={() => {
+                    closeAuthModal();
+                    router.push('/admin');
+                  }}
+                >
+                  ACCESS ADMIN PANEL →
+                </button>
+              )}
               <button
                 type="button"
                 className="auth-modal__btn auth-modal__btn--secondary"
@@ -379,31 +476,42 @@ export default function AuthModal() {
             {/* 1. SIGN IN FORM */}
             {authModalMode === 'login' && (
               <div className="auth-modal__form-body">
-                <form onSubmit={handleLoginSubmit} className="auth-modal__form">
-                  <div className="auth-modal__floating-field">
+                <form noValidate onSubmit={handleLoginSubmit} className="auth-modal__form">
+                  <div className={`auth-modal__floating-field ${fieldErrors.loginEmail ? 'auth-modal__floating-field--error' : ''}`}>
                     <input
                       id="modal-login-email"
                       type="email"
                       className="auth-modal__floating-input"
                       placeholder=" "
                       value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setLoginEmail(e.target.value);
+                        if (fieldErrors.loginEmail) {
+                          setFieldErrors((prev) => ({ ...prev, loginEmail: '' }));
+                        }
+                      }}
                     />
                     <label className="auth-modal__floating-label" htmlFor="modal-login-email">
                       Email Address
                     </label>
+                    {fieldErrors.loginEmail && (
+                      <span className="auth-modal__field-error">{fieldErrors.loginEmail}</span>
+                    )}
                   </div>
 
-                  <div className="auth-modal__floating-field">
+                  <div className={`auth-modal__floating-field ${fieldErrors.loginPassword ? 'auth-modal__floating-field--error' : ''}`}>
                     <input
                       id="modal-login-password"
                       type={showLoginPassword ? 'text' : 'password'}
                       className="auth-modal__floating-input auth-modal__floating-input--with-eye"
                       placeholder=" "
                       value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setLoginPassword(e.target.value);
+                        if (fieldErrors.loginPassword) {
+                          setFieldErrors((prev) => ({ ...prev, loginPassword: '' }));
+                        }
+                      }}
                     />
                     <label className="auth-modal__floating-label" htmlFor="modal-login-password">
                       Password
@@ -426,6 +534,9 @@ export default function AuthModal() {
                         </svg>
                       )}
                     </button>
+                    {fieldErrors.loginPassword && (
+                      <span className="auth-modal__field-error">{fieldErrors.loginPassword}</span>
+                    )}
                   </div>
 
                   <div className="auth-modal__options-row">
@@ -471,35 +582,49 @@ export default function AuthModal() {
             {/* 2. CREATE ACCOUNT (SIGNUP) FORM */}
             {authModalMode === 'register' && (
               <div className="auth-modal__form-body">
-                <form onSubmit={handleRegisterSubmit} className="auth-modal__form">
-                  <div className="auth-modal__floating-field">
+                <form noValidate onSubmit={handleRegisterSubmit} className="auth-modal__form">
+                  <div className={`auth-modal__floating-field ${fieldErrors.fullName ? 'auth-modal__floating-field--error' : ''}`}>
                     <input
                       id="modal-reg-fullname"
                       type="text"
                       className="auth-modal__floating-input"
                       placeholder=" "
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setFullName(e.target.value);
+                        if (fieldErrors.fullName) {
+                          setFieldErrors((prev) => ({ ...prev, fullName: '' }));
+                        }
+                      }}
                     />
                     <label className="auth-modal__floating-label" htmlFor="modal-reg-fullname">
                       Full Name
                     </label>
+                    {fieldErrors.fullName && (
+                      <span className="auth-modal__field-error">{fieldErrors.fullName}</span>
+                    )}
                   </div>
 
-                  <div className="auth-modal__floating-field">
+                  <div className={`auth-modal__floating-field ${fieldErrors.regEmail ? 'auth-modal__floating-field--error' : ''}`}>
                     <input
                       id="modal-reg-email"
                       type="email"
                       className="auth-modal__floating-input"
                       placeholder=" "
                       value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setRegEmail(e.target.value);
+                        if (fieldErrors.regEmail) {
+                          setFieldErrors((prev) => ({ ...prev, regEmail: '' }));
+                        }
+                      }}
                     />
                     <label className="auth-modal__floating-label" htmlFor="modal-reg-email">
                       Email Address *
                     </label>
+                    {fieldErrors.regEmail && (
+                      <span className="auth-modal__field-error">{fieldErrors.regEmail}</span>
+                    )}
                   </div>
 
                   <div className="auth-modal__floating-field">
@@ -516,16 +641,19 @@ export default function AuthModal() {
                     </label>
                   </div>
 
-                  <div className="auth-modal__floating-field">
+                  <div className={`auth-modal__floating-field ${fieldErrors.regPassword ? 'auth-modal__floating-field--error' : ''}`}>
                     <input
                       id="modal-reg-password"
                       type={showRegPassword ? 'text' : 'password'}
                       className="auth-modal__floating-input auth-modal__floating-input--with-eye"
                       placeholder=" "
                       value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      required
-                      minLength={6}
+                      onChange={(e) => {
+                        setRegPassword(e.target.value);
+                        if (fieldErrors.regPassword) {
+                          setFieldErrors((prev) => ({ ...prev, regPassword: '' }));
+                        }
+                      }}
                     />
                     <label className="auth-modal__floating-label" htmlFor="modal-reg-password">
                       Password (min. 6 characters) *
@@ -548,6 +676,9 @@ export default function AuthModal() {
                         </svg>
                       )}
                     </button>
+                    {fieldErrors.regPassword && (
+                      <span className="auth-modal__field-error">{fieldErrors.regPassword}</span>
+                    )}
                   </div>
 
                   <div className="auth-modal__options-row">
@@ -593,20 +724,27 @@ export default function AuthModal() {
                   </p>
                 </div>
 
-                <form onSubmit={handleForgotSubmit} className="auth-modal__form">
-                  <div className="auth-modal__floating-field">
+                <form noValidate onSubmit={handleForgotSubmit} className="auth-modal__form">
+                  <div className={`auth-modal__floating-field ${fieldErrors.forgotEmail ? 'auth-modal__floating-field--error' : ''}`}>
                     <input
                       id="modal-forgot-email"
                       type="email"
                       className="auth-modal__floating-input"
                       placeholder=" "
                       value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setForgotEmail(e.target.value);
+                        if (fieldErrors.forgotEmail) {
+                          setFieldErrors((prev) => ({ ...prev, forgotEmail: '' }));
+                        }
+                      }}
                     />
                     <label className="auth-modal__floating-label" htmlFor="modal-forgot-email">
                       Registered Email
                     </label>
+                    {fieldErrors.forgotEmail && (
+                      <span className="auth-modal__field-error">{fieldErrors.forgotEmail}</span>
+                    )}
                   </div>
 
                   <button
