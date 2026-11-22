@@ -18,90 +18,15 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  */
 function FitProductCard({ product }) {
   const { addItem, openCart } = useCart();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showSizes, setShowSizes] = useState(false);
   const [isMobileQuickBuyOpen, setIsMobileQuickBuyOpen] = useState(false);
   const [addedStatus, setAddedStatus] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [showMobileControls, setShowMobileControls] = useState(false);
-
-  const controlsTimeoutRef = useRef(null);
-  const touchStartXRef = useRef(null);
-  const touchStartYRef = useRef(null);
 
   const images = product.images && product.images.length > 0
     ? product.images
     : ['/images/products/artic-blue-wide.jpg'];
-
-  useEffect(() => {
-    return () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const triggerMobileControls = () => {
-    setShowMobileControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    controlsTimeoutRef.current = setTimeout(() => {
-      setShowMobileControls(false);
-    }, 3500);
-  };
-
-  const handlePrevImage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    triggerMobileControls();
-  };
-
-  const handleNextImage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    triggerMobileControls();
-  };
-
-  const handleDotClick = (e, idx) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCurrentImageIndex(idx);
-    triggerMobileControls();
-  };
-
-  const handleGalleryClick = (e) => {
-    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-      if (!showMobileControls && images.length > 1) {
-        e.preventDefault();
-        triggerMobileControls();
-      }
-    }
-  };
-
-  const handleTouchStart = (e) => {
-    touchStartXRef.current = e.touches[0].clientX;
-    touchStartYRef.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e) => {
-    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
-    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current;
-    touchStartXRef.current = null;
-    touchStartYRef.current = null;
-
-    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX < 0) {
-        setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-      } else {
-        setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-      }
-      triggerMobileControls();
-    }
-  };
+  const mainImage = product.thumbnail || images[0];
 
   const handleQuickAddClick = (e) => {
     e.preventDefault();
@@ -123,7 +48,7 @@ function FitProductCard({ product }) {
       size: size,
       price: product.price || 1199,
       comparePrice: product.comparePrice || 1699,
-      image: images[0],
+      image: mainImage,
       quantity: 1,
     });
 
@@ -134,26 +59,17 @@ function FitProductCard({ product }) {
   };
 
   return (
-    <article
-      className={`fit-card ${
-        showMobileControls ? 'fit-card--controls-active' : ''
-      }`}
-    >
-      {/* Product Image Gallery & Interaction Zone */}
-      <div
-        className="fit-card__gallery"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+    <article className="fit-card">
+      {/* Product Image Zone (Only View Main Thumbnail) */}
+      <div className="fit-card__gallery">
         <Link
           href={`/products/${product.handle}`}
           className="fit-card__link"
           aria-label={product.title}
-          onClick={handleGalleryClick}
         >
           <div className="fit-card__image-container">
             <img
-              src={images[currentImageIndex]}
+              src={mainImage}
               alt={product.title}
               className={`fit-card__image ${imageLoaded ? 'fit-card__image--loaded' : ''}`}
               loading="lazy"
@@ -176,65 +92,6 @@ function FitProductCard({ product }) {
             )}
             {product.badge}
           </span>
-        )}
-
-        {/* Carousel Navigation Arrows */}
-        {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              className="fit-card__nav-button fit-card__nav-button--prev"
-              onClick={handlePrevImage}
-              aria-label="Previous image"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="fit-card__nav-button fit-card__nav-button--next"
-              onClick={handleNextImage}
-              aria-label="Next image"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-
-            {/* Pagination Dots */}
-            <div className="fit-card__dots">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className={`fit-card__dot ${
-                    idx === currentImageIndex ? 'fit-card__dot--active' : ''
-                  }`}
-                  onClick={(e) => handleDotClick(e, idx)}
-                  aria-label={`Jump to image ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </>
         )}
 
         {/* Quick Add "Choose" Pill Button */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
@@ -13,102 +13,19 @@ import './NewArrivals.css';
 const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
 
 /**
- * Individual Product Card with image slideshow, size selection, and quick-add
+ * Individual Product Card displaying main thumbnail, size selection, and quick-add
  */
 function ProductCard({ product }) {
   const { addItem, openCart } = useCart();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showSizes, setShowSizes] = useState(false);
   const [isMobileQuickBuyOpen, setIsMobileQuickBuyOpen] = useState(false);
   const [addedStatus, setAddedStatus] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [showMobileControls, setShowMobileControls] = useState(false);
-
-  const controlsTimeoutRef = useRef(null);
-  const touchStartXRef = useRef(null);
-  const touchStartYRef = useRef(null);
 
   const images = product.images && product.images.length > 0 
     ? product.images 
     : ['/images/products/artic-blue-wide.jpg'];
-
-  // Clean up auto-hide timer on unmount
-  useEffect(() => {
-    return () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Show mobile controls temporarily on click / tap
-  const triggerMobileControls = () => {
-    setShowMobileControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    controlsTimeoutRef.current = setTimeout(() => {
-      setShowMobileControls(false);
-    }, 3500);
-  };
-
-  const handlePrevImage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    triggerMobileControls();
-  };
-
-  const handleNextImage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    triggerMobileControls();
-  };
-
-  const handleDotClick = (e, idx) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCurrentImageIndex(idx);
-    triggerMobileControls();
-  };
-
-  // Gallery click on mobile: reveal arrows if hidden, or allow link if already visible
-  const handleGalleryClick = (e) => {
-    // Check if on touch/mobile device
-    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-      if (!showMobileControls && images.length > 1) {
-        e.preventDefault();
-        triggerMobileControls();
-      }
-    }
-  };
-
-  // Touch Swipe gestures for mobile
-  const handleTouchStart = (e) => {
-    touchStartXRef.current = e.touches[0].clientX;
-    touchStartYRef.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e) => {
-    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
-    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current;
-    touchStartXRef.current = null;
-    touchStartYRef.current = null;
-
-    // Detect horizontal swipe with minimal vertical movement
-    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX < 0) {
-        // Swipe left -> next image
-        setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-      } else {
-        // Swipe right -> previous image
-        setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-      }
-      triggerMobileControls();
-    }
-  };
+  const mainImage = product.thumbnail || images[0];
 
   const handleQuickAddClick = (e) => {
     e.preventDefault();
@@ -130,7 +47,7 @@ function ProductCard({ product }) {
       size: size,
       price: product.price || 1099,
       comparePrice: product.comparePrice || 1499,
-      image: images[0],
+      image: mainImage,
       quantity: 1,
     });
 
@@ -141,26 +58,17 @@ function ProductCard({ product }) {
   };
 
   return (
-    <article
-      className={`product-card ${
-        showMobileControls ? 'product-card--controls-active' : ''
-      }`}
-    >
-      {/* Product Image Gallery & Interaction Zone */}
-      <div
-        className="product-card__gallery"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+    <article className="product-card">
+      {/* Product Image Zone (Only View Main Thumbnail) */}
+      <div className="product-card__gallery">
         <Link
           href={`/products/${product.handle}`}
           className="product-card__link"
           aria-label={product.title}
-          onClick={handleGalleryClick}
         >
           <div className="product-card__image-container">
             <img
-              src={images[currentImageIndex]}
+              src={mainImage}
               alt={product.title}
               className={`product-card__image ${imageLoaded ? 'product-card__image--loaded' : ''}`}
               loading="lazy"
@@ -183,67 +91,6 @@ function ProductCard({ product }) {
             )}
             {product.badge}
           </span>
-        )}
-
-        {/* Carousel Navigation Arrows:
-            - Desktop: visible on hover
-            - Mobile: only visible when user clicks/taps that card */}
-        {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              className="product-card__nav-button product-card__nav-button--prev"
-              onClick={handlePrevImage}
-              aria-label="Previous image"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="product-card__nav-button product-card__nav-button--next"
-              onClick={handleNextImage}
-              aria-label="Next image"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-
-            {/* Pagination Dots */}
-            <div className="product-card__dots">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className={`product-card__dot ${
-                    idx === currentImageIndex ? 'product-card__dot--active' : ''
-                  }`}
-                  onClick={(e) => handleDotClick(e, idx)}
-                  aria-label={`Jump to image ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </>
         )}
 
         {/* Quick Add "Choose" Pill Button */}
