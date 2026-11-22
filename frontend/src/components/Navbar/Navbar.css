@@ -74,8 +74,8 @@
 
 .navbar__icon {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
 }
 
 /* Center: Brand Logo */
@@ -364,25 +364,32 @@
 
 .navbar__action-button--account {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .navbar__user-initial {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background-color: #000000;
   color: #ffffff;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  box-sizing: border-box;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .navbar__action-button--account:hover .navbar__user-initial {
-  transform: scale(1.08);
+  transform: scale(1.06);
   background-color: #27272a;
 }
 
@@ -642,15 +649,22 @@
     height: 36px;
   }
 
-  /* Decreased icon size for mobile */
+  /* All navbar icons strictly uniform 21px x 21px on mobile */
   .navbar__icon {
-    width: 20px;
-    height: 20px;
+    width: 21px;
+    height: 21px;
+  }
+
+  .navbar__user-initial {
+    width: 21px;
+    height: 21px;
+    font-size: 10px;
+    font-weight: 700;
   }
 
   .navbar__cart-icon-wrapper .navbar__badge {
-    top: -2px;
-    right: -4px;
+    top: -3px;
+    right: -5px;
     min-width: 14px;
     height: 14px;
     font-size: 8.5px;
