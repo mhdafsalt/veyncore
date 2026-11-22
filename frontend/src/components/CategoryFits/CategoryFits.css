@@ -658,9 +658,11 @@
     margin-bottom: 14px;
   }
 
-  /* 2 cards visible with partial peek for smooth swipe cue */
+  /* 2 cards visible with next card 10% peek in first view */
   .category-fits__slider-item {
-    flex: 0 0 calc(46% - 4px);
+    flex: 0 0 calc(44% - 4px);
+    min-width: calc(44% - 4px);
+    max-width: calc(44% - 4px);
   }
 
   /* Price row on mobile - strictly in one row with no breaking */

@@ -129,16 +129,6 @@ export default function HeroSection({
     touchEndXRef.current = 0;
   };
 
-  // Active dot index (0 to baseCount - 1)
-  const activeDotIndex = ((currentIndex % baseCount) + baseCount) % baseCount;
-
-  const handleDotClick = (dotIdx) => {
-    if (isTransitioningRef.current) return;
-    isTransitioningRef.current = true;
-    setEnableTransition(true);
-    setCurrentIndex(baseCount + dotIdx);
-  };
-
   return (
     <section
       className="hero-carousel-section"
@@ -147,26 +137,6 @@ export default function HeroSection({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="hero-carousel__container">
-        {/* Left Arrow Button (<) */}
-        <button
-          type="button"
-          className="hero-carousel__arrow hero-carousel__arrow--prev"
-          onClick={handlePrev}
-          aria-label="Previous slide"
-        >
-          <svg
-            className="hero-carousel__arrow-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-
         {/* Slider Viewport Window */}
         <div
           className="hero-carousel__viewport"
@@ -212,41 +182,6 @@ export default function HeroSection({
             ))}
           </div>
         </div>
-
-        {/* Right Arrow Button (>) */}
-        <button
-          type="button"
-          className="hero-carousel__arrow hero-carousel__arrow--next"
-          onClick={handleNext}
-          aria-label="Next slide"
-        >
-          <svg
-            className="hero-carousel__arrow-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Pagination Indicators / Dots */}
-      <div className="hero-carousel__pagination">
-        {Array.from({ length: baseCount }).map((_, dotIdx) => (
-          <button
-            key={`dot-${dotIdx}`}
-            type="button"
-            className={`hero-carousel__dot ${
-              activeDotIndex === dotIdx ? 'hero-carousel__dot--active' : ''
-            }`}
-            onClick={() => handleDotClick(dotIdx)}
-            aria-label={`Go to slide ${dotIdx + 1}`}
-          />
-        ))}
       </div>
     </section>
   );

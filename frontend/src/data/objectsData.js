@@ -361,7 +361,7 @@ export const ALL_OBJECTS_PRODUCTS = [
     images: [
       '/images/hero/ObjectHero03.jpg',
       '/images/products/obg02.jpg',
-      '/images/hero/hero-card-3.jpg'
+      '/images/hero/ObjectHero03.png'
     ],
     description:
       'Solid surgical-grade 316L stainless steel curb link chain with custom industrial clasp. Scratch-resistant, hypoallergenic, water-proof, and sweat-proof. Heavy brutalist drape designed to be worn standalone or layered.',
@@ -411,7 +411,7 @@ export const ALL_OBJECTS_PRODUCTS = [
     images: [
       '/images/products/obg02.jpg',
       '/images/hero/ObjectHero03.jpg',
-      '/images/hero/hero-card-3.jpg'
+      '/images/hero/ObjectHero03.png'
     ],
     description:
       'Cast 316L solid stainless steel heavy hardware link choker with dual locking carabiner mechanism and brushed industrial chrome finish. Sits high along the collarbone to anchor oversized streetwear silhouettes.',
