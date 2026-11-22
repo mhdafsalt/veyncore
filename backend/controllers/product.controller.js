@@ -1,0 +1,499 @@
+import Product from '../models/product.model.js';
+
+/**
+ * GET /api/products
+ * Query products with optional filters
+ */
+export const getProducts = async (req, res) => {
+  try {
+    const {
+      category,
+      subCategory,
+      fit,
+      swipeCategory,
+      search,
+      featured,
+      newArrival,
+      sort,
+      limit = 100,
+    } = req.query;
+
+    const filter = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (subCategory) {
+      filter.subCategory = new RegExp(`^${subCategory}$`, 'i');
+    }
+
+    if (fit) {
+      filter.fit = new RegExp(`^${fit}$`, 'i');
+    }
+
+    if (swipeCategory) {
+      filter.swipeCategory = new RegExp(`^${swipeCategory}$`, 'i');
+    }
+
+    if (featured === 'true') {
+      filter.featured = true;
+    }
+
+    if (newArrival === 'true') {
+      filter.newArrival = true;
+    }
+
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { handle: { $regex: search, $options: 'i' } },
+        { subCategory: { $regex: search, $options: 'i' } },
+        { fit: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    let query = Product.find(filter);
+
+    // Sorting
+    if (sort === 'price-low') {
+      query = query.sort({ price: 1 });
+    } else if (sort === 'price-high') {
+      query = query.sort({ price: -1 });
+    } else if (sort === 'newest') {
+      query = query.sort({ createdAt: -1 });
+    } else {
+      query = query.sort({ sortOrder: 1, createdAt: -1 });
+    }
+
+    const products = await query.limit(parseInt(limit, 10));
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    console.error('[Product Controller] Error fetching products:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve products.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * GET /api/products/:handleOrId
+ * Retrieve single product by handle or MongoDB _id
+ */
+export const getProductByHandleOrId = async (req, res) => {
+  try {
+    const { handleOrId } = req.params;
+
+    let product = null;
+    if (handleOrId.match(/^[0-9a-fA-F]{24}$/)) {
+      product = await Product.findById(handleOrId);
+    }
+
+    if (!product) {
+      product = await Product.findOne({ handle: handleOrId.toLowerCase() });
+    }
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    console.error('[Product Controller] Error fetching product:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve product details.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/products
+ * Admin only: Create a new product
+ */
+export const createProduct = async (req, res) => {
+  try {
+    const data = req.body;
+
+    if (!data.title || !data.price) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product title and price are required.',
+      });
+    }
+
+    // Auto-generate handle if missing
+    if (!data.handle) {
+      data.handle = data.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+    }
+
+    // Ensure handle uniqueness
+    let existing = await Product.findOne({ handle: data.handle });
+    if (existing) {
+      data.handle = `${data.handle}-${Date.now().toString().slice(-4)}`;
+    }
+
+    // Formatting prices
+    const numPrice = Number(data.price);
+    const numCompare = data.comparePrice ? Number(data.comparePrice) : null;
+    data.price = numPrice;
+    data.comparePrice = numCompare;
+    data.salePrice = `Rs. ${numPrice.toLocaleString('en-IN')}.00`;
+    if (numCompare) {
+      data.regularPrice = `Rs. ${numCompare.toLocaleString('en-IN')}.00`;
+    }
+
+    if (data.images && data.images.length > 0 && !data.thumbnail) {
+      data.thumbnail = data.images[0];
+    }
+
+    if (data.category === 'VEYN-OBJECTS') {
+      data.isObject = true;
+    }
+
+    const product = await Product.create(data);
+
+    return res.status(201).json({
+      success: true,
+      message: 'Product created successfully.',
+      data: product,
+    });
+  } catch (error) {
+    console.error('[Product Controller] Error creating product:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create product.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PUT /api/products/:id
+ * Admin only: Update an existing product
+ */
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (updates.price) {
+      updates.price = Number(updates.price);
+      updates.salePrice = `Rs. ${updates.price.toLocaleString('en-IN')}.00`;
+    }
+
+    if (updates.comparePrice) {
+      updates.comparePrice = Number(updates.comparePrice);
+      updates.regularPrice = `Rs. ${updates.comparePrice.toLocaleString('en-IN')}.00`;
+    } else if (updates.comparePrice === '' || updates.comparePrice === null) {
+      updates.comparePrice = null;
+      updates.regularPrice = '';
+    }
+
+    if (updates.images && updates.images.length > 0) {
+      updates.thumbnail = updates.images[0];
+    }
+
+    if (updates.category === 'VEYN-OBJECTS') {
+      updates.isObject = true;
+    } else if (updates.category === 'VEYN-SELECTS') {
+      updates.isObject = false;
+    }
+
+    const product = await Product.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Product updated successfully.',
+      data: product,
+    });
+  } catch (error) {
+    console.error('[Product Controller] Error updating product:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update product.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/products/:id
+ * Admin only: Delete product by ID
+ */
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Product "${product.title}" deleted successfully.`,
+      deletedId: id,
+    });
+  } catch (error) {
+    console.error('[Product Controller] Error deleting product:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete product.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/products/seed
+ * Seed initial catalog data into MongoDB if collection is empty
+ */
+export const seedProducts = async (req, res) => {
+  try {
+    const count = await Product.countDocuments();
+    if (count > 0 && req.query.force !== 'true') {
+      return res.status(200).json({
+        success: true,
+        message: `Database already has ${count} products. Pass ?force=true to overwrite.`,
+        count,
+      });
+    }
+
+    if (req.query.force === 'true') {
+      await Product.deleteMany({});
+    }
+
+    // Default Seed Products
+    const DEFAULT_PRODUCTS = [
+      // Denim Fits (VEYN-SELECTS)
+      {
+        title: 'VEXO BLUE BAGGY',
+        handle: 'vexo-blue-baggy',
+        category: 'VEYN-SELECTS',
+        subCategory: 'BAGGY',
+        fit: 'baggy',
+        swipeCategory: 'baggy',
+        price: 1499,
+        comparePrice: 1700,
+        badge: 'NEW',
+        images: [
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6930.webp?v=1795179025&width=800',
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6933.webp?v=1795179029&width=800',
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6931.webp?v=1795179025&width=800',
+        ],
+        availableSizes: ['28', '30', '32', '34', '36'],
+        description: 'Heavyweight rigid denim with relaxed stacking and authentic wash.',
+        featured: true,
+        newArrival: true,
+        sortOrder: 1,
+      },
+      {
+        title: 'TINTED BLUE WIDE',
+        handle: 'tinted-blue-wide',
+        category: 'VEYN-SELECTS',
+        subCategory: 'WIDE',
+        fit: 'wide',
+        swipeCategory: 'wide',
+        price: 1499,
+        comparePrice: 1700,
+        badge: 'SALE',
+        images: [
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6875.webp?v=1795178652&width=800',
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6877.webp?v=1795178657&width=800',
+        ],
+        availableSizes: ['28', '30', '32', '34'],
+        description: 'Vintage tinted wash with ultra-wide leg silhouette.',
+        featured: true,
+        sortOrder: 2,
+      },
+      {
+        title: 'NID BLUE WIDE',
+        handle: 'nid-blue-wide',
+        category: 'VEYN-SELECTS',
+        subCategory: 'WIDE',
+        fit: 'wide',
+        swipeCategory: 'wide',
+        price: 1499,
+        comparePrice: 1700,
+        badge: 'MUST HAVE',
+        images: [
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6820.webp?v=1795178401&width=800',
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6822.webp?v=1795178408&width=800',
+        ],
+        availableSizes: ['28', '30', '32', '34'],
+        description: 'Light wash relaxed wide leg cut tailored for effortless drape.',
+        featured: true,
+        sortOrder: 3,
+      },
+      {
+        title: 'COAL BLUE BAGGY',
+        handle: 'coal-blue-baggy',
+        category: 'VEYN-SELECTS',
+        subCategory: 'BAGGY',
+        fit: 'baggy',
+        swipeCategory: 'baggy',
+        price: 1499,
+        comparePrice: 1700,
+        badge: 'SALE',
+        images: [
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6900.webp?v=1795178822&width=800',
+          'https://blurgvillage.com/cdn/shop/files/WEBP_File_6902.webp?v=1795178828&width=800',
+        ],
+        availableSizes: ['28', '30', '32', '34', '36'],
+        description: 'Deep indigo coal wash denim with rugged pocket finishing.',
+        featured: true,
+        sortOrder: 4,
+      },
+      {
+        title: 'ARTIC BLUE WIDE',
+        handle: 'artic-blue-wide',
+        category: 'VEYN-SELECTS',
+        subCategory: 'WIDE',
+        fit: 'wide',
+        swipeCategory: 'wide',
+        price: 1199,
+        comparePrice: 1599,
+        badge: 'SALE',
+        images: [
+          'https://veyncult.com/cdn/shop/files/Photoroom_20261114_161026_7cdcaaa2-a323-4305-befb-1dfb2be657aa.jpg?v=1794653177&width=832',
+          'https://veyncult.com/cdn/shop/files/Photoroom_20261114_161205.jpg?v=1794652964&width=832',
+        ],
+        availableSizes: ['28', '30', '32', '34', '36'],
+        description: 'Frosty arctic wash wide denim engineered for daily wear.',
+        newArrival: true,
+        sortOrder: 5,
+      },
+      {
+        title: 'SMOKE ASH SEMI BOOTCUT',
+        handle: 'smoke-ash-semi-bootcut',
+        category: 'VEYN-SELECTS',
+        subCategory: 'BOOTCUT',
+        fit: 'bootcut',
+        swipeCategory: 'bootcut',
+        price: 1299,
+        comparePrice: 1799,
+        badge: 'SALE',
+        images: [
+          'https://veyncult.com/cdn/shop/files/Photoroom_20261120_185006.jpg?v=1795182656&width=1000',
+          'https://veyncult.com/cdn/shop/files/Photoroom_20261120_185049.jpg?v=1795182684&width=1000',
+        ],
+        availableSizes: ['28', '30', '32', '34'],
+        description: 'Smoke ash subtle flare silhouette.',
+        sortOrder: 6,
+      },
+      // Objects (VEYN-OBJECTS)
+      {
+        title: 'TACTICAL CROSSBODY CARGO BAG',
+        handle: 'tactical-crossbody-cargo-bag',
+        category: 'VEYN-OBJECTS',
+        subCategory: 'BAGS',
+        swipeCategory: 'bags',
+        isObject: true,
+        price: 1499,
+        comparePrice: 2199,
+        badge: 'NEW',
+        images: [
+          '/images/hero/ObjectHero01.png',
+          '/images/hero/hero-card-3.jpg',
+        ],
+        availableSizes: ['ONE SIZE'],
+        description: '1000D Ballistic tactical canvas with quick-release metal cobra buckle.',
+        featured: true,
+        sortOrder: 10,
+      },
+      {
+        title: 'HEAVY LINK INDUSTRIAL CHAIN',
+        handle: 'heavy-link-industrial-chain',
+        category: 'VEYN-OBJECTS',
+        subCategory: 'CHAINS',
+        swipeCategory: 'chains',
+        isObject: true,
+        price: 1199,
+        comparePrice: 1799,
+        badge: 'BESTSELLER',
+        images: [
+          '/images/hero/ObjectHero02.png',
+          '/images/hero/hero-card-3.jpg',
+        ],
+        availableSizes: ['55 CM', '65 CM'],
+        description: '316L Surgical stainless steel curb link chain with custom laser engraving.',
+        featured: true,
+        sortOrder: 11,
+      },
+      {
+        title: 'DISTRESSED BRUTALIST METAL CAP',
+        handle: 'distressed-brutalist-metal-cap',
+        category: 'VEYN-OBJECTS',
+        subCategory: 'CAPS',
+        swipeCategory: 'headwear',
+        isObject: true,
+        price: 999,
+        comparePrice: 1499,
+        badge: 'HOT',
+        images: [
+          '/images/hero/hero-card-3.jpg',
+        ],
+        availableSizes: ['ADJUSTABLE'],
+        description: 'Heavyweight vintage washed cotton twill with distressed brass hardware.',
+        featured: true,
+        sortOrder: 12,
+      },
+    ];
+
+    const inserted = await Product.insertMany(DEFAULT_PRODUCTS);
+
+    return res.status(201).json({
+      success: true,
+      message: `Successfully seeded ${inserted.length} initial products.`,
+      count: inserted.length,
+      data: inserted,
+    });
+  } catch (error) {
+    console.error('[Product Controller] Error seeding products:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to seed products.',
+      error: error.message,
+    });
+  }
+};
+
+export default {
+  getProducts,
+  getProductByHandleOrId,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  seedProducts,
+};

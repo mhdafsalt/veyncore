@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import apiRoutes from './routes/index.js';
 import connectDB from './config/db.js';
 import notFoundHandler from './middleware/notFoundHandler.js';
@@ -51,8 +52,9 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Static uploads serving (placeholder for user-uploaded assets)
-app.use('/uploads', express.static('uploads'));
+// Static uploads serving for uploaded media assets
+const uploadsPath = path.resolve(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 // Mount API routes at both /api and root / for seamless flexibility
 app.use('/api', apiRoutes);

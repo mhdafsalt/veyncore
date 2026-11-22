@@ -2,43 +2,38 @@ import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      required: [true, 'Product title is required'],
+      trim: true,
+    },
     handle: {
       type: String,
-      required: [true, 'Product handle is required.'],
+      required: [true, 'Product handle is required'],
       unique: true,
       trim: true,
       lowercase: true,
     },
-    title: {
-      type: String,
-      required: [true, 'Product title is required.'],
-      trim: true,
-    },
-    fit: {
-      type: String,
-      default: 'Baggy Fit',
-      trim: true,
-    },
     category: {
       type: String,
-      default: 'VEYN-SELECTS',
       enum: ['VEYN-SELECTS', 'VEYN-OBJECTS'],
-      trim: true,
+      default: 'VEYN-SELECTS',
+      required: true,
     },
     subCategory: {
       type: String,
+      trim: true,
       default: 'BAGGY',
-      trim: true,
     },
-    badge: {
+    fit: {
       type: String,
-      default: '',
       trim: true,
+      default: '',
     },
     price: {
       type: Number,
-      required: [true, 'Price is required.'],
-      min: [0, 'Price cannot be negative.'],
+      required: [true, 'Price is required'],
+      min: [0, 'Price must be positive'],
     },
     comparePrice: {
       type: Number,
@@ -52,8 +47,9 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    discount: {
+    badge: {
       type: String,
+      trim: true,
       default: '',
     },
     images: {
@@ -66,23 +62,50 @@ const productSchema = new mongoose.Schema(
     },
     availableSizes: {
       type: [String],
-      default: ['28', '30', '32', '34', '36'],
+      default: ['28', '30', '32', '34'],
     },
     description: {
       type: String,
       default: '',
     },
-    inStock: {
-      type: Boolean,
-      default: true,
+    details: {
+      type: [String],
+      default: [],
+    },
+    specs: [
+      {
+        label: { type: String, default: '' },
+        value: { type: String, default: '' },
+      },
+    ],
+    shipping: {
+      type: [String],
+      default: [],
     },
     isObject: {
       type: Boolean,
       default: false,
     },
+    inStock: {
+      type: Boolean,
+      default: true,
+    },
     featured: {
       type: Boolean,
       default: false,
+    },
+    newArrival: {
+      type: Boolean,
+      default: false,
+    },
+    swipeCategory: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    sortOrder: {
+      type: Number,
+      default: 0,
     },
   },
   {
@@ -90,20 +113,19 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save hook to format salePrice and regularPrice if not provided
+// Format helper before saving
 productSchema.pre('save', function (next) {
-  if (this.price) {
+  if (this.price && !this.salePrice) {
     this.salePrice = `Rs. ${this.price.toLocaleString('en-IN')}.00`;
   }
-  if (this.comparePrice) {
+  if (this.comparePrice && !this.regularPrice) {
     this.regularPrice = `Rs. ${this.comparePrice.toLocaleString('en-IN')}.00`;
-    if (this.comparePrice > this.price) {
-      const pct = Math.round(((this.comparePrice - this.price) / this.comparePrice) * 100);
-      this.discount = `Save ${pct}%`;
-    }
   }
-  if (!this.thumbnail && this.images && this.images.length > 0) {
+  if (this.images && this.images.length > 0 && !this.thumbnail) {
     this.thumbnail = this.images[0];
+  }
+  if (this.category === 'VEYN-OBJECTS') {
+    this.isObject = true;
   }
   next();
 });

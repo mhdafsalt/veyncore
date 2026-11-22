@@ -1,0 +1,444 @@
+/* ==========================================================================
+   Admin Image Uploader Component (Brutalist Modern Design)
+   Supports dual-mode: File Upload (drag-and-drop) & URL Upload
+   ========================================================================== */
+
+.admin-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.admin-uploader__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-uploader__label {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+
+.admin-uploader__required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* Mode Switch Tabs */
+.admin-uploader__tabs {
+  display: inline-flex;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.admin-uploader__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #71717a;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.admin-uploader__tab:hover {
+  color: #f4f4f5;
+  background: #27272a;
+}
+
+.admin-uploader__tab--active {
+  color: #000000 !important;
+  background: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.admin-uploader__tab-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Dropzone (File Upload Mode) */
+.admin-uploader__dropzone-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-uploader__dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  padding: 24px 16px;
+  background: #09090b;
+  border: 1.5px dashed #3f3f46;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.admin-uploader__dropzone:hover {
+  border-color: #a1a1aa;
+  background: #121215;
+}
+
+.admin-uploader__dropzone--dragging {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  transform: scale(0.995);
+}
+
+.admin-uploader__dropzone--disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.admin-uploader__file-input {
+  display: none;
+}
+
+.admin-uploader__drop-icon {
+  width: 38px;
+  height: 38px;
+  color: #71717a;
+  margin-bottom: 8px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.admin-uploader__dropzone:hover .admin-uploader__drop-icon {
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.admin-uploader__drop-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f4f4f5;
+  margin-bottom: 4px;
+}
+
+.admin-uploader__drop-browse {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-uploader__drop-hint {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  color: #71717a;
+}
+
+/* Switch Shortcut Hint */
+.admin-uploader__switch-hint-btn {
+  background: transparent;
+  border: none;
+  color: #71717a;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  text-align: right;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 2px 4px;
+  align-self: flex-end;
+  transition: color 0.15s ease;
+}
+
+.admin-uploader__switch-hint-btn:hover {
+  color: #e4e4e7;
+}
+
+/* Upload Progress / Loading */
+.admin-uploader__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-uploader__spinner {
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid #27272a;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: admin-spin 0.7s linear infinite;
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-uploader__loading-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e4e4e7;
+}
+
+/* Success / Error Messages */
+.admin-uploader__success {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 6px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  color: #4ade80;
+}
+
+.admin-uploader__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  color: #f87171;
+}
+
+/* URL Input Mode */
+.admin-uploader__url-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-uploader__url-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-uploader__url-input {
+  width: 100%;
+  padding: 12px 40px 12px 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13px;
+  color: #ffffff;
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.admin-uploader__url-input:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
+}
+
+.admin-uploader__url-clear {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.admin-uploader__url-clear:hover {
+  color: #ffffff;
+}
+
+/* Live Preview Zone */
+.admin-uploader__preview-wrapper {
+  position: relative;
+  width: 100%;
+  background: #141416;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.admin-uploader__preview-img-container {
+  position: relative;
+  width: 100%;
+  min-height: 120px;
+  max-height: 240px;
+  background: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.admin-uploader__preview-img {
+  width: 100%;
+  height: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-uploader__preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #18181b;
+  border-top: 1px solid #27272a;
+}
+
+.admin-uploader__preview-path {
+  font-family: 'Inter', monospace !important;
+  font-size: 11px;
+  color: #a1a1aa;
+  max-width: 65%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-uploader__preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-uploader__preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  font-weight: 600;
+  color: #d4d4d8;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-uploader__preview-btn:hover {
+  color: #ffffff;
+  background: #3f3f46;
+}
+
+.admin-uploader__preview-btn--danger {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.admin-uploader__preview-btn--danger:hover {
+  color: #ffffff;
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+/* Help text */
+.admin-uploader__help {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Uploader Styles
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .admin-uploader__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .admin-uploader__tabs {
+    width: 100%;
+    display: flex;
+  }
+
+  .admin-uploader__tab {
+    flex: 1;
+    justify-content: center;
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .admin-uploader__dropzone {
+    min-height: 120px;
+    padding: 16px 12px;
+  }
+
+  .admin-uploader__drop-title {
+    font-size: 12px;
+  }
+
+  .admin-uploader__drop-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .admin-uploader__preview-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .admin-uploader__preview-path {
+    max-width: 100%;
+    font-size: 10.5px;
+  }
+
+  .admin-uploader__preview-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .admin-uploader__preview-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 10.5px;
+    text-align: center;
+  }
+}
+

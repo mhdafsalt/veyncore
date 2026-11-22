@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { ALL_DROPS_PRODUCTS, SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
+import { API_BASE_URL } from '@/lib/constants';
 import './AllDrops.css';
 
 /**
@@ -271,6 +272,7 @@ function DropsProductCard({ product }) {
  * Main ALL DROPS Collection View
  */
 export default function AllDrops() {
+  const [productsList, setProductsList] = useState(ALL_DROPS_PRODUCTS);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [selectedAvailability, setSelectedAvailability] = useState([]);
   const [minPrice, setMinPrice] = useState('');
@@ -284,6 +286,46 @@ export default function AllDrops() {
 
   const dropdownRef = useRef(null);
   const sentinelRef = useRef(null);
+
+  // Fetch dynamic products from backend API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=100`);
+        const json = await res.json();
+        if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map((p) => ({
+            id: p._id || p.id,
+            title: p.title,
+            handle: p.handle,
+            category: 'VEYN-SELECTS',
+            subCategory: p.subCategory || 'BAGGY',
+            fit: p.fit || 'baggy',
+            price: p.price,
+            comparePrice: p.comparePrice,
+            salePrice: p.salePrice || `Rs. ${p.price.toLocaleString('en-IN')}.00`,
+            regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+            badge: p.badge || '',
+            images: p.images && p.images.length > 0 ? p.images : ['/images/products/artic-blue-wide.jpg'],
+            thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/products/artic-blue-wide.jpg',
+            availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['28', '30', '32', '34', '36'],
+            inStock: p.inStock !== false,
+            createdAt: p.createdAt || new Date().toISOString(),
+          }));
+          if (isMounted) {
+            setProductsList(mapped);
+          }
+        }
+      } catch (e) {
+        // Silently fallback to static products
+      }
+    };
+    fetchProducts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -336,7 +378,7 @@ export default function AllDrops() {
 
   // Filtered & Sorted Products
   const filteredProducts = useMemo(() => {
-    let result = [...ALL_DROPS_PRODUCTS];
+    let result = [...productsList];
 
     // Filter by availability
     if (selectedAvailability.length > 0) {

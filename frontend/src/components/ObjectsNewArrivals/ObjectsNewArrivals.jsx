@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { OBJECTS_PRODUCTS } from '@/data/objectsData';
+import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsNewArrivals.css';
 
 /**
@@ -203,6 +204,46 @@ function ObjectCard({ product }) {
 }
 
 export default function ObjectsNewArrivals() {
+  const [products, setProducts] = useState(OBJECTS_PRODUCTS);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchObjects = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=20`);
+        const json = await res.json();
+        if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const arrivals = json.data.filter((p) => p.newArrival === true);
+          const list = arrivals.length > 0 ? arrivals : json.data.slice(0, 8);
+          const mapped = list.map((p) => ({
+            id: p._id || p.id,
+            title: p.title,
+            handle: p.handle,
+            salePrice: p.salePrice || (p.price ? `Rs. ${p.price.toLocaleString('en-IN')}.00` : ''),
+            regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+            price: p.price,
+            comparePrice: p.comparePrice,
+            images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
+            thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
+            badge: p.badge || (p.newArrival ? 'New' : ''),
+            availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
+          }));
+          if (isMounted && mapped.length > 0) {
+            setProducts(mapped);
+          }
+        }
+      } catch (err) {
+        // Fallback to static
+      }
+    };
+
+    fetchObjects();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section className="new-arrivals" id="object-drops">
       <div className="new-arrivals__container">
@@ -213,8 +254,8 @@ export default function ObjectsNewArrivals() {
 
         {/* 4-col desktop / 2-col mobile Grid */}
         <div className="new-arrivals__grid">
-          {OBJECTS_PRODUCTS.map((product) => (
-            <div key={product.id} className="new-arrivals__grid-item">
+          {products.map((product) => (
+            <div key={product.id || product.handle} className="new-arrivals__grid-item">
               <ObjectCard product={product} />
             </div>
           ))}

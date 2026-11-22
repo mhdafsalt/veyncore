@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { ALL_OBJECTS_PRODUCTS } from '@/data/objectsData';
+import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsAllDrops.css';
 
 /**
@@ -245,6 +246,8 @@ function ObjectsAllDropsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const [productsList, setProductsList] = useState(ALL_OBJECTS_PRODUCTS);
+
   // Read initial category filter from URL search params (e.g. ?category=bags)
   const initialCategoryParam = searchParams.get('category')?.toLowerCase() || 'all';
 
@@ -264,6 +267,45 @@ function ObjectsAllDropsContent() {
   const [mobileColumns, setMobileColumns] = useState('2');
 
   const dropdownRef = useRef(null);
+
+  // Fetch dynamic products from backend API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
+        const json = await res.json();
+        if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map((p) => ({
+            id: p._id || p.id,
+            title: p.title,
+            handle: p.handle,
+            category: 'VEYN-OBJECTS',
+            subCategory: p.subCategory || 'BAGS',
+            price: p.price,
+            comparePrice: p.comparePrice,
+            salePrice: p.salePrice || `Rs. ${p.price.toLocaleString('en-IN')}.00`,
+            regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+            badge: p.badge || '',
+            images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
+            thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
+            availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
+            inStock: p.inStock !== false,
+            createdAt: p.createdAt || new Date().toISOString(),
+          }));
+          if (isMounted) {
+            setProductsList(mapped);
+          }
+        }
+      } catch (e) {
+        // Silently fallback to static products
+      }
+    };
+    fetchProducts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Sync category state when URL param changes
   useEffect(() => {
@@ -336,7 +378,7 @@ function ObjectsAllDropsContent() {
 
   // Filtered & Sorted Objects
   const filteredProducts = useMemo(() => {
-    let result = [...ALL_OBJECTS_PRODUCTS];
+    let result = [...productsList];
 
     // Filter by category tab
     if (activeCategoryTab !== 'all') {

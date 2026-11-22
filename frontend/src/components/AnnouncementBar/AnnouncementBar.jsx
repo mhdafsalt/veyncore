@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/lib/constants';
 import './AnnouncementBar.css';
 
-const ANNOUNCEMENTS = [
+const DEFAULT_ANNOUNCEMENTS = [
   'LEAD WITH CONFIDENCE',
   'FREE SHIPPING ON ALL ORDERS',
   'NEW DENIM DROPS LIVE NOW',
@@ -12,8 +13,37 @@ const ANNOUNCEMENTS = [
 ];
 
 export default function AnnouncementBar() {
+  const [announcements, setAnnouncements] = useState(DEFAULT_ANNOUNCEMENTS);
+
+  // Fetch dynamic announcements from backend
+  useEffect(() => {
+    let isMounted = true;
+    const fetchAnnouncements = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/content/announcements`);
+        const data = await res.json();
+        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const activeList = data.data
+            .filter((a) => a.active !== false)
+            .map((a) => a.text)
+            .filter(Boolean);
+          if (isMounted && activeList.length > 0) {
+            setAnnouncements(activeList);
+          }
+        }
+      } catch (err) {
+        // Fallback to defaults
+      }
+    };
+
+    fetchAnnouncements();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Duplicate array so each group is wide enough to seamlessly loop on all screens
-  const marqueeItems = [...ANNOUNCEMENTS, ...ANNOUNCEMENTS];
+  const marqueeItems = [...announcements, ...announcements];
 
   return (
     <aside className="announcement-bar" role="region" aria-label="Announcement Ticker">

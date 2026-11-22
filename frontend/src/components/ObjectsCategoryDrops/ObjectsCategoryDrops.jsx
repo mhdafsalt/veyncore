@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { OBJECTS_DROP_CATEGORIES, OBJECTS_CATEGORY_DATA } from '@/data/objectsData';
+import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsCategoryDrops.css';
 
 /**
@@ -391,11 +392,93 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
  * 3. CAPS & HEADWEAR (#headwear)
  */
 export default function ObjectsCategoryDrops() {
+  const [categories, setCategories] = useState(OBJECTS_DROP_CATEGORIES);
+  const [categoryData, setCategoryData] = useState(OBJECTS_CATEGORY_DATA);
+
+  // Fetch dynamic categories and products for VEYN-OBJECTS
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadDynamicData = async () => {
+      try {
+        // 1. Fetch dynamic swipe categories
+        const catRes = await fetch(`${API_BASE_URL}/api/content/swipeCategories`);
+        const catJson = await catRes.json();
+        let dynamicCats = null;
+        if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
+          const filtered = catJson.data.filter(
+            (c) => c.targetSection === 'VEYN-OBJECTS' && c.active !== false
+          );
+          if (filtered.length > 0) {
+            dynamicCats = filtered.map((c) => ({
+              id: (c.key || c.id).toLowerCase(),
+              label: c.label,
+              anchorId: (c.key || c.id).toLowerCase(),
+              collectionPath: c.collectionPath || `/collections/objects-drops?category=${(c.key || c.id).toLowerCase()}`,
+            }));
+          }
+        }
+
+        // 2. Fetch dynamic products
+        const prodRes = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
+        const prodJson = await prodRes.json();
+
+        if (isMounted) {
+          if (dynamicCats && dynamicCats.length > 0) {
+            setCategories(dynamicCats);
+          }
+
+          if (prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
+            const grouped = {};
+            prodJson.data.forEach((p) => {
+              const key = (p.swipeCategory || p.subCategory || p.fit || '').toLowerCase();
+              if (!key) return;
+              if (!grouped[key]) grouped[key] = [];
+              grouped[key].push({
+                id: p._id || p.id,
+                title: p.title,
+                handle: p.handle,
+                category: 'VEYN-OBJECTS',
+                subCategory: p.subCategory || key.toUpperCase(),
+                salePrice: p.salePrice || (p.price ? `Rs. ${p.price.toLocaleString('en-IN')}.00` : ''),
+                regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+                price: p.price,
+                comparePrice: p.comparePrice,
+                badge: p.badge || '',
+                images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
+                thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
+                availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
+              });
+            });
+
+            setCategoryData((prev) => {
+              const updated = { ...prev };
+              Object.keys(grouped).forEach((k) => {
+                if (grouped[k].length > 0) {
+                  updated[k] = grouped[k];
+                }
+              });
+              return updated;
+            });
+          }
+        }
+      } catch (err) {
+        // Silently fallback to static data
+      }
+    };
+
+    loadDynamicData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="objects-cat-drops" id="objects-category-drops">
       <div className="objects-cat-drops__container">
-        {OBJECTS_DROP_CATEGORIES.map((cat) => {
-          const products = OBJECTS_CATEGORY_DATA[cat.id] || [];
+        {categories.map((cat) => {
+          const products = categoryData[cat.id] || [];
           return (
             <CategorySwipeRow
               key={cat.id}

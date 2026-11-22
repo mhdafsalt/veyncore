@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { API_BASE_URL } from '@/lib/constants';
 import './SubCategories.css';
 
-const SELECTS_SUBCATEGORIES = [
+const DEFAULT_SELECTS_SUBCATEGORIES = [
   { id: 'home', label: 'HOME', href: '#home' },
   { id: 'flash-sale', label: 'FLASH SALE⚡️', href: '#flash-sale', isGlow: true },
   { id: 'new-drops', label: 'NEW DROPS', href: '/collections/all-drops', isGlow: true },
@@ -19,7 +20,7 @@ const SELECTS_SUBCATEGORIES = [
   { id: 'accessories', label: 'ACCESSORIES', href: '#accessories' }
 ];
 
-const OBJECTS_SUBCATEGORIES = [
+const DEFAULT_OBJECTS_SUBCATEGORIES = [
   { id: 'obj-all', label: 'ALL OBJECTS', href: '/collections/objects-drops' },
   { id: 'obj-drops', label: 'OBJECT DROPS ⚡️', href: '#object-drops', isGlow: true },
   { id: 'bags', label: 'BAGS', href: '#bags' },
@@ -33,13 +34,47 @@ export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
   const router = useRouter();
   const pathname = usePathname();
   const [activeSubId, setActiveSubId] = useState('home');
+  const [dynamicSubcategories, setDynamicSubcategories] = useState(null);
+
   const containerRef = useRef(null);
   const activeTabRef = useRef(null);
 
-  const subcategories =
-    activeMainCategory === 'VEYN-OBJECTS'
-      ? OBJECTS_SUBCATEGORIES
-      : SELECTS_SUBCATEGORIES;
+  // Fetch dynamic subcategories from backend
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSubcategories = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/content/subcategories`);
+        const data = await res.json();
+        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          if (isMounted) {
+            setDynamicSubcategories(data.data);
+          }
+        }
+      } catch (err) {
+        // Fallback to static defaults
+      }
+    };
+
+    fetchSubcategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const subcategories = useMemo(() => {
+    if (dynamicSubcategories && dynamicSubcategories.length > 0) {
+      const filtered = dynamicSubcategories.filter(
+        (sub) =>
+          sub.mainCategory === activeMainCategory && sub.active !== false
+      );
+      if (filtered.length > 0) return filtered;
+    }
+
+    return activeMainCategory === 'VEYN-OBJECTS'
+      ? DEFAULT_OBJECTS_SUBCATEGORIES
+      : DEFAULT_SELECTS_SUBCATEGORIES;
+  }, [dynamicSubcategories, activeMainCategory]);
 
   // Reset active tab when parent main category changes
   useEffect(() => {
@@ -68,59 +103,56 @@ export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
     }
   }, [activeSubId]);
 
-  const handleTabClick = (e, item) => {
-    setActiveSubId(item.id);
+  const handleSubClick = (sub) => {
+    setActiveSubId(sub.id);
 
-    if (item.href.startsWith('#')) {
-      const hash = item.href.slice(1);
-      const target = document.getElementById(hash);
+    if (sub.href.startsWith('/')) {
+      router.push(sub.href);
+      return;
+    }
 
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        const isObjects = activeMainCategory === 'VEYN-OBJECTS';
-        e.preventDefault();
-        router.push(isObjects ? `/veyn-objects#${hash}` : `/#${hash}`);
+    if (sub.href.startsWith('#')) {
+      const sectionId = sub.href.replace('#', '');
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const yOffset = -90;
+        const y =
+          element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
     }
   };
 
   return (
-    <div className="subcategories" aria-label="Subcategory navigation">
-      <div className="subcategories__wrap">
-        <div
-          ref={containerRef}
-          className="subcategories__list"
-          role="tablist"
-        >
-          {subcategories.map((item) => {
-            const isActive = activeSubId === item.id;
+    <nav
+      className="subcategories-nav"
+      aria-label="Sub categories secondary navigation"
+      role="navigation"
+    >
+      <div className="subcategories-nav__wrapper" ref={containerRef}>
+        <div className="subcategories-nav__track">
+          {subcategories.map((sub) => {
+            const isActive = activeSubId === sub.id;
+            const isGlow = Boolean(sub.isGlow);
 
             return (
-              <div
-                key={item.id}
+              <button
+                key={sub.id}
                 ref={isActive ? activeTabRef : null}
-                className={`subcategories__item ${
-                  isActive ? 'subcategories__item--active' : ''
-                } ${item.isGlow ? 'subcategories__item--glow' : ''}`}
+                type="button"
+                className={`subcategory-pill ${
+                  isActive ? 'subcategory-pill--active' : ''
+                } ${isGlow ? 'subcategory-pill--glow' : ''}`}
+                onClick={() => handleSubClick(sub)}
+                aria-current={isActive ? 'page' : undefined}
               >
-                <a
-                  href={item.href}
-                  className={`subcategories__link ${
-                    isActive ? 'subcategories__link--active' : ''
-                  } ${item.isGlow ? 'subcategories__link--glow' : ''}`}
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={(e) => handleTabClick(e, item)}
-                >
-                  <span className="subcategories__label">{item.label}</span>
-                </a>
-              </div>
+                <span className="subcategory-pill__label">{sub.label}</span>
+                {isGlow && <span className="subcategory-pill__glow-fx" aria-hidden="true" />}
+              </button>
             );
           })}
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

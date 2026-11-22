@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { FIT_CATEGORIES, CATEGORY_FITS_DATA } from '@/data/categoryFitsData';
+import { API_BASE_URL } from '@/lib/constants';
 import './CategoryFits.css';
 
 /**
@@ -410,11 +411,91 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
  * and a centered bottom "View all" button.
  */
 export default function CategoryFits() {
+  const [categories, setCategories] = useState(FIT_CATEGORIES);
+  const [categoryData, setCategoryData] = useState(CATEGORY_FITS_DATA);
+
+  // Fetch dynamic categories and products from backend
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadDynamicData = async () => {
+      try {
+        // 1. Fetch swipe categories
+        const catRes = await fetch(`${API_BASE_URL}/api/content/swipeCategories`);
+        const catJson = await catRes.json();
+        let dynamicCats = null;
+        if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
+          const filtered = catJson.data.filter(
+            (c) => c.targetSection === 'VEYN-SELECTS' && c.active !== false
+          );
+          if (filtered.length > 0) {
+            dynamicCats = filtered.map((c) => ({
+              id: (c.key || c.id).toLowerCase(),
+              label: c.label,
+              collectionPath: c.collectionPath || `/collections/${(c.key || c.id).toLowerCase()}`,
+            }));
+          }
+        }
+
+        // 2. Fetch products
+        const prodRes = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=100`);
+        const prodJson = await prodRes.json();
+
+        if (isMounted) {
+          if (dynamicCats && dynamicCats.length > 0) {
+            setCategories(dynamicCats);
+          }
+
+          if (prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
+            const grouped = {};
+            prodJson.data.forEach((p) => {
+              const key = (p.swipeCategory || p.fit || p.subCategory || '').toLowerCase();
+              if (!key) return;
+              if (!grouped[key]) grouped[key] = [];
+              grouped[key].push({
+                id: p._id || p.id,
+                title: p.title,
+                handle: p.handle,
+                fit: p.fit || key,
+                salePrice: p.salePrice || (p.price ? `Rs. ${p.price.toLocaleString('en-IN')}.00` : ''),
+                regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+                price: p.price,
+                comparePrice: p.comparePrice,
+                badge: p.badge || '',
+                images: p.images && p.images.length > 0 ? p.images : ['/images/products/artic-blue-wide.jpg'],
+                thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/products/artic-blue-wide.jpg',
+                availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['28', '30', '32', '34', '36'],
+              });
+            });
+
+            setCategoryData((prev) => {
+              const updated = { ...prev };
+              Object.keys(grouped).forEach((k) => {
+                if (grouped[k].length > 0) {
+                  updated[k] = grouped[k];
+                }
+              });
+              return updated;
+            });
+          }
+        }
+      } catch (err) {
+        // Silently fallback to static data
+      }
+    };
+
+    loadDynamicData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="category-fits" id="category-fits-showcase">
       <div className="category-fits__container">
-        {FIT_CATEGORIES.map((cat) => {
-          const products = CATEGORY_FITS_DATA[cat.id] || [];
+        {categories.map((cat) => {
+          const products = categoryData[cat.id] || [];
           return (
             <FitSwipeRow
               key={cat.id}
