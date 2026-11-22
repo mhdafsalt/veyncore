@@ -1,0 +1,186 @@
+/* ==========================================================================
+   AdminDashboard.css - Core Shell & Tabs Layout
+   ========================================================================== */
+
+.admin-dashboard {
+  min-height: 100vh;
+  background-color: #fafafa;
+  color: #000000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  padding: 32px 24px 80px;
+  box-sizing: border-box;
+}
+
+.admin-dashboard__container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Tab Navigation */
+.admin-dashboard__tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.admin-dashboard__tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.admin-dashboard__tabs::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 2px;
+}
+
+.admin-dashboard__tab {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #52525b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.admin-dashboard__tab:hover {
+  color: #000000;
+  border-color: #a1a1aa;
+}
+
+.admin-dashboard__tab--active {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.admin-dashboard__tab--active:hover {
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* Loading & Access Denied */
+.admin-dashboard--loading,
+.admin-dashboard--denied {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.admin-dashboard__spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e5e5;
+  border-top-color: #000000;
+  border-radius: 50%;
+  animation: adminDashSpin 0.7s linear infinite;
+}
+
+@keyframes adminDashSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-dashboard__loading-text {
+  margin-top: 16px;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 700;
+  color: #52525b;
+}
+
+.admin-dashboard__denied-box {
+  max-width: 440px;
+}
+
+.admin-dashboard__denied-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.admin-dashboard__denied-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+.admin-dashboard__denied-desc {
+  font-size: 13.5px;
+  color: #71717a;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.admin-dashboard__denied-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.admin-dashboard__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.admin-dashboard__btn--primary {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+.admin-dashboard__btn--primary:hover {
+  background-color: #27272a;
+}
+
+.admin-dashboard__btn--outline {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #d4d4d8;
+}
+
+.admin-dashboard__btn--outline:hover {
+  background-color: #f4f4f5;
+  border-color: #a1a1aa;
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 16px 12px 60px;
+  }
+}

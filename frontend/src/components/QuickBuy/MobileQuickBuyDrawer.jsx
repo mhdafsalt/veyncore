@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import './MobileQuickBuyDrawer.css';
 
@@ -27,7 +28,7 @@ function extractNumericPrice(val) {
 }
 
 export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
-  const { addItem, openCart } = useCart();
+  const { addItem, openCart, whatsappNumber } = useCart();
   const [mounted, setMounted] = useState(false);
   const [selectedSize, setSelectedSize] = useState('28');
   const [quantity, setQuantity] = useState(1);
@@ -102,6 +103,34 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
 
     onClose();
     openCart();
+  };
+
+  // Build Direct WhatsApp Order Link
+  const buildDirectWhatsAppLink = () => {
+    const itemTotal = numSalePrice * quantity;
+    const productUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}/products/${product.handle || product.id}`
+      : '';
+
+    const lines = [
+      '*New Order Request - VEYNCORE*',
+      '--------------------------------',
+      '*Item Details:*',
+      `• *${product?.title || 'Product'}*`,
+      `  Size: ${selectedSize}`,
+      `  Quantity: ${quantity}`,
+      `  Price: Rs. ${numSalePrice.toLocaleString('en-IN')}.00 INR`,
+      productUrl ? `  Product Link: ${productUrl}` : '',
+      '--------------------------------',
+      `*Total Amount:* Rs. ${itemTotal.toLocaleString('en-IN')}.00 INR`,
+      '*Shipping:* Free Shipping All Over India',
+      '--------------------------------',
+      'Please confirm my order and share payment instructions. Thank you!'
+    ].filter(Boolean);
+
+    const message = lines.join('\n');
+    const targetNumber = whatsappNumber || '919876543210';
+    return `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
   };
 
   const handleBuyNow = (e) => {
@@ -248,14 +277,18 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
           </button>
         </div>
 
-        {/* Buy It Now Button */}
-        <button
-          type="button"
-          className="mobile-quick-buy__buy-now-btn"
-          onClick={handleBuyNow}
+        {/* Direct WhatsApp Order Button */}
+        <a
+          href={buildDirectWhatsAppLink()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mobile-quick-buy__whatsapp-btn"
+          onClick={() => onClose()}
+          aria-label="Direct WhatsApp Order"
         >
-          Buy it now
-        </button>
+          <FaWhatsapp className="mobile-quick-buy__whatsapp-icon" size={20} aria-hidden="true" />
+          <span>Direct WhatsApp Order</span>
+        </a>
       </div>
     </div>
   );

@@ -14,8 +14,9 @@
   border-top: 1px solid #e5e5e5;
 }
 
-.modern-footer:has(.image-banner) {
-  border-top: none;
+.modern-footer:has(.image-banner),
+.product-page-wrapper .modern-footer {
+  border-top: none !important;
 }
 
 .modern-footer * {
@@ -233,6 +234,10 @@
   padding: 24px 0 8px;
   background-color: #ffffff;
   border-top: 1px solid #e5e5e5;
+}
+
+.product-page-wrapper .modern-footer__nav-wrapper {
+  border-top: none !important;
 }
 
 .modern-footer__accordions {

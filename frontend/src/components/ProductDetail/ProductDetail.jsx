@@ -18,7 +18,7 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  * pincode estimator, collapsible accordions, social sharing, and related denims.
  */
 export default function ProductDetail({ product }) {
-  const { addItem } = useCart();
+  const { addItem, whatsappNumber } = useCart();
   const isObject = Boolean(product?.isObject || product?.category === 'VEYN-OBJECTS');
 
   // State Management
@@ -143,18 +143,34 @@ export default function ProductDetail({ product }) {
     setTimeout(() => setAddedAnimation(false), 1800);
   };
 
-  // Buy It Now
-  const handleBuyItNow = () => {
-    addItem({
-      id: `${product.id}-${selectedSize}`,
-      productId: product.id,
-      title: product.title,
-      size: selectedSize,
-      price: product.price,
-      comparePrice: product.comparePrice,
-      image: images[0],
-      quantity: quantity
-    });
+  // Build Direct WhatsApp Order Link
+  const buildDirectWhatsAppLink = () => {
+    const rawPrice = product?.salePrice ?? product?.price ?? 1299;
+    const numPrice = typeof rawPrice === 'number'
+      ? rawPrice
+      : (parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 0);
+    const itemTotal = numPrice * quantity;
+    const productUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+    const lines = [
+      '*New Order Request - VEYNCORE*',
+      '--------------------------------',
+      '*Item Details:*',
+      `• *${product?.title || 'Product'}*`,
+      `  Size: ${selectedSize}`,
+      `  Quantity: ${quantity}`,
+      `  Price: Rs. ${numPrice.toLocaleString('en-IN')}.00 INR`,
+      productUrl ? `  Product Link: ${productUrl}` : '',
+      '--------------------------------',
+      `*Total Amount:* Rs. ${itemTotal.toLocaleString('en-IN')}.00 INR`,
+      '*Shipping:* Free Shipping All Over India',
+      '--------------------------------',
+      'Please confirm my order and share payment instructions. Thank you!'
+    ].filter(Boolean);
+
+    const message = lines.join('\n');
+    const targetNumber = whatsappNumber || '919876543210';
+    return `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
   };
 
   // Social Sharing
@@ -459,14 +475,16 @@ export default function ProductDetail({ product }) {
                   )}
                 </button>
 
-                <button
-                  type="button"
-                  className="product-btn product-btn--buy-now"
-                  onClick={handleBuyItNow}
+                <a
+                  href={buildDirectWhatsAppLink()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="product-btn product-btn--whatsapp"
+                  aria-label="Direct WhatsApp Order"
                 >
-                  <span className="product-btn__shimmer" />
-                  <span className="product-btn__text">BUY IT NOW</span>
-                </button>
+                  <FaWhatsapp className="product-btn__whatsapp-icon" size={22} aria-hidden="true" />
+                  <span className="product-btn__text">Direct WhatsApp Order</span>
+                </a>
               </div>
 
               {/* Collapsible Accordion: What is VEYN-SELECTS / VEYN-OBJECTS? */}
