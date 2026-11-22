@@ -22,9 +22,13 @@ export async function generateMetadata({ params }) {
   const handle = resolvedParams?.handle;
   const product = getProductByHandle(handle);
 
+  const isObject = product?.isObject || product?.category === 'VEYN-OBJECTS';
+
   return {
     title: `${product.title} | VEYNCORE`,
-    description: `${product.title} — ${product.fit || 'Baggy Fit'}. Exclusive streetwear denim handpicked for VEYNCORE. Free nationwide delivery & no-cost EMI available.`,
+    description: isObject
+      ? `${product.title} — ${product.subCategory || 'HARDWARE & UTILITY'}. Engineered tactical brutalist artifacts by VEYNCORE Objects Lab. Free nationwide delivery.`
+      : `${product.title} — ${product.fit || 'Baggy Fit'}. Exclusive streetwear denim handpicked for VEYNCORE. Free nationwide delivery & no-cost EMI available.`,
     openGraph: {
       title: `${product.title} | VEYNCORE`,
       description: `${product.title} — ${product.salePrice}. Official VEYNCORE store.`,
@@ -48,10 +52,15 @@ export default async function ProductDetailPage({ params }) {
   const handle = resolvedParams?.handle;
   const product = getProductByHandle(handle);
 
+  const initialCat =
+    product?.isObject || product?.category === 'VEYN-OBJECTS'
+      ? 'VEYN-OBJECTS'
+      : 'VEYN-SELECTS';
+
   return (
     <main className="product-page-wrapper">
       {/* 1. Header with AnnouncementBar, Navbar, MainCategories & SubCategories */}
-      <StoreHeader initialCategory={product.category || 'VEYN-SELECTS'} />
+      <StoreHeader initialCategory={initialCat} />
 
       {/* 2. Product Details Component */}
       <ProductDetail product={product} />

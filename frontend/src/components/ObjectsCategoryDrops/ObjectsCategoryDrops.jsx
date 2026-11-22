@@ -60,7 +60,7 @@ function ObjectProductCard({ product }) {
   return (
     <article className="obj-drop-card">
       <div className="obj-drop-card__gallery">
-        <Link href="/collections/all-drops" className="obj-drop-card__link">
+        <Link href={`/products/${product.handle || product.id}`} className="obj-drop-card__link">
           <div className="obj-drop-card__image-container">
             <img
               src={images[0]}
@@ -167,7 +167,7 @@ function ObjectProductCard({ product }) {
 
       {/* Product Details (Title & Price) */}
       <div className="obj-drop-card__details">
-        <Link href="/collections/all-drops" className="obj-drop-card__title-link">
+        <Link href={`/products/${product.handle || product.id}`} className="obj-drop-card__title-link">
           <h3 className="obj-drop-card__title">{product.title}</h3>
         </Link>
         <div className="obj-drop-card__pricing">
@@ -196,7 +196,7 @@ function ViewAllEndCard({ categoryLabel, collectionPath }) {
     <article className="obj-drop-card obj-drop-card--view-all">
       <Link href={collectionPath} className="obj-drop-card__view-all-link" aria-label={`View all ${categoryLabel}`}>
         <div className="obj-drop-card__view-all-box">
-          <span className="obj-drop-card__view-all-text">View</span>
+          <span className="obj-drop-card__view-all-text">View all</span>
           <svg
             className="obj-drop-card__view-all-arrow"
             width="20"

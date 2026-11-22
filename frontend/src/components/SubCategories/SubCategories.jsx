@@ -20,13 +20,13 @@ const SELECTS_SUBCATEGORIES = [
 ];
 
 const OBJECTS_SUBCATEGORIES = [
-  { id: 'obj-all', label: 'ALL OBJECTS', href: '#all-objects' },
+  { id: 'obj-all', label: 'ALL OBJECTS', href: '/collections/objects-drops' },
   { id: 'obj-drops', label: 'OBJECT DROPS ⚡️', href: '#object-drops', isGlow: true },
   { id: 'bags', label: 'BAGS', href: '#bags' },
   { id: 'chains', label: 'CHAINS', href: '#chains' },
   { id: 'headwear', label: 'CAPS & HEADWEAR', href: '#headwear' },
   { id: 'hardware', label: 'HARDWARE', href: '#hardware' },
-  { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops' }
+  { id: 'all-drops', label: 'ALL DROPS', href: '/collections/objects-drops' }
 ];
 
 export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {

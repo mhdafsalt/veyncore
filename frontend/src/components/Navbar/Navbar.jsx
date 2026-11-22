@@ -563,7 +563,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="/collections/all-drops"
+                    href="/collections/objects-drops"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >

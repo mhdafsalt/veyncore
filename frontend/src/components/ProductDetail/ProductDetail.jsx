@@ -19,6 +19,7 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  */
 export default function ProductDetail({ product }) {
   const { addItem } = useCart();
+  const isObject = Boolean(product?.isObject || product?.category === 'VEYN-OBJECTS');
 
   // State Management
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -381,7 +382,7 @@ export default function ProductDetail({ product }) {
                       <line x1="14" y1="7" x2="14" y2="11" />
                       <line x1="18" y1="7" x2="18" y2="13" />
                     </svg>
-                    <span>SIZE CHART</span>
+                    <span>{isObject ? 'SPECIFICATIONS' : 'SIZE CHART'}</span>
                   </button>
                 </div>
 
@@ -468,7 +469,7 @@ export default function ProductDetail({ product }) {
                 </button>
               </div>
 
-              {/* Collapsible Accordion: What is VEYN-SELECTS? */}
+              {/* Collapsible Accordion: What is VEYN-SELECTS / VEYN-OBJECTS? */}
               <div className="product-accordion">
                 <button
                   type="button"
@@ -476,7 +477,9 @@ export default function ProductDetail({ product }) {
                   onClick={() => setIsBrandStoryOpen((prev) => !prev)}
                   aria-expanded={isBrandStoryOpen}
                 >
-                  <span className="product-accordion__title">WHAT IS VEYN-SELECTS?</span>
+                  <span className="product-accordion__title">
+                    {isObject ? 'WHAT IS VEYN-OBJECTS?' : 'WHAT IS VEYN-SELECTS?'}
+                  </span>
                   <span className={`product-accordion__icon ${isBrandStoryOpen ? 'product-accordion__icon--open' : ''}`}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="6 9 12 15 18 9" />
@@ -519,6 +522,21 @@ export default function ProductDetail({ product }) {
                 <div className="product-tabs__body">
                   {activeTab === 'description' && (
                     <div className="product-tabs__pane">
+                      {product.description && (
+                        <p className="product-tabs__description-text">
+                          {product.description}
+                        </p>
+                      )}
+                      {product.specs && product.specs.length > 0 && (
+                        <div className="product-tabs__specs-grid">
+                          {product.specs.map((item, idx) => (
+                            <div key={idx} className="product-tabs__spec-row">
+                              <span className="product-tabs__spec-key">{item.label}:</span>
+                              <span className="product-tabs__spec-val">{item.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <ul className="product-tabs__list">
                         {(product.details || []).map((item, idx) => (
                           <li key={idx} className="product-tabs__list-item">
@@ -700,7 +718,7 @@ export default function ProductDetail({ product }) {
       </div>
 
       {/* =========================================================
-          SIZE CHART MODAL
+          SIZE CHART / SPECIFICATIONS MODAL
           ========================================================= */}
       {isSizeModalOpen && (
         <div className="size-modal" role="dialog" aria-modal="true" aria-labelledby="size-modal-title">
@@ -710,34 +728,42 @@ export default function ProductDetail({ product }) {
             {/* Modal Header */}
             <div className="size-modal__header">
               <div className="size-modal__title-group">
-                <h3 className="size-modal__title" id="size-modal-title">SIZE GUIDE & MEASUREMENTS</h3>
-                <p className="size-modal__subtitle">Pants & Jeans Fit Specification</p>
+                <h3 className="size-modal__title" id="size-modal-title">
+                  {isObject ? 'ARTIFACT SPECIFICATIONS & FIT' : 'SIZE GUIDE & MEASUREMENTS'}
+                </h3>
+                <p className="size-modal__subtitle">
+                  {isObject
+                    ? `${product.subCategory || 'HARDWARE'} DIMENSION & ENGINEERING GUIDE`
+                    : 'Pants & Jeans Fit Specification'}
+                </p>
               </div>
 
-              {/* Unit Toggle & Close Button */}
+              {/* Unit Toggle & Close Button (for jeans) or Close Button (for objects) */}
               <div className="size-modal__actions">
-                <div className="size-modal__unit-toggle" role="radiogroup" aria-label="Measurement Units">
-                  <button
-                    type="button"
-                    className={`size-modal__unit-btn ${sizeUnit === 'inches' ? 'size-modal__unit-btn--active' : ''}`}
-                    onClick={() => setSizeUnit('inches')}
-                  >
-                    IN
-                  </button>
-                  <button
-                    type="button"
-                    className={`size-modal__unit-btn ${sizeUnit === 'cm' ? 'size-modal__unit-btn--active' : ''}`}
-                    onClick={() => setSizeUnit('cm')}
-                  >
-                    CM
-                  </button>
-                </div>
+                {!isObject && (
+                  <div className="size-modal__unit-toggle" role="radiogroup" aria-label="Measurement Units">
+                    <button
+                      type="button"
+                      className={`size-modal__unit-btn ${sizeUnit === 'inches' ? 'size-modal__unit-btn--active' : ''}`}
+                      onClick={() => setSizeUnit('inches')}
+                    >
+                      IN
+                    </button>
+                    <button
+                      type="button"
+                      className={`size-modal__unit-btn ${sizeUnit === 'cm' ? 'size-modal__unit-btn--active' : ''}`}
+                      onClick={() => setSizeUnit('cm')}
+                    >
+                      CM
+                    </button>
+                  </div>
+                )}
 
                 <button
                   type="button"
                   className="size-modal__close-btn"
                   onClick={() => setIsSizeModalOpen(false)}
-                  aria-label="Close size guide"
+                  aria-label="Close modal"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <line x1="18" y1="6" x2="6" y2="18" />
@@ -749,86 +775,193 @@ export default function ProductDetail({ product }) {
 
             {/* Modal Body */}
             <div className="size-modal__body">
-              {/* Measurement Table */}
-              <div className="size-modal__table-wrap">
-                <table className="size-modal__table">
-                  <thead>
-                    <tr>
-                      <th>Size</th>
-                      <th>Waist ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                      <th>Rise ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                      <th>Thighs ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                      <th>Length ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                      <th>Leg Opening ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {measurements.map((row) => (
-                      <tr
-                        key={row.size}
-                        className={row.size === selectedSize ? 'size-modal__row--selected' : ''}
-                      >
-                        <td className="size-modal__cell-size">{row.size}</td>
-                        <td>{row.waist}</td>
-                        <td>{row.rise}</td>
-                        <td>{row.thighs}</td>
-                        <td>{row.length}</td>
-                        <td>{row.legOpening}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {isObject ? (
+                /* Object Specifications & Sizing */
+                <div className="size-modal__object-body">
+                  {product.subCategory === 'CHAINS' && (
+                    <div className="size-modal__table-wrap">
+                      <table className="size-modal__table">
+                        <thead>
+                          <tr>
+                            <th>Size</th>
+                            <th>Length (IN)</th>
+                            <th>Length (CM)</th>
+                            <th>Drape / Resting Position</th>
+                            <th>Link Profile</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className={selectedSize === '50CM' ? 'size-modal__row--selected' : ''}>
+                            <td className="size-modal__cell-size">50CM</td>
+                            <td>20 in</td>
+                            <td>50.8 cm</td>
+                            <td>High Collarbone / Choker Stance</td>
+                            <td>10-12mm Flat Curb</td>
+                          </tr>
+                          <tr className={selectedSize === '55CM' ? 'size-modal__row--selected' : ''}>
+                            <td className="size-modal__cell-size">55CM</td>
+                            <td>22 in</td>
+                            <td>55.9 cm</td>
+                            <td>Mid-Chest Classic Streetwear Drape</td>
+                            <td>10-12mm Flat Curb</td>
+                          </tr>
+                          <tr className={selectedSize === '60CM' ? 'size-modal__row--selected' : ''}>
+                            <td className="size-modal__cell-size">60CM</td>
+                            <td>24 in</td>
+                            <td>61.0 cm</td>
+                            <td>Longline Drop (Over Hoodies / Sweaters)</td>
+                            <td>10-12mm Flat Curb</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
 
-              {/* How to Measure Section */}
-              <div className="size-modal__guide">
-                <div className="size-modal__guide-illustration">
-                  <svg className="size-modal__pants-svg" viewBox="0 0 200 240" fill="none" stroke="currentColor" strokeWidth="2">
-                    {/* Stylized Pants Silhouette */}
-                    <path
-                      d="M 50 20 L 150 20 L 155 70 L 170 220 L 120 220 L 100 95 L 80 220 L 30 220 L 45 70 Z"
-                      fill="#f8f9fa"
-                      stroke="#111"
-                      strokeWidth="2.5"
-                    />
-                    {/* Waistband marker */}
-                    <line x1="50" y1="32" x2="150" y2="32" stroke="#666" strokeDasharray="3 3" />
-                    {/* Rise marker */}
-                    <line x1="100" y1="20" x2="100" y2="95" stroke="#000" strokeWidth="2" />
-                    {/* Thigh marker */}
-                    <line x1="52" y1="105" x2="98" y2="105" stroke="#000" strokeDasharray="2 2" />
-                    {/* Length marker */}
-                    <line x1="175" y1="20" x2="175" y2="220" stroke="#000" strokeWidth="1.5" />
-                    {/* Leg Opening marker */}
-                    <line x1="30" y1="228" x2="80" y2="228" stroke="#000" strokeWidth="2" />
-                  </svg>
-                </div>
+                  {product.subCategory === 'BAGS' && (
+                    <div className="size-modal__table-wrap">
+                      <table className="size-modal__table">
+                        <thead>
+                          <tr>
+                            <th>Specification</th>
+                            <th>Technical Detail</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="size-modal__cell-size">Dimensions</td>
+                            <td>{product.dimensions || 'Structured Streetwear Utility Volume'}</td>
+                          </tr>
+                          <tr>
+                            <td className="size-modal__cell-size">Materials</td>
+                            <td>{product.materials || '1000D Ballistic Cordura / Heavy Canvas'}</td>
+                          </tr>
+                          <tr>
+                            <td className="size-modal__cell-size">Hardware</td>
+                            <td>Matte Black Zinc Alloy Buckles &amp; YKK Reverse Zips</td>
+                          </tr>
+                          <tr>
+                            <td className="size-modal__cell-size">Water Resistance</td>
+                            <td>Water-Repellent DWR Finish / Weather-Proof</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
 
-                <div className="size-modal__guide-text">
-                  <h4 className="size-modal__guide-title">How to Measure Pants &amp; Jeans</h4>
-                  <ul className="size-modal__guide-list">
-                    <li>
-                      <strong>Waist:</strong> Measure straight across the top of the waistband and double the measurement.
-                    </li>
-                    <li>
-                      <strong>Rise:</strong> Measure vertically from the bottom of the crotch seam up to the top waistband.
-                    </li>
-                    <li>
-                      <strong>Thighs:</strong> Measure straight across the leg 1 inch below the crotch seam.
-                    </li>
-                    <li>
-                      <strong>Length:</strong> Measure from the top waistband along the outer seam down to the bottom hem.
-                    </li>
-                    <li>
-                      <strong>Leg Opening:</strong> Measure straight across the bottom hem of one leg.
-                    </li>
-                  </ul>
+                  {product.subCategory === 'CAPS' && (
+                    <div className="size-modal__table-wrap">
+                      <table className="size-modal__table">
+                        <thead>
+                          <tr>
+                            <th>Specification</th>
+                            <th>Measurement</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="size-modal__row--selected">
+                            <td className="size-modal__cell-size">Head Circumference</td>
+                            <td>54cm - 60cm (Fully Adjustable Strapback)</td>
+                          </tr>
+                          <tr>
+                            <td className="size-modal__cell-size">Visor Length</td>
+                            <td>7.2 cm Pre-curved with raw distressed edging</td>
+                          </tr>
+                          <tr>
+                            <td className="size-modal__cell-size">Crown Depth</td>
+                            <td>12 cm Relaxed Low-Profile Unstructured Fit</td>
+                          </tr>
+                          <tr>
+                            <td className="size-modal__cell-size">Closure</td>
+                            <td>Antique Silver Solid Metal Buckle + Strap Recess</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
 
-                  <div className="size-modal__tip">
-                    <span>💡 <strong>Streetwear Fit Tip:</strong> For our signature relaxed baggy silhouette, select your standard waist size. For an extreme oversized drop, choose one size up.</span>
+                  <div className="size-modal__tip" style={{ marginTop: '20px' }}>
+                    <span>
+                      🛡️ <strong>VEYN-OBJECTS Material Guarantee:</strong> Solid surgical-grade 316L stainless steel &amp; high-tenacity canvas. 100% waterproof, rust-proof, and hypoallergenic.
+                    </span>
                   </div>
                 </div>
-              </div>
+              ) : (
+                /* Denim Pants Size Chart */
+                <>
+                  <div className="size-modal__table-wrap">
+                    <table className="size-modal__table">
+                      <thead>
+                        <tr>
+                          <th>Size</th>
+                          <th>Waist ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                          <th>Rise ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                          <th>Thighs ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                          <th>Length ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                          <th>Leg Opening ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {measurements.map((row) => (
+                          <tr
+                            key={row.size}
+                            className={row.size === selectedSize ? 'size-modal__row--selected' : ''}
+                          >
+                            <td className="size-modal__cell-size">{row.size}</td>
+                            <td>{row.waist}</td>
+                            <td>{row.rise}</td>
+                            <td>{row.thighs}</td>
+                            <td>{row.length}</td>
+                            <td>{row.legOpening}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="size-modal__guide">
+                    <div className="size-modal__guide-illustration">
+                      <svg className="size-modal__pants-svg" viewBox="0 0 200 240" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path
+                          d="M 50 20 L 150 20 L 155 70 L 170 220 L 120 220 L 100 95 L 80 220 L 30 220 L 45 70 Z"
+                          fill="#f8f9fa"
+                          stroke="#111"
+                          strokeWidth="2.5"
+                        />
+                        <line x1="50" y1="32" x2="150" y2="32" stroke="#666" strokeDasharray="3 3" />
+                        <line x1="100" y1="20" x2="100" y2="95" stroke="#000" strokeWidth="2" />
+                        <line x1="52" y1="105" x2="98" y2="105" stroke="#000" strokeDasharray="2 2" />
+                        <line x1="175" y1="20" x2="175" y2="220" stroke="#000" strokeWidth="1.5" />
+                        <line x1="30" y1="228" x2="80" y2="228" stroke="#000" strokeWidth="2" />
+                      </svg>
+                    </div>
+
+                    <div className="size-modal__guide-text">
+                      <h4 className="size-modal__guide-title">How to Measure Pants &amp; Jeans</h4>
+                      <ul className="size-modal__guide-list">
+                        <li>
+                          <strong>Waist:</strong> Measure straight across the top of the waistband and double the measurement.
+                        </li>
+                        <li>
+                          <strong>Rise:</strong> Measure vertically from the bottom of the crotch seam up to the top waistband.
+                        </li>
+                        <li>
+                          <strong>Thighs:</strong> Measure straight across the leg 1 inch below the crotch seam.
+                        </li>
+                        <li>
+                          <strong>Length:</strong> Measure from the top waistband along the outer seam down to the bottom hem.
+                        </li>
+                        <li>
+                          <strong>Leg Opening:</strong> Measure straight across the bottom hem of one leg.
+                        </li>
+                      </ul>
+
+                      <div className="size-modal__tip">
+                        <span>💡 <strong>Streetwear Fit Tip:</strong> For our signature relaxed baggy silhouette, select your standard waist size. For an extreme oversized drop, choose one size up.</span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

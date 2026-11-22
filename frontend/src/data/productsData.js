@@ -7,6 +7,7 @@
 import { CATEGORY_FITS_DATA } from './categoryFitsData';
 import { NEW_ARRIVALS_PRODUCTS } from './newArrivalsData';
 import { ALL_DROPS_PRODUCTS } from './allDropsData';
+import { getObjectByHandle, getAllObjectHandles } from './objectsData';
 
 export const DEFAULT_MEASUREMENTS = {
   inches: [
@@ -191,7 +192,13 @@ export function getProductByHandle(handle) {
     return PRODUCTS_DATA[normalizedHandle];
   }
 
-  // 2. Check in Category Fits data
+  // 2. Check in VEYN-OBJECTS Hardware & Tactical Catalog
+  const objectProduct = getObjectByHandle(normalizedHandle);
+  if (objectProduct) {
+    return objectProduct;
+  }
+
+  // 3. Check in Category Fits data
   for (const fitKey of Object.keys(CATEGORY_FITS_DATA)) {
     const list = CATEGORY_FITS_DATA[fitKey] || [];
     const found = list.find((item) => item.handle === normalizedHandle || item.id === normalizedHandle);
@@ -298,6 +305,10 @@ export function getAllProductHandles() {
 
   ALL_DROPS_PRODUCTS.forEach((item) => {
     if (item.handle) handles.add(item.handle);
+  });
+
+  getAllObjectHandles().forEach((handle) => {
+    if (handle) handles.add(handle);
   });
 
   return Array.from(handles);
