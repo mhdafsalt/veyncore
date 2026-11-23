@@ -1,0 +1,48 @@
+/* AdminToast Styles */
+.admin-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background-color: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  font-weight: 500;
+  animation: admin-slide-toast 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: calc(100vw - 48px);
+  box-sizing: border-box;
+}
+
+@keyframes admin-slide-toast {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.admin-toast--success {
+  border-left: 4px solid #10b981;
+}
+
+.admin-toast--error {
+  border-left: 4px solid #ef4444;
+}
+
+.admin-toast__icon {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.admin-toast__message {
+  line-height: 1.4;
+}

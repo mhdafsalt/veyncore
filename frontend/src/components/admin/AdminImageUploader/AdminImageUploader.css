@@ -1,14 +1,16 @@
 /* ==========================================================================
-   Admin Image Uploader Component (Brutalist Modern Design)
-   Supports dual-mode: File Upload (drag-and-drop) & URL Upload
+   Admin Image Uploader Component (Modern Luxury Minimalist Design)
+   Supports dual-mode: File Upload (drag-and-drop) & Direct URL Upload
+   Strictly Inter typography, light high-contrast aesthetic.
    ========================================================================== */
 
 .admin-uploader {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 .admin-uploader__header {
@@ -16,15 +18,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .admin-uploader__label {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #a1a1aa;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: 0.01em;
 }
 
 .admin-uploader__required {
@@ -32,48 +34,48 @@
   margin-left: 2px;
 }
 
-/* Mode Switch Tabs */
+/* Mode Switch Segmented Tabs */
 .admin-uploader__tabs {
   display: inline-flex;
-  background: #18181b;
-  border: 1px solid #27272a;
-  border-radius: 6px;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   padding: 3px;
-  gap: 4px;
+  gap: 3px;
 }
 
 .admin-uploader__tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 5px 12px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #71717a;
+  font-weight: 500;
+  color: #64748b;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  line-height: 1;
 }
 
 .admin-uploader__tab:hover {
-  color: #f4f4f5;
-  background: #27272a;
+  color: #0f172a;
 }
 
 .admin-uploader__tab--active {
-  color: #000000 !important;
+  color: #0f172a !important;
   background: #ffffff !important;
-  font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .admin-uploader__tab-icon {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
 }
 
@@ -90,91 +92,74 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 140px;
-  padding: 24px 16px;
-  background: #09090b;
-  border: 1.5px dashed #3f3f46;
-  border-radius: 8px;
+  min-height: 136px;
+  padding: 22px 16px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
   cursor: pointer;
   text-align: center;
-  transition: all 0.2s ease;
-  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .admin-uploader__dropzone:hover {
-  border-color: #a1a1aa;
-  background: #121215;
+  border-color: #0f172a;
+  background: #f1f5f9;
 }
 
 .admin-uploader__dropzone--dragging {
-  border-color: #3b82f6 !important;
-  background: rgba(59, 130, 246, 0.08) !important;
-  transform: scale(0.995);
+  border-color: #0f172a !important;
+  background: #f1f5f9 !important;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.06);
 }
 
-.admin-uploader__dropzone--disabled {
-  pointer-events: none;
-  opacity: 0.6;
+.admin-uploader__dropzone--has-val {
+  min-height: 84px;
+  padding: 14px 16px;
 }
 
 .admin-uploader__file-input {
-  display: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 5;
 }
 
 .admin-uploader__drop-icon {
-  width: 38px;
-  height: 38px;
-  color: #71717a;
+  width: 28px;
+  height: 28px;
+  color: #64748b;
   margin-bottom: 8px;
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .admin-uploader__dropzone:hover .admin-uploader__drop-icon {
-  color: #ffffff;
+  color: #0f172a;
   transform: translateY(-2px);
 }
 
 .admin-uploader__drop-title {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 13px;
   font-weight: 600;
-  color: #f4f4f5;
-  margin-bottom: 4px;
+  color: #0f172a;
 }
 
 .admin-uploader__drop-browse {
-  color: #3b82f6;
+  color: #0f172a;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .admin-uploader__drop-hint {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 11px;
-  color: #71717a;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 4px;
 }
 
-/* Switch Shortcut Hint */
-.admin-uploader__switch-hint-btn {
-  background: transparent;
-  border: none;
-  color: #71717a;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 11px;
-  text-align: right;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  padding: 2px 4px;
-  align-self: flex-end;
-  transition: color 0.15s ease;
-}
-
-.admin-uploader__switch-hint-btn:hover {
-  color: #e4e4e7;
-}
-
-/* Upload Progress / Loading */
+/* Loading Spinner inside Dropzone */
 .admin-uploader__loading {
   display: flex;
   flex-direction: column;
@@ -185,53 +170,23 @@
 .admin-uploader__spinner {
   width: 26px;
   height: 26px;
-  border: 2.5px solid #27272a;
-  border-top-color: #ffffff;
+  border: 2.5px solid #e2e8f0;
+  border-top-color: #0f172a;
   border-radius: 50%;
-  animation: admin-spin 0.7s linear infinite;
+  animation: admin-uploader-spin 0.75s linear infinite;
 }
 
-@keyframes admin-spin {
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes admin-uploader-spin {
+  to { transform: rotate(360deg); }
 }
 
 .admin-uploader__loading-text {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 12px;
-  font-weight: 600;
-  color: #e4e4e7;
+  font-weight: 500;
+  color: #0f172a;
 }
 
-/* Success / Error Messages */
-.admin-uploader__success {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 6px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 11px;
-  color: #4ade80;
-}
-
-.admin-uploader__error {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 6px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 11px;
-  color: #f87171;
-}
-
-/* URL Input Mode */
+/* Direct URL Input Mode */
 .admin-uploader__url-wrap {
   display: flex;
   flex-direction: column;
@@ -247,198 +202,207 @@
 
 .admin-uploader__url-input {
   width: 100%;
-  padding: 12px 40px 12px 14px;
+  height: 40px;
+  padding: 0 36px 0 14px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 13px;
-  color: #ffffff;
-  background: #09090b;
-  border: 1px solid #27272a;
-  border-radius: 6px;
+  color: #0f172a;
   outline: none;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
 .admin-uploader__url-input:focus {
-  border-color: #ffffff;
-  box-shadow: 0 0 0 1px #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.admin-uploader__url-input::placeholder {
+  color: #94a3b8;
 }
 
 .admin-uploader__url-clear {
   position: absolute;
-  right: 12px;
+  right: 10px;
   background: transparent;
   border: none;
-  color: #71717a;
+  color: #94a3b8;
   cursor: pointer;
+  font-size: 12px;
   padding: 4px;
-  font-size: 14px;
-  line-height: 1;
-  border-radius: 4px;
-  transition: color 0.15s ease;
-}
-
-.admin-uploader__url-clear:hover {
-  color: #ffffff;
-}
-
-/* Live Preview Zone */
-.admin-uploader__preview-wrapper {
-  position: relative;
-  width: 100%;
-  background: #141416;
-  border: 1px solid #27272a;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-
-.admin-uploader__preview-img-container {
-  position: relative;
-  width: 100%;
-  min-height: 120px;
-  max-height: 240px;
-  background: #09090b;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.admin-uploader__url-clear:hover {
+  color: #0f172a;
+}
+
+/* Switch Mode Hint Button */
+.admin-uploader__switch-hint-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  padding: 2px 0;
+  transition: color 0.15s ease;
+  width: fit-content;
+}
+
+.admin-uploader__switch-hint-btn:hover {
+  color: #0f172a;
+  text-decoration: underline;
+}
+
+/* Upload Feedback Alerts */
+.admin-uploader__success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.admin-uploader__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Live Image Preview Wrapper */
+.admin-uploader__preview-wrapper {
+  margin-top: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.admin-uploader__preview-img-container {
+  width: 100%;
+  background-color: #0f172a;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .admin-uploader__preview-img {
   width: 100%;
   height: 100%;
-  max-height: 240px;
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
 .admin-uploader__preview-toolbar {
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  background: #18181b;
-  border-top: 1px solid #27272a;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .admin-uploader__preview-path {
   font-family: 'Inter', monospace !important;
   font-size: 11px;
-  color: #a1a1aa;
-  max-width: 65%;
+  color: #64748b;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 50%;
 }
 
 .admin-uploader__preview-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .admin-uploader__preview-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
   font-size: 11px;
   font-weight: 600;
-  color: #d4d4d8;
-  background: #27272a;
-  border: 1px solid #3f3f46;
-  border-radius: 4px;
-  text-decoration: none;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .admin-uploader__preview-btn:hover {
-  color: #ffffff;
-  background: #3f3f46;
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
 }
 
 .admin-uploader__preview-btn--danger {
-  color: #f87171;
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.3);
+  color: #e11d48;
+  border-color: #fecdd3;
+  background: #ffffff;
 }
 
 .admin-uploader__preview-btn--danger:hover {
-  color: #ffffff;
-  background: #ef4444;
-  border-color: #ef4444;
+  background: #fff1f2;
+  border-color: #fda4af;
+  color: #be123c;
 }
 
-/* Help text */
 .admin-uploader__help {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 11px;
-  color: #71717a;
-  margin-top: 2px;
+  font-size: 11.5px;
+  color: #64748b;
 }
 
-/* --------------------------------------------------------------------------
-   Responsive Uploader Styles
-   -------------------------------------------------------------------------- */
-@media (max-width: 600px) {
-  .admin-uploader__header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .admin-uploader__tabs {
-    width: 100%;
-    display: flex;
-  }
-
-  .admin-uploader__tab {
-    flex: 1;
-    justify-content: center;
-    padding: 7px 10px;
-    font-size: 11px;
-  }
-
-  .admin-uploader__dropzone {
-    min-height: 120px;
-    padding: 16px 12px;
-  }
-
-  .admin-uploader__drop-title {
-    font-size: 12px;
-  }
-
-  .admin-uploader__drop-icon {
-    width: 32px;
-    height: 32px;
-  }
-
+@media (max-width: 640px) {
   .admin-uploader__preview-toolbar {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .admin-uploader__preview-path {
     max-width: 100%;
-    font-size: 10.5px;
   }
 
   .admin-uploader__preview-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
     width: 100%;
+    justify-content: space-between;
   }
 
   .admin-uploader__preview-btn {
     flex: 1;
-    justify-content: center;
-    padding: 6px 8px;
-    font-size: 10.5px;
     text-align: center;
   }
 }
-

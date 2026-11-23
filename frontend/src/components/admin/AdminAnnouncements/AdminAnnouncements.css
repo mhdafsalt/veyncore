@@ -1,0 +1,10 @@
+/* AdminAnnouncements Styles */
+.admin-announcements__toggle-btn {
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s ease;
+}
+
+.admin-announcements__toggle-btn:hover {
+  opacity: 0.85;
+}

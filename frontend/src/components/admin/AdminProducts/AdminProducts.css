@@ -1,0 +1,22 @@
+/* AdminProducts Styles */
+.admin-products__title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.admin-products__handle {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.admin-products__stock-btn {
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s ease;
+}
+
+.admin-products__stock-btn:hover {
+  opacity: 0.82;
+}

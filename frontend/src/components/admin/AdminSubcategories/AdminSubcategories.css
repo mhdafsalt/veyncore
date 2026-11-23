@@ -1,0 +1,10 @@
+/* AdminSubcategories Styles */
+.admin-subcategories__toggle-btn {
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s ease;
+}
+
+.admin-subcategories__toggle-btn:hover {
+  opacity: 0.85;
+}
