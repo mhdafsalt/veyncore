@@ -106,12 +106,12 @@ export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
   const handleSubClick = (sub) => {
     setActiveSubId(sub.id);
 
-    if (sub.href.startsWith('/')) {
+    if (sub.href && sub.href.startsWith('/')) {
       router.push(sub.href);
       return;
     }
 
-    if (sub.href.startsWith('#')) {
+    if (sub.href && sub.href.startsWith('#')) {
       const sectionId = sub.href.replace('#', '');
       const element = document.getElementById(sectionId);
       if (element) {
@@ -124,35 +124,41 @@ export default function SubCategories({ activeMainCategory = 'VEYN-SELECTS' }) {
   };
 
   return (
-    <nav
-      className="subcategories-nav"
-      aria-label="Sub categories secondary navigation"
-      role="navigation"
-    >
-      <div className="subcategories-nav__wrapper" ref={containerRef}>
-        <div className="subcategories-nav__track">
+    <div className="subcategories" aria-label="Subcategory navigation">
+      <div className="subcategories__wrap">
+        <div
+          ref={containerRef}
+          className="subcategories__list"
+          role="tablist"
+        >
           {subcategories.map((sub) => {
             const isActive = activeSubId === sub.id;
             const isGlow = Boolean(sub.isGlow);
 
             return (
-              <button
+              <div
                 key={sub.id}
-                ref={isActive ? activeTabRef : null}
-                type="button"
-                className={`subcategory-pill ${
-                  isActive ? 'subcategory-pill--active' : ''
-                } ${isGlow ? 'subcategory-pill--glow' : ''}`}
-                onClick={() => handleSubClick(sub)}
-                aria-current={isActive ? 'page' : undefined}
+                className={`subcategories__item ${
+                  isActive ? 'subcategories__item--active' : ''
+                } ${isGlow ? 'subcategories__item--glow' : ''}`}
               >
-                <span className="subcategory-pill__label">{sub.label}</span>
-                {isGlow && <span className="subcategory-pill__glow-fx" aria-hidden="true" />}
-              </button>
+                <button
+                  type="button"
+                  ref={isActive ? activeTabRef : null}
+                  className={`subcategories__link ${
+                    isActive ? 'subcategories__link--active' : ''
+                  } ${isGlow ? 'subcategories__link--glow' : ''}`}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => handleSubClick(sub)}
+                >
+                  <span className="subcategories__label">{sub.label}</span>
+                </button>
+              </div>
             );
           })}
         </div>
       </div>
-    </nav>
+    </div>
   );
 }

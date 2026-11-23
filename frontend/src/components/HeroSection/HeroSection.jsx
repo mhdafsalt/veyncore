@@ -83,12 +83,14 @@ export default function HeroSection({
   // Responsive items-per-view
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setItemsPerView(1); // Mobile: 1 box
-      } else if (window.innerWidth < 1024) {
-        setItemsPerView(2); // Tablet: 2 boxes
-      } else {
-        setItemsPerView(3); // Desktop/Laptop: 3 boxes
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 768) {
+          setItemsPerView(1); // Mobile: 1 box
+        } else if (window.innerWidth < 1024) {
+          setItemsPerView(2); // Tablet: 2 boxes
+        } else {
+          setItemsPerView(3); // Desktop/Laptop: 3 boxes
+        }
       }
     };
 
@@ -110,7 +112,7 @@ export default function HeroSection({
     setCurrentIndex((prev) => prev + 1);
   }, []);
 
-  // Previous slide
+  // Move backward
   const handlePrev = useCallback(() => {
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
@@ -166,101 +168,100 @@ export default function HeroSection({
     touchEndXRef.current = 0;
   };
 
-  // Track transform calculation: shift by (100% / itemsPerView) per index
-  const translatePercent = -(currentIndex * (100 / itemsPerView));
-
   return (
     <section
-      className="hero-section"
-      aria-label="Featured Collections Carousel"
+      className="hero-carousel-section"
+      aria-label="Featured Collections Infinite Carousel"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
-      <div className="hero-section__viewport">
+      <div className="hero-carousel__container">
+        {/* Slider Viewport Window */}
         <div
-          className="hero-section__track"
-          style={{
-            transform: `translate3d(${translatePercent}%, 0, 0)`,
-            transition: enableTransition
-              ? 'transform 0.65s cubic-bezier(0.25, 1, 0.5, 1)'
-              : 'none',
-          }}
-          onTransitionEnd={handleTransitionEnd}
+          className="hero-carousel__viewport"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-          {extendedSlides.map((slide, idx) => (
-            <div
-              key={`${slide.id}-${idx}`}
-              className="hero-section__slide"
-              style={{ flex: `0 0 ${100 / itemsPerView}%` }}
-            >
-              <Link
-                href={slide.href || '/collections/all-drops'}
-                className="hero-card"
-                aria-label={slide.title}
+          <div
+            className={`hero-carousel__track ${
+              enableTransition ? 'hero-carousel__track--animated' : ''
+            }`}
+            style={{
+              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {extendedSlides.map((slide, idx) => (
+              <div
+                key={`${slide.id}-${idx}`}
+                className="hero-carousel__slide"
+                style={{
+                  flex: `0 0 ${100 / itemsPerView}%`,
+                  maxWidth: `${100 / itemsPerView}%`,
+                }}
               >
-                <div className="hero-card__image-container">
+                <Link
+                  href={slide.href || '/collections/all-drops'}
+                  className="hero-carousel__card-link"
+                  aria-label={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
+                >
                   <img
                     src={slide.image}
-                    alt={slide.title}
-                    className="hero-card__image"
-                    loading={idx < itemsPerView ? 'eager' : 'lazy'}
+                    alt={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
+                    className="hero-carousel__card-image"
+                    loading={
+                      idx >= baseCount && idx < baseCount + itemsPerView
+                        ? 'eager'
+                        : 'lazy'
+                    }
                   />
-                  <div className="hero-card__overlay">
-                    <span className="hero-card__subtitle">{slide.subtitle}</span>
-                    <h3 className="hero-card__title">{slide.title}</h3>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Minimalist Floating Navigation Arrows */}
+          <button
+            type="button"
+            className="hero-carousel__arrow hero-carousel__arrow--prev"
+            onClick={handlePrev}
+            aria-label="Previous slide"
+          >
+            <svg
+              className="hero-carousel__arrow-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="hero-carousel__arrow hero-carousel__arrow--next"
+            onClick={handleNext}
+            aria-label="Next slide"
+          >
+            <svg
+              className="hero-carousel__arrow-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
         </div>
-
-        {/* Circular Left Arrow */}
-        <button
-          type="button"
-          className="hero-section__arrow hero-section__arrow--prev"
-          onClick={handlePrev}
-          aria-label="Previous slide"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-
-        {/* Circular Right Arrow */}
-        <button
-          type="button"
-          className="hero-section__arrow hero-section__arrow--next"
-          onClick={handleNext}
-          aria-label="Next slide"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
       </div>
     </section>
   );
