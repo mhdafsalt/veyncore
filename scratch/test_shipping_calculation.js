@@ -36,7 +36,7 @@ const getShippingDetails = (pincode) => {
     isCalculated: true,
     isKerala: false,
     charge: 50,
-    label: '₹50',
+    label: '₹50 (Outside Kerala)',
     message: 'A delivery charge of ₹50 applies.',
   };
 };
@@ -75,7 +75,7 @@ console.log('\n--- 2. Testing Outside Kerala Pincodes ---');
 const outsidePins = ['560001', '110001', '400001', '700001', '600001', '500001'];
 outsidePins.forEach(pin => {
   const details = getShippingDetails(pin);
-  const ok = details.isCalculated === true && details.isKerala === false && details.charge === 50 && details.label === '₹50';
+  const ok = details.isCalculated === true && details.isKerala === false && details.charge === 50 && details.label === '₹50 (Outside Kerala)';
   console.log(`Pin ${pin}:`, ok ? 'PASS (₹50)' : 'FAIL', details);
 });
 

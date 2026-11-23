@@ -90,7 +90,7 @@ const getShippingDetails = (pincode) => {
     isCalculated: true,
     isKerala: false,
     charge: 50,
-    label: '₹50',
+    label: '₹50 (Outside Kerala)',
     message: 'A delivery charge of ₹50 applies.',
   };
 };
@@ -303,11 +303,13 @@ export default function WhatsAppCheckoutModal() {
    */
   const buildWhatsAppMessage = (currentRef) => {
     const lines = [
-      'FLINTSECTOR CART ORDER',
+      '*Hello VEYNCORE!*',
       '',
-      `Order Reference: ${currentRef}`,
-      'Source: FlintSector Website',
-      `Number of Products: ${totalQuantity}`,
+      'I would like to place an order.',
+      '',
+      `*Order Reference:* ${currentRef}`,
+      '*Order Source:* VEYNCORE Website',
+      `*Total Products:* ${totalQuantity}`,
       ''
     ];
 
@@ -315,40 +317,39 @@ export default function WhatsAppCheckoutModal() {
     items.forEach((item) => {
       const numPrice = parseNumericPrice(item.price);
       const itemTotal = numPrice * (Number(item.quantity) || 1);
+      const colour = item.variant || item.color || item.fit || 'Standard';
 
-      lines.push('PRODUCT DETAILS');
+      lines.push('*PRODUCT DETAILS*');
       lines.push('');
-      lines.push(`Product: ${item.title || 'Product'}`);
-      lines.push(`Variant: ${item.variant || 'Standard'}`);
-      lines.push(`Size: ${item.size || 'ONE SIZE'}`);
-      lines.push(`Quantity: ${item.quantity || 1}`);
-      lines.push(`Unit Price: ₹${numPrice.toLocaleString('en-IN')}`);
-      lines.push(`Item Total: ₹${itemTotal.toLocaleString('en-IN')}`);
-      lines.push(`Product Link: ${item.url || ''}`);
+      lines.push(`*Product:* ${item.title || 'Product'}`);
+      lines.push(`*Colour:* ${colour}`);
+      lines.push(`*Size:* ${item.size || 'ONE SIZE'}`);
+      lines.push(`*Quantity:* ${item.quantity || 1}`);
+      lines.push(`*Unit Price:* ₹${numPrice.toLocaleString('en-IN')}`);
+      lines.push(`*Item Total:* ₹${itemTotal.toLocaleString('en-IN')}`);
+      lines.push(`*Product Link:* ${item.url || ''}`);
       lines.push('');
     });
 
     // ORDER SUMMARY
-    lines.push('ORDER SUMMARY');
+    lines.push('*ORDER SUMMARY*');
     lines.push('');
-    lines.push(`Subtotal: ₹${subtotal.toLocaleString('en-IN')}`);
-    if (shippingInfo.isKerala) {
-      lines.push('Shipping: FREE (Kerala)');
-    } else {
-      lines.push(`Shipping: ₹${shippingCharge}`);
-    }
-    lines.push(`Total: ₹${grandTotal.toLocaleString('en-IN')}`);
+    lines.push(`*Subtotal:* ₹${subtotal.toLocaleString('en-IN')}`);
+    lines.push(`*Shipping Charges:* ₹${shippingCharge}`);
+    lines.push(`*Grand Total:* ₹${grandTotal.toLocaleString('en-IN')}`);
     lines.push('');
 
     // CUSTOMER DETAILS
     const cleanedPhone = (formData.phone || '').trim().replace(/^(\+91|91|0)/, '').replace(/[\s-]/g, '');
 
-    lines.push('CUSTOMER DETAILS');
+    lines.push('*CUSTOMER DETAILS*');
     lines.push('');
-    lines.push(`Name: ${(formData.name || '').trim()}`);
-    lines.push(`Delivery Address: ${(formData.address || '').trim()}`);
-    lines.push(`Pincode: ${(formData.pincode || '').trim()}`);
-    lines.push(`Phone Number: ${cleanedPhone}`);
+    lines.push(`*Name:* ${(formData.name || '').trim()}`);
+    lines.push(`*Delivery Address:* ${(formData.address || '').trim()}`);
+    lines.push(`*Pincode:* ${(formData.pincode || '').trim()}`);
+    lines.push(`*Phone Number:* ${cleanedPhone}`);
+    lines.push('');
+    lines.push('*Please confirm my order and share payment instructions!*');
 
     return lines.join('\n');
   };
@@ -451,26 +452,9 @@ export default function WhatsAppCheckoutModal() {
       <div className="wa-checkout-modal__card" ref={modalRef}>
         {/* Top Header */}
         <header className="wa-checkout-modal__header">
-          <button
-            type="button"
-            className="wa-checkout-modal__back-btn"
-            onClick={closeCheckout}
-            aria-label="Back to store"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            <span>Back</span>
-          </button>
-
-          <div className="wa-checkout-modal__title-wrap">
-            <h2 id="checkout-modal-title" className="wa-checkout-modal__title">
-              DELIVERY DETAILS
-            </h2>
-            <span className="wa-checkout-modal__brand-badge">
-              FLINTSECTOR &bull; DIRECT ORDER
-            </span>
-          </div>
+          <h2 id="checkout-modal-title" className="wa-checkout-modal__title">
+            DELIVERY DETAILS
+          </h2>
 
           <button
             type="button"
@@ -641,32 +625,6 @@ export default function WhatsAppCheckoutModal() {
                   {errors.pincode}
                 </span>
               )}
-              {/* Informative message based on Pincode / Shipping */}
-              {!errors.pincode && shippingInfo.isCalculated && (
-                <div
-                  className={`wa-pincode-status ${shippingInfo.isKerala ? 'wa-pincode-status--free' : 'wa-pincode-status--standard'}`}
-                  role="status"
-                >
-                  {shippingInfo.isKerala ? (
-                    <>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span>Congratulations! You get FREE delivery.</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <rect x="1" y="3" width="15" height="13" />
-                        <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
-                        <circle cx="5.5" cy="18.5" r="2.5" />
-                        <circle cx="18.5" cy="18.5" r="2.5" />
-                      </svg>
-                      <span>A delivery charge of ₹50 applies.</span>
-                    </>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Order Summary Box */}
@@ -683,7 +641,7 @@ export default function WhatsAppCheckoutModal() {
                     shippingInfo.isKerala ? (
                       <span className="wa-summary__shipping-kerala">FREE (Kerala)</span>
                     ) : (
-                      <span className="wa-summary__shipping-outside">₹50</span>
+                      <span className="wa-summary__shipping-outside">₹50 (Outside Kerala)</span>
                     )
                   ) : (
                     <span className="wa-summary__shipping-pending">Enter 6-digit pincode</span>

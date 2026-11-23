@@ -16,11 +16,13 @@ const buildWhatsAppMessage = ({
   const grandTotal = subtotal + shipping;
 
   const lines = [
-    'FLINTSECTOR CART ORDER',
+    '*Hello VEYNCORE!*',
     '',
-    `Order Reference: ${orderId}`,
-    'Source: FlintSector Website',
-    `Number of Products: ${totalQuantity}`,
+    'I would like to place an order.',
+    '',
+    `*Order Reference:* ${orderId}`,
+    '*Order Source:* VEYNCORE Website',
+    `*Total Products:* ${totalQuantity}`,
     ''
   ];
 
@@ -28,34 +30,37 @@ const buildWhatsAppMessage = ({
     const rawPrice = item.price ?? 0;
     const numPrice = Number(rawPrice) || 0;
     const itemTotal = numPrice * (Number(item.quantity) || 1);
+    const colour = item.variant || item.color || item.fit || 'Standard';
 
-    lines.push('PRODUCT DETAILS');
+    lines.push('*PRODUCT DETAILS*');
     lines.push('');
-    lines.push(`Product: ${item.title || 'Product'}`);
-    lines.push(`Variant: ${item.variant || 'Standard'}`);
-    lines.push(`Size: ${item.size || 'ONE SIZE'}`);
-    lines.push(`Quantity: ${item.quantity || 1}`);
-    lines.push(`Unit Price: ₹${numPrice.toLocaleString('en-IN')}`);
-    lines.push(`Item Total: ₹${itemTotal.toLocaleString('en-IN')}`);
-    lines.push(`Product Link: ${item.url || ''}`);
+    lines.push(`*Product:* ${item.title || 'Product'}`);
+    lines.push(`*Colour:* ${colour}`);
+    lines.push(`*Size:* ${item.size || 'ONE SIZE'}`);
+    lines.push(`*Quantity:* ${item.quantity || 1}`);
+    lines.push(`*Unit Price:* ₹${numPrice.toLocaleString('en-IN')}`);
+    lines.push(`*Item Total:* ₹${itemTotal.toLocaleString('en-IN')}`);
+    lines.push(`*Product Link:* ${item.url || ''}`);
     lines.push('');
   });
 
-  lines.push('ORDER SUMMARY');
+  lines.push('*ORDER SUMMARY*');
   lines.push('');
-  lines.push(`Subtotal: ₹${subtotal.toLocaleString('en-IN')}`);
-  lines.push(`Shipping: ₹${shipping}`);
-  lines.push(`Total: ₹${grandTotal.toLocaleString('en-IN')}`);
+  lines.push(`*Subtotal:* ₹${subtotal.toLocaleString('en-IN')}`);
+  lines.push(`*Shipping Charges:* ₹${shipping}`);
+  lines.push(`*Grand Total:* ₹${grandTotal.toLocaleString('en-IN')}`);
   lines.push('');
 
   const cleanedPhone = (formData.phone || '').trim().replace(/^(\+91|91|0)/, '').replace(/[\s-]/g, '');
 
-  lines.push('CUSTOMER DETAILS');
+  lines.push('*CUSTOMER DETAILS*');
   lines.push('');
-  lines.push(`Name: ${(formData.name || '').trim()}`);
-  lines.push(`Delivery Address: ${(formData.address || '').trim()}`);
-  lines.push(`Pincode: ${(formData.pincode || '').trim()}`);
-  lines.push(`Phone Number: ${cleanedPhone}`);
+  lines.push(`*Name:* ${(formData.name || '').trim()}`);
+  lines.push(`*Delivery Address:* ${(formData.address || '').trim()}`);
+  lines.push(`*Pincode:* ${(formData.pincode || '').trim()}`);
+  lines.push(`*Phone Number:* ${cleanedPhone}`);
+  lines.push('');
+  lines.push('*Please confirm my order and share payment instructions!*');
 
   return lines.join('\n');
 };
