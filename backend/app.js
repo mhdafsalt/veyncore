@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
 import apiRoutes from './routes/index.js';
 import connectDB from './config/db.js';
 import notFoundHandler from './middleware/notFoundHandler.js';
@@ -52,9 +54,19 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Static uploads serving for uploaded media assets
-const uploadsPath = path.resolve(process.cwd(), 'uploads');
-app.use('/uploads', express.static(uploadsPath));
+// Static uploads serving for uploaded media assets (safe on read-only serverless filesystems)
+try {
+  const uploadsPath = path.resolve(process.cwd(), 'uploads');
+  if (fs.existsSync(uploadsPath)) {
+    app.use('/uploads', express.static(uploadsPath));
+  }
+  const tmpUploadsPath = path.join(os.tmpdir(), 'uploads');
+  if (fs.existsSync(tmpUploadsPath)) {
+    app.use('/uploads', express.static(tmpUploadsPath));
+  }
+} catch (e) {
+  // Gracefully ignored on read-only environments
+}
 
 // Mount API routes at both /api and root / for seamless flexibility
 app.use('/api', apiRoutes);

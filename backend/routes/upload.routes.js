@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import multer from 'multer';
-import fs from 'fs';
 import path from 'path';
 import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
 import {
@@ -11,26 +10,9 @@ import {
 
 const router = Router();
 
-// Ensure local uploads directory exists
-const uploadDir = path.resolve(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Multer Disk Storage Configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const cleanBase = path
-      .basename(file.originalname, ext)
-      .replace(/[^a-zA-Z0-9_-]/g, '_')
-      .slice(0, 32);
-    cb(null, `${cleanBase}-${Date.now()}${ext}`);
-  },
-});
+// Memory Storage: buffers files directly in memory (req.file.buffer)
+// Completely avoids writing to read-only filesystems like Vercel (/var/task)
+const storage = multer.memoryStorage();
 
 // File filter restricting uploads to valid image formats
 const fileFilter = (req, file, cb) => {
