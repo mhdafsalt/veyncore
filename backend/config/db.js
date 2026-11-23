@@ -3,9 +3,11 @@ import dotenv from 'dotenv';
 import path from 'node:path';
 import mongoose from 'mongoose';
 
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1']);
-} catch (e) {}
+if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME && !process.env.AWS_EXECUTION_ENV) {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  } catch (e) {}
+}
 
 dotenv.config();
 dotenv.config({ path: path.resolve(process.cwd(), 'backend/.env') });
@@ -38,7 +40,11 @@ export const connectDB = async () => {
   }
 
   try {
-    const conn = await mongoose.connect(uri);
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4,
+    });
     cachedConnection = conn;
 
     // Mask credentials when logging host info
