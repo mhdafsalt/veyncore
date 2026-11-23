@@ -54,7 +54,7 @@ ensureDirs();
 
 let succeeded = false;
 let attempts = 0;
-while (!succeeded && attempts < 5) {
+while (!succeeded && attempts < 8) {
   attempts++;
   ensureDirs();
   try {
@@ -67,13 +67,13 @@ while (!succeeded && attempts < 5) {
     console.log('Build succeeded:\n', out);
     succeeded = true;
   } catch (err) {
-    if (attempts >= 5) {
+    if (attempts >= 8) {
       console.error('Build output:\n', err.stdout);
       console.error('Build error:\n', err.stderr || err.message);
       process.exit(1);
     }
     console.log(`Build attempt ${attempts} hit transient error, waiting before retry...`);
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000);
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500);
     ensureDirs();
   }
 }

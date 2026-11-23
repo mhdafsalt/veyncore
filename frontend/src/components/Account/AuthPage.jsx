@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import './AuthPage.css';
 
 export default function AuthPage() {
   const router = useRouter();
+  const { totalCount, openCart } = useCart();
   const {
     user,
     isAuthenticated,
@@ -264,10 +266,16 @@ export default function AuthPage() {
               <span className="auth-dashboard__stat-value">{addresses.length}</span>
               <span className="auth-dashboard__stat-sub">Default in Mumbai</span>
             </div>
-            <div className="auth-dashboard__stat-card">
-              <span className="auth-dashboard__stat-label">VIP DROP ACCESS</span>
-              <span className="auth-dashboard__stat-value auth-dashboard__stat-value--active">ACTIVE</span>
-              <span className="auth-dashboard__stat-sub">Early restock priority</span>
+            <div
+              className="auth-dashboard__stat-card auth-dashboard__stat-card--clickable"
+              onClick={() => openCart()}
+              role="button"
+              tabIndex={0}
+              title="View cart items"
+            >
+              <span className="auth-dashboard__stat-label">CART ITEMS</span>
+              <span className="auth-dashboard__stat-value">{totalCount}</span>
+              <span className="auth-dashboard__stat-sub">In active shopping cart</span>
             </div>
           </div>
 

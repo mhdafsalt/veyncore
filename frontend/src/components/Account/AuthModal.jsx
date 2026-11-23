@@ -3,10 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import './AuthModal.css';
 
 export default function AuthModal() {
   const router = useRouter();
+  const { totalCount, openCart } = useCart();
   const {
     user,
     isAuthenticated,
@@ -392,9 +394,18 @@ export default function AuthModal() {
                 <span className="auth-modal__stat-label">SAVED ADDRESS</span>
                 <span className="auth-modal__stat-val">{addresses.length}</span>
               </div>
-              <div className="auth-modal__stat-box">
-                <span className="auth-modal__stat-label">DROP ACCESS</span>
-                <span className="auth-modal__stat-val auth-modal__stat-val--highlight">VIP</span>
+              <div
+                className="auth-modal__stat-box auth-modal__stat-box--clickable"
+                onClick={() => {
+                  closeAuthModal();
+                  openCart();
+                }}
+                role="button"
+                tabIndex={0}
+                title="View cart items"
+              >
+                <span className="auth-modal__stat-label">CART ITEMS</span>
+                <span className="auth-modal__stat-val">{totalCount}</span>
               </div>
             </div>
 
