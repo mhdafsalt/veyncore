@@ -5,12 +5,19 @@ import AdminImageUploader from '../AdminImageUploader/AdminImageUploader';
 import './AdminBottomBanner.css';
 
 export default function AdminBottomBanner({
+  initialSection = 'VEYN-SELECTS',
   bannerData,
   bannerDataObjects,
   onSaveBanner,
   isSaving = false,
 }) {
-  const [activeSection, setActiveSection] = useState('VEYN-SELECTS'); // 'VEYN-SELECTS' | 'VEYN-OBJECTS'
+  const [activeSection, setActiveSection] = useState(initialSection); // 'VEYN-SELECTS' | 'VEYN-OBJECTS'
+
+  useEffect(() => {
+    if (initialSection) {
+      setActiveSection(initialSection);
+    }
+  }, [initialSection]);
 
   const [selectsForm, setSelectsForm] = useState({
     imageDesktop: '/images/ImageBanner.png',
@@ -70,9 +77,13 @@ export default function AdminBottomBanner({
     <div className="admin-view">
       <div className="admin-view__header">
         <div>
-          <h1 className="admin-view__title">HOMEPAGE BOTTOM CAMPAIGN BANNER</h1>
+          <h1 className="admin-view__title">
+            {isObjects ? 'VEYN-OBJECTS IMAGE BANNER' : 'VEYN-SELECTS IMAGE BANNER'}
+          </h1>
           <p className="admin-view__subtitle">
-            Configure independent editorial campaign banners for VEYN-SELECTS and VEYN-OBJECTS.
+            {isObjects
+              ? 'Configure the full-width editorial campaign banner displayed on the VEYN-OBJECTS homepage.'
+              : 'Configure the full-width editorial denim campaign banner displayed on the VEYN-SELECTS homepage.'}
           </p>
         </div>
       </div>

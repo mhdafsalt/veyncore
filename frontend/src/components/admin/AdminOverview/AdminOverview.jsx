@@ -115,8 +115,20 @@ export default function AdminOverview({
           >
             <span className="admin-shortcut-card__icon">📢</span>
             <div>
-              <h4>Bottom Banner</h4>
+              <h4>Selects Bottom Banner</h4>
               <p>Customize the editorial denim campaign banner.</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            className="admin-shortcut-card"
+            onClick={() => onNavigateTab('objectsBanner')}
+          >
+            <span className="admin-shortcut-card__icon">🏺</span>
+            <div>
+              <h4>Objects Image Banner</h4>
+              <p>Customize the editorial artifacts campaign image banner.</p>
             </div>
           </button>
         </div>

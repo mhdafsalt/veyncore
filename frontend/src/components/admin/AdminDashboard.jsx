@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const { user, token, isAuthenticated, isLoading, logout, openAuthModal } = useAuth();
 
-  // Active Tab: 'overview' | 'products' | 'media' | 'subcategories' | 'hero' | 'announcements' | 'swipeCategories' | 'bottomBanner' | 'users'
+  // Active Tab: 'overview' | 'products' | 'media' | 'subcategories' | 'hero' | 'announcements' | 'swipeCategories' | 'bottomBanner' | 'objectsBanner' | 'users'
   const [activeTab, setActiveTab] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -718,7 +718,14 @@ export default function AdminDashboard() {
           className={`admin-mobile-quicktab ${activeTab === 'bottomBanner' ? 'admin-mobile-quicktab--active' : ''}`}
           onClick={() => setActiveTab('bottomBanner')}
         >
-          <span>Bottom Banner</span>
+          <span>Selects Banner</span>
+        </button>
+        <button
+          type="button"
+          className={`admin-mobile-quicktab ${activeTab === 'objectsBanner' ? 'admin-mobile-quicktab--active' : ''}`}
+          onClick={() => setActiveTab('objectsBanner')}
+        >
+          <span>Objects Banner</span>
         </button>
         <button
           type="button"
@@ -817,6 +824,17 @@ export default function AdminDashboard() {
 
           {activeTab === 'bottomBanner' && (
             <AdminBottomBanner
+              initialSection="VEYN-SELECTS"
+              bannerData={siteContent?.bottomBanner}
+              bannerDataObjects={siteContent?.bottomBannerObjects}
+              onSaveBanner={handleSaveBottomBanner}
+              isSaving={isSaving}
+            />
+          )}
+
+          {activeTab === 'objectsBanner' && (
+            <AdminBottomBanner
+              initialSection="VEYN-OBJECTS"
               bannerData={siteContent?.bottomBanner}
               bannerDataObjects={siteContent?.bottomBannerObjects}
               onSaveBanner={handleSaveBottomBanner}
