@@ -6,6 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { FiTrash2 } from 'react-icons/fi';
 import { useCart, UPSELL_PRODUCTS, DEFAULT_INITIAL_ITEM } from '@/context/CartContext';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
+import { parseNumericPrice } from '@/lib/priceUtils';
 import './CartDrawer.css';
 
 const TRENDING_COLLECTIONS = [
@@ -39,7 +40,8 @@ export default function CartDrawer() {
     updateQuantity,
     totalCount,
     subtotal,
-    whatsappNumber
+    whatsappNumber,
+    openCheckout
   } = useCart();
 
   const [upsellIndex, setUpsellIndex] = useState(0);
@@ -84,7 +86,29 @@ export default function CartDrawer() {
     setUpsellIndex((prev) => (prev - 1 + UPSELL_PRODUCTS.length) % UPSELL_PRODUCTS.length);
   };
 
-  // Build WhatsApp order link
+  // Direct WhatsApp Order - Opens modern Delivery Details checkout modal
+  const handleDirectWhatsAppClick = (e) => {
+    e.preventDefault();
+    closeCart();
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    if (openCheckout) {
+      openCheckout(
+        cartItems.map((item) => ({
+          title: item.title,
+          handle: item.handle || item.id,
+          variant: item.variant || item.fit || item.color || 'Standard',
+          size: item.size || 'ONE SIZE',
+          quantity: item.quantity || 1,
+          price: parseNumericPrice(item.price, 1299),
+          image: item.image,
+          url: `${origin}/products/${item.handle || item.id}`,
+        })),
+        'cart_drawer'
+      );
+    }
+  };
+
+  // Build WhatsApp order link (legacy fallback)
   const buildWhatsAppLink = () => {
     const lines = [
       '*New Order Request - VEYNCORE*',
@@ -104,7 +128,8 @@ export default function CartDrawer() {
     lines.push('Please confirm my order and share payment instructions!');
 
     const message = lines.join('\n');
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const WHATSAPP_NUMBER = '919446391166';
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   };
 
   return (
@@ -197,11 +222,11 @@ export default function CartDrawer() {
 
                       <div className="cart-drawer__item-price-wrap">
                         <span className="cart-drawer__item-price">
-                          Rs. {item.price.toLocaleString()}.00
+                          Rs. {parseNumericPrice(item.price).toLocaleString('en-IN')}.00
                         </span>
                         {item.comparePrice && (
                           <s className="cart-drawer__item-compare-price">
-                            Rs. {item.comparePrice.toLocaleString()}.00
+                            Rs. {parseNumericPrice(item.comparePrice).toLocaleString('en-IN')}.00
                           </s>
                         )}
                       </div>
@@ -419,7 +444,7 @@ export default function CartDrawer() {
             <div className="cart-drawer__total-row">
               <span className="cart-drawer__total-label">Total:</span>
               <span className="cart-drawer__total-amount">
-                Rs. {subtotal.toLocaleString()}.00 INR
+                Rs. {parseNumericPrice(subtotal).toLocaleString('en-IN')}.00 INR
               </span>
             </div>
 
@@ -429,29 +454,18 @@ export default function CartDrawer() {
 
             {/* ONLY DIRECT WHATSAPP ORDER BUTTON */}
             <div className="cart-drawer__whatsapp-action">
-              <a
-                href={buildWhatsAppLink()}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
                 className="cart-drawer__whatsapp-btn"
                 aria-label="Direct WhatsApp Order"
-                onClick={() => {
-                  trackWhatsAppClick({
-                    productHandle: cartItems.map((i) => i.handle || i.id).join(', '),
-                    productTitle: cartItems.map((i) => i.title || i.name).join(', '),
-                    size: cartItems.map((i) => i.size).join(', '),
-                    price: subtotal,
-                    quantity: totalCount,
-                    source: 'cart_drawer',
-                  });
-                }}
+                onClick={handleDirectWhatsAppClick}
               >
                 {/* Official WhatsApp React Icon */}
                 <FaWhatsapp className="cart-drawer__whatsapp-icon" size={24} aria-hidden="true" />
                 <span className="cart-drawer__whatsapp-btn-text">
                   Direct WhatsApp Order
                 </span>
-              </a>
+              </button>
             </div>
           </div>
         ) : (

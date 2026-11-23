@@ -1,0 +1,939 @@
+/**
+ * WhatsApp Checkout Modal Styles
+ * FlintSector Design Language: Streetwear Minimalist & Luxury Utility
+ * 100% Native CSS - BEM Architecture
+ */
+
+/* ==========================================================================
+   Modal Overlay & Backdrop
+   ========================================================================== */
+.wa-checkout-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: waModalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes waModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.wa-checkout-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ==========================================================================
+   Modal Card
+   ========================================================================== */
+.wa-checkout-modal__card {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  max-height: 92vh;
+  background-color: #ffffff;
+  color: #111111;
+  border-radius: 12px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: waCardSlideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes waCardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.wa-checkout-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.wa-checkout-modal__back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.wa-checkout-modal__back-btn:hover {
+  background-color: #f3f4f6;
+  color: #111111;
+}
+
+.wa-checkout-modal__title-wrap {
+  text-align: center;
+}
+
+.wa-checkout-modal__title {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111111;
+}
+
+.wa-checkout-modal__brand-badge {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.wa-checkout-modal__close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: #4b5563;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.wa-checkout-modal__close-btn:hover {
+  background-color: #f3f4f6;
+  color: #111111;
+}
+
+/* ==========================================================================
+   Scrollable Body
+   ========================================================================== */
+.wa-checkout-modal__body {
+  padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ==========================================================================
+   Order Items Section
+   ========================================================================== */
+.wa-checkout-items {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.wa-checkout-items__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.wa-checkout-items__label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #374151;
+}
+
+.wa-checkout-items__count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  background-color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.wa-checkout-items__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.wa-checkout-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #ffffff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.wa-checkout-item__thumb {
+  width: 52px;
+  height: 62px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+.wa-checkout-item__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wa-checkout-item__meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-checkout-item__title {
+  margin: 0 0 4px 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #111111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-checkout-item__specs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.wa-checkout-item__pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #4b5563;
+  background-color: #f3f4f6;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.wa-checkout-item__price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #000000;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.wa-checkout-item__unit-price {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* ==========================================================================
+   Delivery Form - Floating Label Design (Matches Login / Signup Architecture)
+   ========================================================================== */
+.wa-delivery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.wa-delivery-form__intro {
+  margin-bottom: 2px;
+}
+
+.wa-delivery-form__intro-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wa-delivery-form__user-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: #374151;
+  background-color: #f3f4f6;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.wa-delivery-form__user-tag strong {
+  color: #111111;
+}
+
+.wa-delivery-form__user-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #16a34a;
+  flex-shrink: 0;
+}
+
+.wa-delivery-form__heading {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #111111;
+}
+
+.wa-delivery-form__sub {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #6b7280;
+}
+
+/* Floating Field Base */
+.wa-floating-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.wa-floating-input {
+  width: 100%;
+  height: 52px;
+  padding: 20px 14px 6px;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #000000;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  box-sizing: border-box;
+}
+
+.wa-floating-input:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* Floating Textarea */
+.wa-floating-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 22px 14px 8px;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.45;
+  color: #000000;
+  background-color: #ffffff;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  box-sizing: border-box;
+}
+
+.wa-floating-textarea:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* Floating Label Default (Resting Inside Input) */
+.wa-floating-label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #71717a;
+  pointer-events: none;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left top;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 2;
+}
+
+/* Resting position for textarea */
+.wa-floating-field--textarea .wa-floating-label {
+  top: 15px;
+  transform: translateY(0);
+}
+
+/* Floating Label Active State (On Focus, Filled, or Non-Empty) */
+.wa-floating-input:focus ~ .wa-floating-label,
+.wa-floating-input:not(:placeholder-shown) ~ .wa-floating-label,
+.wa-floating-field--filled .wa-floating-label,
+.wa-floating-textarea:focus ~ .wa-floating-label,
+.wa-floating-textarea:not(:placeholder-shown) ~ .wa-floating-label {
+  top: 7px;
+  transform: translateY(0);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: #000000;
+  text-transform: uppercase;
+}
+
+/* Placeholder Visibility:
+   Hidden when unfocused so it doesn't clash with the resting label.
+   Reveals smoothly on focus to guide the user! */
+.wa-floating-input::placeholder,
+.wa-floating-textarea::placeholder {
+  color: transparent;
+  opacity: 0;
+  transition: color 0.18s ease, opacity 0.18s ease;
+}
+
+.wa-floating-input:focus::placeholder,
+.wa-floating-textarea:focus::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+/* Phone Field Container with +91 Prefix */
+.wa-floating-phone-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  background-color: #ffffff;
+  height: 52px;
+  overflow: hidden;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wa-floating-phone-wrap:focus-within {
+  border-color: #000000;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+.wa-floating-phone-prefix {
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #71717a;
+  background-color: #f4f4f5;
+  border-right: 1px solid #d4d4d8;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.wa-floating-phone-input-box {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.wa-floating-input--phone {
+  height: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 20px 12px 6px !important;
+  background-color: transparent !important;
+}
+
+.wa-floating-phone-input-box .wa-floating-label {
+  left: 12px;
+}
+
+/* Pincode Field */
+.wa-floating-input--pincode {
+  letter-spacing: 0.12em;
+}
+
+/* Validation Error States */
+.wa-floating-field--error .wa-floating-input,
+.wa-floating-field--error .wa-floating-textarea,
+.wa-floating-field--error .wa-floating-phone-wrap {
+  border-color: #dc2626 !important;
+  background-color: #fff8f8;
+}
+
+.wa-floating-field--error .wa-floating-input:focus,
+.wa-floating-field--error .wa-floating-textarea:focus,
+.wa-floating-field--error .wa-floating-phone-wrap:focus-within {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+.wa-floating-field--error .wa-floating-label {
+  color: #dc2626 !important;
+}
+
+.wa-field__required {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.wa-field__error-msg {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #dc2626;
+  margin-top: 5px;
+  padding-left: 2px;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+/* Pincode Informative Status Message */
+.wa-pincode-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  animation: waPincodeStatusIn 0.2s ease-out;
+  line-height: 1.35;
+}
+
+@keyframes waPincodeStatusIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wa-pincode-status--free {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.wa-pincode-status--free svg {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.wa-pincode-status--standard {
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.wa-pincode-status--standard svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Order Summary Box
+   ========================================================================== */
+.wa-summary {
+  background-color: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 4px;
+}
+
+.wa-summary__title {
+  margin: 0 0 10px 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #374151;
+}
+
+.wa-summary__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wa-summary__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.wa-summary__shipping-free,
+.wa-summary__shipping-kerala {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.wa-summary__shipping-outside {
+  color: #111111;
+  font-weight: 700;
+}
+
+.wa-summary__shipping-pending {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.wa-summary__divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 4px 0;
+}
+
+.wa-summary__row--total {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #000000;
+}
+
+/* ==========================================================================
+   Popup Blocked Alert
+   ========================================================================== */
+.wa-checkout-blocked-alert {
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+  padding: 12px 14px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.wa-checkout-blocked-alert p {
+  margin: 0 0 8px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.wa-checkout-blocked-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #25d366;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.wa-checkout-blocked-btn:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Action Button & Responsive WhatsApp CTA
+   ========================================================================== */
+.wa-delivery-form__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.wa-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 18px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+
+.wa-submit-btn:hover:not(:disabled) {
+  background-color: #222222;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.wa-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.wa-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.wa-submit-btn__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.wa-submit-btn__icon {
+  color: #25d366;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.wa-submit-btn__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.wa-submit-btn__divider {
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+
+.wa-submit-btn__price {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.wa-submit-btn__loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wa-submit-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: waSpin 0.7s linear infinite;
+}
+
+@keyframes waSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Checkout Guarantee Bottom Text
+   ========================================================================== */
+.wa-checkout-guarantee {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.4;
+  padding: 0 4px;
+}
+
+.wa-checkout-guarantee__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.wa-checkout-guarantee__icon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.wa-checkout-guarantee__dot {
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+.wa-checkout-guarantee__sub {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 640px) {
+  .wa-checkout-modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .wa-checkout-modal__card {
+    max-width: 100%;
+    max-height: 94vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    animation: waCardSlideUpMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes waCardSlideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .wa-checkout-modal__header {
+    padding: 14px 16px;
+  }
+
+  .wa-checkout-modal__body {
+    padding: 16px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .wa-submit-btn {
+    min-height: 48px;
+    padding: 12px 14px;
+  }
+
+  .wa-submit-btn__content {
+    gap: 8px;
+  }
+
+  .wa-submit-btn__icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .wa-submit-btn__label {
+    font-size: clamp(0.74rem, 3.2vw, 0.84rem);
+    letter-spacing: 0.02em;
+    gap: 5px;
+  }
+
+  .wa-checkout-guarantee {
+    font-size: 0.72rem;
+    gap: 3px 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .wa-submit-btn {
+    padding: 11px 10px;
+  }
+
+  .wa-submit-btn__content {
+    gap: 6px;
+  }
+
+  .wa-submit-btn__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .wa-submit-btn__label {
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+
+  .wa-checkout-guarantee {
+    font-size: 0.7rem;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .wa-checkout-guarantee__dot {
+    display: none;
+  }
+
+  .wa-checkout-guarantee__badge {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .wa-checkout-guarantee__sub {
+    color: #6b7280;
+  }
+}
+
+@media (max-width: 350px) {
+  .wa-submit-btn__label {
+    font-size: 0.7rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    line-height: 1.25;
+  }
+}

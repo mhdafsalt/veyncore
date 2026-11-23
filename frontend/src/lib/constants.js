@@ -21,6 +21,8 @@ export const getApiBaseUrl = () => {
 
 export const API_BASE_URL = getApiBaseUrl();
 
+export const WHATSAPP_NUMBER = '919446391166';
+
 export const APP_METADATA = {
   title: 'Veyncore Full-Stack Application',
   description:

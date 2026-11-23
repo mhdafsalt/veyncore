@@ -6,6 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { getProductByHandle } from '@/data/productsData';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
+import { parseNumericPrice } from '@/lib/priceUtils';
 import './ProductDetail.css';
 
 /**
@@ -19,7 +20,7 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  * pincode estimator, collapsible accordions, social sharing, and related denims.
  */
 export default function ProductDetail({ product }) {
-  const { addItem, whatsappNumber } = useCart();
+  const { addItem, whatsappNumber, openCheckout } = useCart();
   const isObject = Boolean(product?.isObject || product?.category === 'VEYN-OBJECTS');
 
   // State Management
@@ -129,13 +130,16 @@ export default function ProductDetail({ product }) {
 
   // Add to Cart
   const handleAddToCart = () => {
+    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
+    const numCompare = parseNumericPrice(product?.comparePrice ?? product?.regularPrice ?? null);
+
     addItem({
       id: `${product.id}-${selectedSize}`,
       productId: product.id,
       title: product.title,
       size: selectedSize,
-      price: product.price,
-      comparePrice: product.comparePrice,
+      price: numPrice,
+      comparePrice: numCompare,
       image: images[0],
       quantity: quantity
     });
@@ -144,12 +148,37 @@ export default function ProductDetail({ product }) {
     setTimeout(() => setAddedAnimation(false), 1800);
   };
 
-  // Build Direct WhatsApp Order Link
+  // Direct WhatsApp Order - Opens modern Delivery Details checkout modal
+  const handleDirectWhatsAppClick = (e) => {
+    e.preventDefault();
+    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
+
+    const productUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const resolvedVariant =
+      product?.color ||
+      product?.fit ||
+      product?.subCategory ||
+      (isObject ? 'Hardware Object' : 'Baggy');
+
+    if (openCheckout) {
+      openCheckout([
+        {
+          title: product?.title || 'Product',
+          handle: product?.handle || product?.id,
+          variant: resolvedVariant,
+          size: selectedSize || 'ONE SIZE',
+          quantity: quantity || 1,
+          price: numPrice,
+          image: images[0] || product?.thumbnail || '/images/hero/hero-card-3.jpg',
+          url: productUrl,
+        }
+      ], 'product_detail');
+    }
+  };
+
+  // Build Direct WhatsApp Order Link (legacy fallback)
   const buildDirectWhatsAppLink = () => {
-    const rawPrice = product?.salePrice ?? product?.price ?? 1299;
-    const numPrice = typeof rawPrice === 'number'
-      ? rawPrice
-      : (parseFloat(String(rawPrice).replace(/[^0-9.]/g, '')) || 0);
+    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
     const itemTotal = numPrice * quantity;
     const productUrl = typeof window !== 'undefined' ? window.location.href : '';
 
@@ -170,8 +199,8 @@ export default function ProductDetail({ product }) {
     ].filter(Boolean);
 
     const message = lines.join('\n');
-    const targetNumber = whatsappNumber || '919876543210';
-    return `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
+    const WHATSAPP_NUMBER = '919446391166';
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   };
 
   // Social Sharing
@@ -476,27 +505,15 @@ export default function ProductDetail({ product }) {
                   )}
                 </button>
 
-                <a
-                  href={buildDirectWhatsAppLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
                   className="product-btn product-btn--whatsapp"
                   aria-label="Direct WhatsApp Order"
-                  onClick={() => {
-                    const rawPrice = product?.salePrice ?? product?.price ?? 1299;
-                    trackWhatsAppClick({
-                      productHandle: product?.handle || '',
-                      productTitle: product?.title || 'Product',
-                      size: selectedSize || '',
-                      price: rawPrice,
-                      quantity: quantity || 1,
-                      source: 'product_detail',
-                    });
-                  }}
+                  onClick={handleDirectWhatsAppClick}
                 >
                   <FaWhatsapp className="product-btn__whatsapp-icon" size={22} aria-hidden="true" />
                   <span className="product-btn__text">Direct WhatsApp Order</span>
-                </a>
+                </button>
               </div>
 
               {/* Collapsible Accordion: What is VEYN-SELECTS / VEYN-OBJECTS? */}

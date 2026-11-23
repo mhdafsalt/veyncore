@@ -1,6 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
+import { parseNumericPrice } from '@/lib/priceUtils';
+import { WHATSAPP_NUMBER } from '@/lib/constants';
 
 const CartContext = createContext(null);
 
@@ -45,23 +47,44 @@ export function CartProvider({ children }) {
   // Start with 1 item matching user screenshot so active cart state is immediately visible
   const [cartItems, setCartItems] = useState([DEFAULT_INITIAL_ITEM]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [whatsappNumber, setWhatsappNumber] = useState('919876543210'); // Customizable WhatsApp number
+  const [whatsappNumber, setWhatsappNumber] = useState(WHATSAPP_NUMBER); // Official WhatsApp Business number: 919446391166
+
+  // WhatsApp Checkout Modal State
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [checkoutSource, setCheckoutSource] = useState('product_detail');
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
 
+  const openCheckout = (items = [], source = 'product_detail') => {
+    const rawItems = items && items.length > 0 ? items : cartItems;
+    const sanitizedItems = rawItems.map((item) => ({
+      ...item,
+      price: parseNumericPrice(item.price ?? item.salePrice, 1299),
+    }));
+    setCheckoutItems(sanitizedItems);
+    setCheckoutSource(source);
+    setIsCheckoutOpen(true);
+  };
+
+  const closeCheckout = () => {
+    setIsCheckoutOpen(false);
+  };
+
   const addItem = (item, quantity = 1) => {
     setCartItems((prevItems) => {
       const compositeId = item.id ? item.id : `${item.productId || 'item'}-${item.size || 'default'}`;
       const addQty = item.quantity || quantity || 1;
+      const cleanPrice = parseNumericPrice(item.price ?? item.salePrice, 1299);
       const existingIndex = prevItems.findIndex((i) => i.id === compositeId);
       if (existingIndex > -1) {
         const updated = [...prevItems];
         updated[existingIndex].quantity += addQty;
         return updated;
       }
-      return [...prevItems, { ...item, id: compositeId, quantity: addQty }];
+      return [...prevItems, { ...item, id: compositeId, price: cleanPrice, quantity: addQty }];
     });
     setIsCartOpen(true);
   };
@@ -89,7 +112,7 @@ export function CartProvider({ children }) {
   }, [cartItems]);
 
   const subtotal = useMemo(() => {
-    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    return cartItems.reduce((acc, item) => acc + parseNumericPrice(item.price, 0) * item.quantity, 0);
   }, [cartItems]);
 
   return (
@@ -106,7 +129,12 @@ export function CartProvider({ children }) {
         totalCount,
         subtotal,
         whatsappNumber,
-        setWhatsappNumber
+        setWhatsappNumber,
+        isCheckoutOpen,
+        checkoutItems,
+        checkoutSource,
+        openCheckout,
+        closeCheckout
       }}
     >
       {children}

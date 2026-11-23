@@ -188,7 +188,7 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                       <FaInstagram size={18} aria-hidden="true" />
                     </a>
                     <a
-                      href="https://wa.me/"
+                      href="https://wa.me/919446391166"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="modern-footer__channel-icon-btn"

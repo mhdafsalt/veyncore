@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
+import { parseNumericPrice } from '@/lib/priceUtils';
 import './MobileQuickBuyDrawer.css';
 
 /**
@@ -18,18 +19,8 @@ function formatPriceText(val) {
   return String(val).replace(/Rs\.\s*/g, 'Rs.\u00A0');
 }
 
-/**
- * Extract numeric price value for cart calculations
- */
-function extractNumericPrice(val) {
-  if (typeof val === 'number') return val;
-  if (!val) return 0;
-  const cleaned = String(val).replace(/[^0-9.]/g, '');
-  return parseFloat(cleaned) || 0;
-}
-
 export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
-  const { addItem, openCart, whatsappNumber } = useCart();
+  const { addItem, openCart, whatsappNumber, openCheckout } = useCart();
   const [mounted, setMounted] = useState(false);
   const [selectedSize, setSelectedSize] = useState('28');
   const [quantity, setQuantity] = useState(1);
@@ -79,12 +70,12 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
   const thumbnail = images[0];
   const sizes = product.availableSizes || product.sizes || ['28', '30', '32', '34', '36'];
 
-  const salePriceDisplay = formatPriceText(product.salePrice ?? product.price ?? 1299);
-  const regularPriceDisplay = formatPriceText(product.regularPrice ?? product.comparePrice ?? product.compareAtPrice ?? null);
+  const salePriceDisplay = formatPriceText(product.price ?? product.salePrice ?? 1299);
+  const regularPriceDisplay = formatPriceText(product.comparePrice ?? product.regularPrice ?? product.compareAtPrice ?? null);
 
-  const numSalePrice = extractNumericPrice(product.salePrice ?? product.price ?? 1299);
-  const numRegularPrice = product.regularPrice || product.comparePrice || product.compareAtPrice
-    ? extractNumericPrice(product.regularPrice || product.comparePrice || product.compareAtPrice)
+  const numSalePrice = parseNumericPrice(product.price ?? product.salePrice ?? 1299);
+  const numRegularPrice = product.comparePrice || product.regularPrice || product.compareAtPrice
+    ? parseNumericPrice(product.comparePrice ?? product.regularPrice ?? product.compareAtPrice)
     : null;
 
   const handleAddToCart = (e) => {
@@ -106,7 +97,39 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
     openCart();
   };
 
-  // Build Direct WhatsApp Order Link
+  // Direct WhatsApp Order - Opens Delivery Details checkout modal
+  const handleDirectWhatsAppClick = (e) => {
+    e.preventDefault();
+    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
+
+    const productUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}/products/${product?.handle || product?.id}`
+      : '';
+
+    const resolvedVariant =
+      product?.color ||
+      product?.fit ||
+      product?.subCategory ||
+      'Standard';
+
+    onClose();
+    if (openCheckout) {
+      openCheckout([
+        {
+          title: product?.title || 'Product',
+          handle: product?.handle || product?.id,
+          variant: resolvedVariant,
+          size: selectedSize || 'ONE SIZE',
+          quantity: 1,
+          price: numPrice,
+          image: (product?.images && product.images[0]) || product?.thumbnail || '/images/hero/hero-card-3.jpg',
+          url: productUrl,
+        }
+      ], 'quick_buy');
+    }
+  };
+
+  // Build Direct WhatsApp Order Link (legacy fallback)
   const buildDirectWhatsAppLink = () => {
     const itemTotal = numSalePrice * quantity;
     const productUrl = typeof window !== 'undefined'
@@ -130,8 +153,8 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
     ].filter(Boolean);
 
     const message = lines.join('\n');
-    const targetNumber = whatsappNumber || '919876543210';
-    return `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
+    const WHATSAPP_NUMBER = '919446391166';
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   };
 
   const handleBuyNow = (e) => {
@@ -279,28 +302,15 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
         </div>
 
         {/* Direct WhatsApp Order Button */}
-        <a
-          href={buildDirectWhatsAppLink()}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
           className="mobile-quick-buy__whatsapp-btn"
-          onClick={() => {
-            const rawPrice = product?.salePrice ?? product?.price ?? 1299;
-            trackWhatsAppClick({
-              productHandle: product?.handle || '',
-              productTitle: product?.title || 'Product',
-              size: selectedSize || '',
-              price: rawPrice,
-              quantity: 1,
-              source: 'quick_buy',
-            });
-            onClose();
-          }}
+          onClick={handleDirectWhatsAppClick}
           aria-label="Direct WhatsApp Order"
         >
           <FaWhatsapp className="mobile-quick-buy__whatsapp-icon" size={20} aria-hidden="true" />
           <span>Direct WhatsApp Order</span>
-        </a>
+        </button>
       </div>
     </div>
   );

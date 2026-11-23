@@ -72,7 +72,8 @@ while (!succeeded && attempts < 5) {
       console.error('Build error:\n', err.stderr || err.message);
       process.exit(1);
     }
-    console.log(`Build attempt ${attempts} hit transient error, retrying...`);
+    console.log(`Build attempt ${attempts} hit transient error, waiting before retry...`);
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000);
     ensureDirs();
   }
 }

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './constants';
+import { parseNumericPrice } from './priceUtils';
 
 /**
  * Tracks when a user clicks any "Direct WhatsApp Order" button.
@@ -24,10 +25,7 @@ export function trackWhatsAppClick({
   try {
     if (typeof window === 'undefined') return;
 
-    const numPrice =
-      typeof price === 'number'
-        ? price
-        : parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0;
+    const numPrice = parseNumericPrice(price, 0);
 
     const payload = JSON.stringify({
       productHandle,

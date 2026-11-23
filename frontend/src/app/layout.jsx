@@ -3,6 +3,7 @@ import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CartDrawer from '@/components/CartDrawer/CartDrawer';
 import AuthModal from '@/components/Account/AuthModal';
+import WhatsAppCheckoutModal from '@/components/Checkout/WhatsAppCheckoutModal';
 
 export const metadata = {
   title: 'Veyncore',
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
           <CartProvider>
             {children}
             <CartDrawer />
+            <WhatsAppCheckoutModal />
             <AuthModal />
           </CartProvider>
         </AuthProvider>
