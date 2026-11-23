@@ -2,41 +2,50 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const baseDir = 'c:/afsall/All_Projects/veyncore/frontend';
+const baseDir = path.resolve(__dirname, '..', 'frontend');
 
-// Pre-create common Next.js directories to avoid Windows EPERM on mkdir
-const dirsToEnsure = [
-  '.next',
-  '.next/types',
-  '.next/types/app',
-  '.next/types/app/_not-found',
-  '.next/types/app/collections',
-  '.next/types/app/products',
-  '.next/types/app/account',
-  '.next/types/app/veyn-objects',
-  '.next/server',
-  '.next/server/app',
-  '.next/server/app/_not-found',
-  '.next/server/app/collections',
-  '.next/server/app/products',
-  '.next/server/app/account',
-  '.next/server/app/veyn-objects',
-  '.next/static',
-  '.next/static/chunks',
-  '.next/static/chunks/app',
-  '.next/static/chunks/app/_not-found',
-  '.next/static/chunks/app/collections',
-  '.next/static/chunks/app/products',
-  '.next/static/chunks/app/account',
-  '.next/static/chunks/app/veyn-objects'
+const routes = [
+  '',
+  '_not-found',
+  'admin',
+  'account',
+  'account/login',
+  'collections',
+  'collections/all',
+  'collections/all-drops',
+  'collections/objects',
+  'collections/objects-drops',
+  'products',
+  'products/[handle]',
+  'veyn-objects'
 ];
 
 function ensureDirs() {
-  dirsToEnsure.forEach(d => {
-    const full = path.join(baseDir, d);
+  const prefixes = [
+    '.next',
+    '.next/types',
+    '.next/types/app',
+    '.next/server',
+    '.next/server/app',
+    '.next/static',
+    '.next/static/chunks',
+    '.next/static/chunks/app'
+  ];
+
+  prefixes.forEach(p => {
+    const full = path.join(baseDir, p);
     if (!fs.existsSync(full)) {
       try { fs.mkdirSync(full, { recursive: true }); } catch (e) {}
     }
+  });
+
+  routes.forEach(r => {
+    ['.next/types/app', '.next/server/app', '.next/static/chunks/app'].forEach(prefix => {
+      const full = path.join(baseDir, prefix, r);
+      if (!fs.existsSync(full)) {
+        try { fs.mkdirSync(full, { recursive: true }); } catch (e) {}
+      }
+    });
   });
 
   const pagesDir = path.join(baseDir, '.next/server/pages');
@@ -45,7 +54,8 @@ function ensureDirs() {
   }
 }
 
-console.log('App Router build environment verified with _not-found.');
+console.log('Precreating .next directories for sandboxed build...');
+ensureDirs();
 
 let succeeded = false;
 let attempts = 0;
