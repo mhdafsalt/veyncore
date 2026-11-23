@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { getDBStatus } from '../config/db.js';
 
 /**
@@ -9,6 +10,7 @@ export const getHealthStatus = () => {
     message: 'Backend API is running',
     timestamp: new Date().toISOString(),
     database: getDBStatus(),
+    databaseName: mongoose.connection?.name || null,
     environment: process.env.NODE_ENV || 'development',
   };
 };
