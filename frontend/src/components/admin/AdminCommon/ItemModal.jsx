@@ -131,56 +131,39 @@ export default function ItemModal({
                 helpText="Choose an image file from your device or paste a web/local image URL."
               />
 
-              <div className="admin-form-group">
-                <label className="admin-form-label">SLIDE TITLE</label>
-                <input
-                  type="text"
-                  className="admin-form-input"
-                  value={formData.title || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  placeholder="e.g. Wide Leg Fit"
-                />
-              </div>
+              <div className="admin-form-grid">
+                <div className="admin-form-group">
+                  <label className="admin-form-label">TARGET LINK *</label>
+                  <input
+                    type="text"
+                    className="admin-form-input"
+                    value={formData.href || ''}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, href: e.target.value }))
+                    }
+                    placeholder="/collections/all-drops"
+                    required
+                  />
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>
+                    Destination URL when slide is clicked
+                  </span>
+                </div>
 
-              <div className="admin-form-group">
-                <label className="admin-form-label">SUBTITLE</label>
-                <input
-                  type="text"
-                  className="admin-form-input"
-                  value={formData.subtitle || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, subtitle: e.target.value }))
-                  }
-                  placeholder="e.g. Best Choice"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label className="admin-form-label">CORNER TAG BADGE</label>
-                <input
-                  type="text"
-                  className="admin-form-input"
-                  value={formData.tag || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, tag: e.target.value }))
-                  }
-                  placeholder="e.g. DROP 01"
-                />
-              </div>
-
-              <div className="admin-form-group">
-                <label className="admin-form-label">TARGET LINK</label>
-                <input
-                  type="text"
-                  className="admin-form-input"
-                  value={formData.href || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, href: e.target.value }))
-                  }
-                  placeholder="/collections/all-drops"
-                />
+                <div className="admin-form-group">
+                  <label className="admin-form-label">CORNER TAG BADGE (OPTIONAL)</label>
+                  <input
+                    type="text"
+                    className="admin-form-input"
+                    value={formData.tag || ''}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, tag: e.target.value }))
+                    }
+                    placeholder="e.g. DROP 01"
+                  />
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>
+                    Optional promotional badge overlay
+                  </span>
+                </div>
               </div>
             </>
           )}

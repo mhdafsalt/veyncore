@@ -94,12 +94,15 @@ export default function AdminHeroSlides({
               </div>
 
               <div className="admin-hero-card__body">
-                <h3 className="admin-hero-card__title">
-                  {slide.title || 'Untitled Slide'}
-                </h3>
-                <p className="admin-hero-card__sub">{slide.subtitle || 'No subtitle'}</p>
+                {slide.title && (
+                  <h3 className="admin-hero-card__title">{slide.title}</h3>
+                )}
+                {slide.subtitle && (
+                  <p className="admin-hero-card__sub">{slide.subtitle}</p>
+                )}
                 <div className="admin-hero-card__href">
-                  Target: {slide.href || '/collections/all-drops'}
+                  <span style={{ fontWeight: 600, color: 'var(--admin-text-main)' }}>Link: </span>
+                  {slide.href || '/collections/all-drops'}
                 </div>
               </div>
 

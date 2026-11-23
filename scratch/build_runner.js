@@ -61,17 +61,20 @@ let succeeded = false;
 let attempts = 0;
 while (!succeeded && attempts < 3) {
   attempts++;
+  ensureDirs();
+  const interval = setInterval(ensureDirs, 100);
   try {
-    ensureDirs();
     const out = execSync('npx next build --no-lint', {
       cwd: baseDir,
       encoding: 'utf8',
       stdio: 'pipe',
       env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1' }
     });
+    clearInterval(interval);
     console.log('Build succeeded:\n', out);
     succeeded = true;
   } catch (err) {
+    clearInterval(interval);
     if (attempts >= 3) {
       console.error('Build output:\n', err.stdout);
       console.error('Build error:\n', err.stderr || err.message);
