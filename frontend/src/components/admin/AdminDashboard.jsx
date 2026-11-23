@@ -19,6 +19,7 @@ import AdminSwipeCategories from './AdminSwipeCategories/AdminSwipeCategories';
 import AdminBottomBanner from './AdminBottomBanner/AdminBottomBanner';
 import AdminMedia from './AdminMedia/AdminMedia';
 import AdminUsers from './AdminUsers/AdminUsers';
+import AdminWhatsAppOrders from './AdminWhatsAppOrders/AdminWhatsAppOrders';
 import ItemModal from './AdminCommon/ItemModal';
 import DeleteConfirmModal from './AdminCommon/DeleteConfirmModal';
 import AdminToast from './AdminCommon/AdminToast';
@@ -41,6 +42,8 @@ export default function AdminDashboard() {
     totalProducts: 0,
     selectsCount: 0,
     objectsCount: 0,
+    whatsappClicks: 0,
+    recentWhatsAppClicks: [],
     recentUsers: [],
   });
 
@@ -673,6 +676,14 @@ export default function AdminDashboard() {
         </button>
         <button
           type="button"
+          className={`admin-mobile-quicktab ${activeTab === 'whatsappOrders' ? 'admin-mobile-quicktab--active' : ''}`}
+          onClick={() => setActiveTab('whatsappOrders')}
+        >
+          <span>WhatsApp</span>
+          <span className="admin-mobile-quicktab__badge">{metrics.whatsappClicks || 0}</span>
+        </button>
+        <button
+          type="button"
           className={`admin-mobile-quicktab ${activeTab === 'subcategories' ? 'admin-mobile-quicktab--active' : ''}`}
           onClick={() => setActiveTab('subcategories')}
         >
@@ -751,6 +762,13 @@ export default function AdminDashboard() {
                 setActiveTab(tab);
                 if (tab === 'media') fetchMediaFiles();
               }}
+            />
+          )}
+
+          {activeTab === 'whatsappOrders' && (
+            <AdminWhatsAppOrders
+              metrics={metrics}
+              getAuthHeaders={getAuthHeaders}
             />
           )}
 

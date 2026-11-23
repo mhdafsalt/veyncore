@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { getProductByHandle } from '@/data/productsData';
+import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
 import './ProductDetail.css';
 
 /**
@@ -481,6 +482,17 @@ export default function ProductDetail({ product }) {
                   rel="noopener noreferrer"
                   className="product-btn product-btn--whatsapp"
                   aria-label="Direct WhatsApp Order"
+                  onClick={() => {
+                    const rawPrice = product?.salePrice ?? product?.price ?? 1299;
+                    trackWhatsAppClick({
+                      productHandle: product?.handle || '',
+                      productTitle: product?.title || 'Product',
+                      size: selectedSize || '',
+                      price: rawPrice,
+                      quantity: quantity || 1,
+                      source: 'product_detail',
+                    });
+                  }}
                 >
                   <FaWhatsapp className="product-btn__whatsapp-icon" size={22} aria-hidden="true" />
                   <span className="product-btn__text">Direct WhatsApp Order</span>

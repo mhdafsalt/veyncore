@@ -5,6 +5,7 @@ import productRoutes from './product.routes.js';
 import contentRoutes from './content.routes.js';
 import uploadRoutes from './upload.routes.js';
 import healthRoutes from './health.routes.js';
+import analyticsRoutes from './analytics.routes.js';
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.use('/products', productRoutes);
 router.use('/content', contentRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/health', healthRoutes);
+router.use('/analytics', analyticsRoutes);
 
 export default router;

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FiTrash2 } from 'react-icons/fi';
 import { useCart, UPSELL_PRODUCTS, DEFAULT_INITIAL_ITEM } from '@/context/CartContext';
+import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
 import './CartDrawer.css';
 
 const TRENDING_COLLECTIONS = [
@@ -434,6 +435,16 @@ export default function CartDrawer() {
                 rel="noopener noreferrer"
                 className="cart-drawer__whatsapp-btn"
                 aria-label="Direct WhatsApp Order"
+                onClick={() => {
+                  trackWhatsAppClick({
+                    productHandle: cartItems.map((i) => i.handle || i.id).join(', '),
+                    productTitle: cartItems.map((i) => i.title || i.name).join(', '),
+                    size: cartItems.map((i) => i.size).join(', '),
+                    price: subtotal,
+                    quantity: totalCount,
+                    source: 'cart_drawer',
+                  });
+                }}
               >
                 {/* Official WhatsApp React Icon */}
                 <FaWhatsapp className="cart-drawer__whatsapp-icon" size={24} aria-hidden="true" />

@@ -815,56 +815,130 @@
   box-shadow: var(--admin-shadow-xs);
 }
 
-.admin-search-wrap {
-  position: relative;
-  min-width: 260px;
-}
-
+.admin-search-wrap,
 .admin-search-box {
+  position: relative;
   display: flex;
   align-items: center;
-  background-color: var(--admin-surface);
-  border: 1px solid var(--admin-border-strong);
-  border-radius: var(--admin-radius-md);
-  padding: 0 12px;
-  gap: 8px;
+  background-color: var(--admin-surface, #ffffff);
+  border: 1px solid var(--admin-border-strong, #cbd5e1);
+  border-radius: var(--admin-radius-md, 8px);
+  padding: 0 34px 0 36px;
   height: 38px;
-  transition: all 0.15s ease;
-  box-shadow: var(--admin-shadow-xs);
+  min-width: 260px;
+  max-width: 380px;
+  width: 100%;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--admin-shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.04));
+  box-sizing: border-box;
 }
 
+.admin-search-wrap::before,
+.admin-search-box::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.admin-search-wrap:hover,
+.admin-search-box:hover {
+  border-color: #94a3b8;
+  box-shadow: var(--admin-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.05));
+}
+
+.admin-search-wrap:hover::before,
+.admin-search-box:hover::before {
+  opacity: 1;
+}
+
+.admin-search-wrap:focus-within,
 .admin-search-box:focus-within {
-  border-color: var(--admin-border-focus);
+  border-color: var(--admin-text-main, #0f172a);
+  background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
 }
 
+.admin-search-wrap:focus-within::before,
+.admin-search-box:focus-within::before {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.05);
+}
+
 .admin-search-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 13px;
-  color: var(--admin-text-main);
-  width: 100%;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  font-size: 13px !important;
+  font-family: inherit !important;
+  color: var(--admin-text-main, #0f172a) !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: normal !important;
 }
 
 .admin-search-input::placeholder {
-  color: var(--admin-text-muted);
+  color: var(--admin-text-muted, #94a3b8) !important;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .admin-search-clear {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--admin-text-muted);
-  font-size: 13px;
-  padding: 2px 4px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--admin-surface-subtle, #f1f5f9);
+  border: 1px solid var(--admin-border, #e2e8f0);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  color: var(--admin-text-secondary, #64748b);
+  font-size: 10px;
+  line-height: 1;
+  transition: all 0.15s ease;
+  padding: 0;
 }
 
 .admin-search-clear:hover {
-  color: var(--admin-text-main);
+  background-color: var(--admin-text-main, #0f172a);
+  color: #ffffff;
+  border-color: var(--admin-text-main, #0f172a);
+}
+
+.admin-input {
+  background-color: var(--admin-surface, #ffffff);
+  border: 1px solid var(--admin-border-strong, #cbd5e1);
+  border-radius: var(--admin-radius-md, 8px);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--admin-text-main, #0f172a);
+  outline: none;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-input:focus {
+  border-color: var(--admin-text-main, #0f172a);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
 }
 
 /* --------------------------------------------------------------------------

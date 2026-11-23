@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
+import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
 import './MobileQuickBuyDrawer.css';
 
 /**
@@ -283,7 +284,18 @@ export default function MobileQuickBuyDrawer({ isOpen, onClose, product }) {
           target="_blank"
           rel="noopener noreferrer"
           className="mobile-quick-buy__whatsapp-btn"
-          onClick={() => onClose()}
+          onClick={() => {
+            const rawPrice = product?.salePrice ?? product?.price ?? 1299;
+            trackWhatsAppClick({
+              productHandle: product?.handle || '',
+              productTitle: product?.title || 'Product',
+              size: selectedSize || '',
+              price: rawPrice,
+              quantity: 1,
+              source: 'quick_buy',
+            });
+            onClose();
+          }}
           aria-label="Direct WhatsApp Order"
         >
           <FaWhatsapp className="mobile-quick-buy__whatsapp-icon" size={20} aria-hidden="true" />

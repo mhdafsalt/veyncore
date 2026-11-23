@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import Product from '../models/product.model.js';
+import WhatsAppClick from '../models/whatsappClick.model.js';
 
 /**
  * GET /api/admin/overview
@@ -13,6 +14,19 @@ export const getAdminOverview = async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const selectsCount = await Product.countDocuments({ category: 'VEYN-SELECTS' });
     const objectsCount = await Product.countDocuments({ category: 'VEYN-OBJECTS' });
+
+    // WhatsApp Click Count
+    let whatsappClicks = 0;
+    let recentWhatsAppClicks = [];
+    try {
+      whatsappClicks = await WhatsAppClick.countDocuments();
+      recentWhatsAppClicks = await WhatsAppClick.find()
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean();
+    } catch (clickErr) {
+      console.warn('[Admin Overview] Failed to fetch WhatsApp click counts:', clickErr.message);
+    }
 
     const recentUsers = await User.find()
       .select('-password')
@@ -29,6 +43,8 @@ export const getAdminOverview = async (req, res) => {
         totalProducts,
         selectsCount,
         objectsCount,
+        whatsappClicks,
+        recentWhatsAppClicks,
         recentUsers,
       },
     });

@@ -50,10 +50,15 @@ export default function AdminOverview({
           <span className="admin-kpi-card__sub">Authenticated via MongoDB</span>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => onNavigateTab('users')} role="button" tabIndex={0}>
-          <span className="admin-kpi-card__label">VIP NOTIFICATIONS</span>
-          <div className="admin-kpi-card__val">{metrics?.vipUsers ?? 0}</div>
-          <span className="admin-kpi-card__sub">Opted-in for secret drop alerts</span>
+        <div
+          className="admin-kpi-card admin-kpi-card--whatsapp"
+          onClick={() => onNavigateTab('whatsappOrders')}
+          role="button"
+          tabIndex={0}
+        >
+          <span className="admin-kpi-card__label">WHATSAPP ORDERS</span>
+          <div className="admin-kpi-card__val">{metrics?.whatsappClicks ?? 0}</div>
+          <span className="admin-kpi-card__sub">Direct WhatsApp order button clicks</span>
         </div>
 
         <div className="admin-kpi-card" onClick={() => onNavigateTab('announcements')} role="button" tabIndex={0}>
