@@ -448,35 +448,11 @@ function ObjectsAllDropsContent() {
       <div className="obj-all__container">
         {/* Collection Header */}
         <header className="obj-all__header">
-          <div className="obj-all__header-top">
-            <span className="obj-all__kicker">VEYN-OBJECTS // HARDWARE ARCHIVE</span>
-            <span className="obj-all__count-badge">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'artifact' : 'artifacts'}
-            </span>
-          </div>
           <h1 className="obj-all__title">OBJECT DROPS</h1>
+          <span className="obj-all__count-badge">
+            {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
+          </span>
         </header>
-
-        {/* Category Pill Tabs */}
-        <div className="obj-all__tabs" role="tablist" aria-label="Object Category Tabs">
-          {OBJECT_CATEGORIES.map((cat) => {
-            const isActive = activeCategoryTab === cat.id;
-            const count = categoryCounts[cat.id] || 0;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={`obj-all__tab ${isActive ? 'obj-all__tab--active' : ''}`}
-                onClick={() => handleTabChange(cat.id)}
-              >
-                <span>{cat.label}</span>
-                <span className="obj-all__tab-count">({count})</span>
-              </button>
-            );
-          })}
-        </div>
 
         {/* Filter and Control Bar */}
         <div className="obj-all__controls" ref={dropdownRef}>

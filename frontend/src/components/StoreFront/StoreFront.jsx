@@ -86,7 +86,7 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
         )}
 
         {/* 6. Modern VEYNCORE Footer with Editorial Image Banner on Homepage */}
-        <Footer showBanner={true} />
+        <Footer showBanner={true} activeMainCategory={activeCategory} />
       </main>
     </>
   );

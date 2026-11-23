@@ -73,6 +73,13 @@ const contentSchema = new mongoose.Schema(
       buttonLink: { type: String, default: '/collections/all-drops' },
       active: { type: Boolean, default: true },
     },
+    bottomBannerObjects: {
+      imageDesktop: { type: String, default: '/images/hero/ObjectHero03.jpg' },
+      imageMobile: { type: String, default: '/images/hero/ObjectHero03.jpg' },
+      altText: { type: String, default: 'VEYN-OBJECTS Artifacts Campaign' },
+      buttonLink: { type: String, default: '/collections/objects-drops' },
+      active: { type: Boolean, default: true },
+    },
   },
   {
     timestamps: true,

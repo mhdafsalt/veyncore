@@ -1,6 +1,7 @@
 /* ==========================================================================
    ImageBanner - Editorial Campaign Image Banner (Pure Image Only)
    Positioned directly at the top of the Footer section on the Homepage
+   Guarantees exact matching height and aspect ratio across VEYN-SELECTS & VEYN-OBJECTS
    ========================================================================== */
 
 .image-banner {
@@ -20,11 +21,17 @@
   text-decoration: none;
 }
 
+.image-banner__picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .image-banner__img {
   width: 100%;
+  aspect-ratio: 1898 / 550;
   height: auto;
   max-height: 560px;
-  min-height: 280px;
   object-fit: cover;
   object-position: center 30%;
   display: block;
@@ -38,7 +45,7 @@
 
 @media (max-width: 768px) {
   .image-banner__img {
-    min-height: 220px;
+    aspect-ratio: 447 / 372;
     max-height: 420px;
     object-position: center center;
   }
@@ -46,8 +53,8 @@
 
 @media (max-width: 488px) {
   .image-banner__img {
-    min-height: 220px;
-    max-height: 310px;
+    aspect-ratio: 447 / 372;
+    max-height: 340px;
     object-position: center center;
   }
 }

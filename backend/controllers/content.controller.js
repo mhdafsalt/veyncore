@@ -110,6 +110,13 @@ const DEFAULT_CONTENT = {
     buttonLink: '/collections/all-drops',
     active: true,
   },
+  bottomBannerObjects: {
+    imageDesktop: '/images/hero/ObjectHero03.jpg',
+    imageMobile: '/images/hero/ObjectHero03.jpg',
+    altText: 'VEYN-OBJECTS Artifacts Campaign',
+    buttonLink: '/collections/objects-drops',
+    active: true,
+  },
 };
 
 /**
@@ -151,7 +158,7 @@ export const getSectionContent = async (req, res) => {
       content = await SiteContent.create(DEFAULT_CONTENT);
     }
 
-    let sectionData = content[section];
+    let sectionData = content[section] || DEFAULT_CONTENT[section];
     if (sectionData === undefined) {
       return res.status(404).json({
         success: false,

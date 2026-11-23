@@ -47,11 +47,6 @@ function ensureDirs() {
       }
     });
   });
-
-  const pagesDir = path.join(baseDir, '.next/server/pages');
-  if (fs.existsSync(pagesDir)) {
-    try { fs.rmSync(pagesDir, { recursive: true, force: true }); } catch (e) {}
-  }
 }
 
 console.log('Precreating .next directories for sandboxed build...');
@@ -59,10 +54,9 @@ ensureDirs();
 
 let succeeded = false;
 let attempts = 0;
-while (!succeeded && attempts < 3) {
+while (!succeeded && attempts < 5) {
   attempts++;
   ensureDirs();
-  const interval = setInterval(ensureDirs, 100);
   try {
     const out = execSync('npx next build --no-lint', {
       cwd: baseDir,
@@ -70,12 +64,10 @@ while (!succeeded && attempts < 3) {
       stdio: 'pipe',
       env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1' }
     });
-    clearInterval(interval);
     console.log('Build succeeded:\n', out);
     succeeded = true;
   } catch (err) {
-    clearInterval(interval);
-    if (attempts >= 3) {
+    if (attempts >= 5) {
       console.error('Build output:\n', err.stdout);
       console.error('Build error:\n', err.stderr || err.message);
       process.exit(1);

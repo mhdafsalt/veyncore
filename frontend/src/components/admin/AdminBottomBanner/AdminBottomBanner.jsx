@@ -6,10 +6,13 @@ import './AdminBottomBanner.css';
 
 export default function AdminBottomBanner({
   bannerData,
+  bannerDataObjects,
   onSaveBanner,
   isSaving = false,
 }) {
-  const [formData, setFormData] = useState({
+  const [activeSection, setActiveSection] = useState('VEYN-SELECTS'); // 'VEYN-SELECTS' | 'VEYN-OBJECTS'
+
+  const [selectsForm, setSelectsForm] = useState({
     imageDesktop: '/images/ImageBanner.png',
     imageMobile: '/images/ImageBanner-Mob.png',
     altText: 'VEYNCORE Denim Campaign',
@@ -17,9 +20,18 @@ export default function AdminBottomBanner({
     active: true,
   });
 
+  const [objectsForm, setObjectsForm] = useState({
+    imageDesktop: '/images/hero/ObjectHero03.jpg',
+    imageMobile: '/images/hero/ObjectHero03.jpg',
+    altText: 'VEYN-OBJECTS Artifacts Campaign',
+    buttonLink: '/collections/objects-drops',
+    active: true,
+  });
+
+  // Sync VEYN-SELECTS data
   useEffect(() => {
     if (bannerData) {
-      setFormData({
+      setSelectsForm({
         imageDesktop: bannerData.imageDesktop || '/images/ImageBanner.png',
         imageMobile: bannerData.imageMobile || '/images/ImageBanner-Mob.png',
         altText: bannerData.altText || 'VEYNCORE Denim Campaign',
@@ -29,10 +41,30 @@ export default function AdminBottomBanner({
     }
   }, [bannerData]);
 
+  // Sync VEYN-OBJECTS data
+  useEffect(() => {
+    if (bannerDataObjects) {
+      setObjectsForm({
+        imageDesktop: bannerDataObjects.imageDesktop || '/images/hero/ObjectHero03.jpg',
+        imageMobile: bannerDataObjects.imageMobile || '/images/hero/ObjectHero03.jpg',
+        altText: bannerDataObjects.altText || 'VEYN-OBJECTS Artifacts Campaign',
+        buttonLink: bannerDataObjects.buttonLink || '/collections/objects-drops',
+        active: bannerDataObjects.active !== false,
+      });
+    }
+  }, [bannerDataObjects]);
+
+  const currentForm = activeSection === 'VEYN-OBJECTS' ? objectsForm : selectsForm;
+  const setCurrentForm = activeSection === 'VEYN-OBJECTS' ? setObjectsForm : setSelectsForm;
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSaveBanner(formData);
+    if (onSaveBanner) {
+      onSaveBanner(currentForm, activeSection);
+    }
   };
+
+  const isObjects = activeSection === 'VEYN-OBJECTS';
 
   return (
     <div className="admin-view">
@@ -40,51 +72,86 @@ export default function AdminBottomBanner({
         <div>
           <h1 className="admin-view__title">HOMEPAGE BOTTOM CAMPAIGN BANNER</h1>
           <p className="admin-view__subtitle">
-            Configure the wide editorial campaign banner displayed directly above the footer on the homepage.
+            Configure independent editorial campaign banners for VEYN-SELECTS and VEYN-OBJECTS.
           </p>
+        </div>
+      </div>
+
+      {/* Category Tabs Switcher */}
+      <div className="admin-filters-bar" style={{ marginBottom: '20px' }}>
+        <div className="admin-filter-pills">
+          <button
+            type="button"
+            className={`admin-filter-pill ${
+              !isObjects ? 'admin-filter-pill--active' : ''
+            }`}
+            onClick={() => setActiveSection('VEYN-SELECTS')}
+          >
+            VEYN-SELECTS (DENIMS)
+          </button>
+          <button
+            type="button"
+            className={`admin-filter-pill ${
+              isObjects ? 'admin-filter-pill--active' : ''
+            }`}
+            onClick={() => setActiveSection('VEYN-OBJECTS')}
+          >
+            VEYN-OBJECTS (ARTIFACTS)
+          </button>
         </div>
       </div>
 
       <div className="admin-card">
         <form onSubmit={handleSubmit} className="admin-banner-editor">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0, textTransform: 'uppercase' }}>
+              {isObjects ? 'VEYN-OBJECTS Bottom Banner' : 'VEYN-SELECTS Bottom Banner'}
+            </h3>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>
+              Target: {isObjects ? 'veyncore.in/veyn-objects' : 'veyncore.in/'}
+            </span>
+          </div>
+
           <div className="admin-form-group">
             <label className="admin-toggle-label">
               <input
                 type="checkbox"
-                checked={formData.active}
+                checked={currentForm.active}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, active: e.target.checked }))
+                  setCurrentForm((prev) => ({ ...prev, active: e.target.checked }))
                 }
                 style={{ display: 'none' }}
               />
               <span className="admin-toggle-switch__thumb" />
-              <span>Display Campaign Banner on Storefront Homepage</span>
+              <span>
+                Display Campaign Banner on {isObjects ? 'VEYN-OBJECTS' : 'VEYN-SELECTS'} Homepage
+              </span>
             </label>
           </div>
 
           <div className="admin-form-grid">
             <AdminImageUploader
               label="DESKTOP HERO BANNER IMAGE *"
-              value={formData.imageDesktop}
+              value={currentForm.imageDesktop}
               onChange={(newUrl) =>
-                setFormData((prev) => ({ ...prev, imageDesktop: newUrl }))
+                setCurrentForm((prev) => ({ ...prev, imageDesktop: newUrl }))
               }
-              aspectRatio="16/7"
-              placeholder="/images/ImageBanner.png"
+              aspectRatio="1898/550"
+              placeholder={isObjects ? '/images/hero/ObjectHero03.jpg' : '/images/ImageBanner.png'}
               required
-              helpText="High-res horizontal banner for desktop viewports (1920x800 recommended)."
+              helpText="High-res horizontal banner matching VEYN-SELECTS size (1898x550 or 16:9 ratio recommended)."
             />
 
             <AdminImageUploader
               label="MOBILE BANNER IMAGE (PORTRAIT/SQUARE) *"
-              value={formData.imageMobile}
+              value={currentForm.imageMobile}
               onChange={(newUrl) =>
-                setFormData((prev) => ({ ...prev, imageMobile: newUrl }))
+                setCurrentForm((prev) => ({ ...prev, imageMobile: newUrl }))
               }
-              aspectRatio="4/3"
-              placeholder="/images/ImageBanner-Mob.png"
+              aspectRatio="447/372"
+              placeholder={isObjects ? '/images/hero/ObjectHero03.jpg' : '/images/ImageBanner-Mob.png'}
               required
-              helpText="Vertical optimized image for smartphones and tablets."
+              helpText="Vertical optimized image for smartphones and tablets (447x372 ratio recommended)."
             />
           </div>
 
@@ -94,11 +161,15 @@ export default function AdminBottomBanner({
               <input
                 type="text"
                 className="admin-form-input"
-                value={formData.altText}
+                value={currentForm.altText}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, altText: e.target.value }))
+                  setCurrentForm((prev) => ({ ...prev, altText: e.target.value }))
                 }
-                placeholder="VEYNCORE Denim Campaign"
+                placeholder={
+                  isObjects
+                    ? 'VEYN-OBJECTS Artifacts Campaign'
+                    : 'VEYNCORE Denim Campaign'
+                }
               />
             </div>
 
@@ -107,26 +178,31 @@ export default function AdminBottomBanner({
               <input
                 type="text"
                 className="admin-form-input"
-                value={formData.buttonLink}
+                value={currentForm.buttonLink}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, buttonLink: e.target.value }))
+                  setCurrentForm((prev) => ({ ...prev, buttonLink: e.target.value }))
                 }
-                placeholder="/collections/all-drops"
+                placeholder={isObjects ? '/collections/objects-drops' : '/collections/all-drops'}
               />
             </div>
           </div>
 
           {/* Live Preview */}
           <div className="admin-form-group">
-            <label className="admin-form-label">LIVE PREVIEW</label>
+            <label className="admin-form-label">
+              LIVE PREVIEW ({isObjects ? 'VEYN-OBJECTS' : 'VEYN-SELECTS'})
+            </label>
             <div className="admin-banner-preview">
               <img
-                src={formData.imageDesktop || '/images/ImageBanner.png'}
+                src={
+                  currentForm.imageDesktop ||
+                  (isObjects ? '/images/hero/ObjectHero03.jpg' : '/images/ImageBanner.png')
+                }
                 alt="Banner Preview"
                 className="admin-banner-preview__img"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/images/ImageBanner.png';
+                  e.target.src = isObjects ? '/images/hero/ObjectHero03.jpg' : '/images/ImageBanner.png';
                 }}
               />
             </div>
@@ -138,7 +214,9 @@ export default function AdminBottomBanner({
               className="admin-btn admin-btn--black"
               disabled={isSaving}
             >
-              {isSaving ? 'Saving Changes...' : 'Save Banner Settings'}
+              {isSaving
+                ? 'Saving Changes...'
+                : `Save ${isObjects ? 'VEYN-OBJECTS' : 'VEYN-SELECTS'} Banner`}
             </button>
           </div>
         </form>

@@ -6,7 +6,7 @@ import { FaInstagram, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import './Footer.css';
 
-export default function Footer({ showBanner = false }) {
+export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-SELECTS' }) {
   const [openSections, setOpenSections] = useState({
     quickLinks: false,
     policies: false,
@@ -23,7 +23,7 @@ export default function Footer({ showBanner = false }) {
   return (
     <footer className="modern-footer" id="modern-footer">
       {/* 1. Image Banner Section (at the top of the footer on Homepage) */}
-      {showBanner && <ImageBanner />}
+      {showBanner && <ImageBanner targetSection={activeMainCategory} />}
 
       {/* 2. Collapsible Navigation Accordions (QUICK LINKS, POLICIES, CHANNELS) */}
       <div className="modern-footer__nav-wrapper">

@@ -514,10 +514,11 @@ export default function AdminDashboard() {
   // =========================================================================
   // BOTTOM BANNER HANDLER
   // =========================================================================
-  const handleSaveBottomBanner = async (bannerPayload) => {
+  const handleSaveBottomBanner = async (bannerPayload, targetSection = 'VEYN-SELECTS') => {
     try {
       setIsSaving(true);
-      const res = await fetch(`${API_BASE_URL}/api/content/bottomBanner`, {
+      const sectionKey = targetSection === 'VEYN-OBJECTS' ? 'bottomBannerObjects' : 'bottomBanner';
+      const res = await fetch(`${API_BASE_URL}/api/content/${sectionKey}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify(bannerPayload),
@@ -525,7 +526,10 @@ export default function AdminDashboard() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast('Bottom campaign banner saved and published live.', 'success');
+        showToast(
+          `${targetSection === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS'} campaign banner saved live.`,
+          'success'
+        );
         fetchContent();
       } else {
         showToast(data.message || 'Save failed', 'error');
@@ -826,6 +830,7 @@ export default function AdminDashboard() {
           {activeTab === 'bottomBanner' && (
             <AdminBottomBanner
               bannerData={siteContent?.bottomBanner}
+              bannerDataObjects={siteContent?.bottomBannerObjects}
               onSaveBanner={handleSaveBottomBanner}
               isSaving={isSaving}
             />

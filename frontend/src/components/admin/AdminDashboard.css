@@ -1204,6 +1204,7 @@
 
 .admin-banner-preview__img {
   width: 100%;
+  aspect-ratio: 1898 / 550;
   height: auto;
   max-height: 280px;
   object-fit: cover;

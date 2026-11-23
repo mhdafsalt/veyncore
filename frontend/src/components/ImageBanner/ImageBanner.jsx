@@ -6,39 +6,70 @@ import { API_BASE_URL } from '@/lib/constants';
 import './ImageBanner.css';
 
 export default function ImageBanner({
-  buttonLink: defaultButtonLink = '/collections/all-drops',
-  imageDesktop: defaultImageDesktop = '/images/ImageBanner.png',
-  imageMobile: defaultImageMobile = '/images/ImageBanner-Mob.png',
-  altText: defaultAltText = 'VEYNCORE Denim Campaign',
+  targetSection = 'VEYN-SELECTS',
+  buttonLink: customButtonLink,
+  imageDesktop: customImageDesktop,
+  imageMobile: customImageMobile,
+  altText: customAltText,
 }) {
+  const isObjects = targetSection === 'VEYN-OBJECTS';
+
+  const defaultImageDesktop = isObjects
+    ? '/images/hero/ObjectHero03.jpg'
+    : '/images/ImageBanner.png';
+
+  const defaultImageMobile = isObjects
+    ? '/images/hero/ObjectHero03.jpg'
+    : '/images/ImageBanner-Mob.png';
+
+  const defaultButtonLink = isObjects
+    ? '/collections/objects-drops'
+    : '/collections/all-drops';
+
+  const defaultAltText = isObjects
+    ? 'VEYN-OBJECTS Artifacts Campaign'
+    : 'VEYNCORE Denim Campaign';
+
   const [banner, setBanner] = useState({
-    imageDesktop: defaultImageDesktop,
-    imageMobile: defaultImageMobile,
-    altText: defaultAltText,
-    buttonLink: defaultButtonLink,
+    imageDesktop: customImageDesktop || defaultImageDesktop,
+    imageMobile: customImageMobile || defaultImageMobile,
+    altText: customAltText || defaultAltText,
+    buttonLink: customButtonLink || defaultButtonLink,
     active: true,
   });
 
-  // Fetch dynamic bottom banner settings from backend
+  // Fetch dynamic bottom banner settings from backend for the active section
   useEffect(() => {
     let isMounted = true;
     const fetchBanner = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/content/bottomBanner`);
+        const endpoint = isObjects
+          ? `${API_BASE_URL}/api/content/bottomBannerObjects`
+          : `${API_BASE_URL}/api/content/bottomBanner`;
+
+        const res = await fetch(endpoint);
         const data = await res.json();
         if (res.ok && data.success && data.data) {
           if (isMounted) {
             setBanner({
-              imageDesktop: data.data.imageDesktop || defaultImageDesktop,
-              imageMobile: data.data.imageMobile || defaultImageMobile,
-              altText: data.data.altText || defaultAltText,
-              buttonLink: data.data.buttonLink || defaultButtonLink,
+              imageDesktop: data.data.imageDesktop || customImageDesktop || defaultImageDesktop,
+              imageMobile: data.data.imageMobile || customImageMobile || defaultImageMobile,
+              altText: data.data.altText || customAltText || defaultAltText,
+              buttonLink: data.data.buttonLink || customButtonLink || defaultButtonLink,
               active: data.data.active !== false,
             });
           }
         }
       } catch (err) {
-        // Fallback to defaults
+        if (isMounted) {
+          setBanner({
+            imageDesktop: customImageDesktop || defaultImageDesktop,
+            imageMobile: customImageMobile || defaultImageMobile,
+            altText: customAltText || defaultAltText,
+            buttonLink: customButtonLink || defaultButtonLink,
+            active: true,
+          });
+        }
       }
     };
 
@@ -46,16 +77,31 @@ export default function ImageBanner({
     return () => {
       isMounted = false;
     };
-  }, [defaultButtonLink, defaultImageDesktop, defaultImageMobile, defaultAltText]);
+  }, [
+    targetSection,
+    isObjects,
+    defaultButtonLink,
+    defaultImageDesktop,
+    defaultImageMobile,
+    defaultAltText,
+    customButtonLink,
+    customImageDesktop,
+    customImageMobile,
+    customAltText,
+  ]);
 
   if (!banner.active) {
     return null;
   }
 
   return (
-    <section className="image-banner" aria-label="VEYNCORE Campaign Banner">
-      <Link href={banner.buttonLink || '/collections/all-drops'} className="image-banner__link" aria-label="View campaign collection">
-        <picture>
+    <section className="image-banner" aria-label={banner.altText || 'VEYNCORE Campaign Banner'}>
+      <Link
+        href={banner.buttonLink || defaultButtonLink}
+        className="image-banner__link"
+        aria-label={banner.altText || 'View campaign collection'}
+      >
+        <picture className="image-banner__picture">
           <source media="(max-width: 768px)" srcSet={banner.imageMobile} />
           <img
             src={banner.imageDesktop}
