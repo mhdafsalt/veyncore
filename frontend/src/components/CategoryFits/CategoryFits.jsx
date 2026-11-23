@@ -302,6 +302,8 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
 
   return (
     <section className="category-fits__row" id={`fit-${fitId}`}>
+      {/* Anchor alias for direct subcategory jumping */}
+      <span id={fitId} style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
       {/* Row Header with Fit Name and Link */}
       <header className="category-fits__row-header">
         <h2 className="category-fits__row-heading">{fitLabel}</h2>
@@ -493,6 +495,11 @@ export default function CategoryFits() {
 
   return (
     <div className="category-fits" id="category-fits-showcase">
+      {/* Anchor aliases for subcategory sections */}
+      <span id="denims" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
+      <span id="cargo" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
+      <span id="tops" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
+      <span id="accessories" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
       <div className="category-fits__container">
         {categories.map((cat) => {
           const products = categoryData[cat.id] || [];

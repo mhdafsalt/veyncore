@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   optimizeFonts: false,
+  experimental: {
+    optimizePackageImports: ['react-icons'],
+  },
   async rewrites() {
     return [
       {

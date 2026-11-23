@@ -17,7 +17,6 @@ import AdminHeroSlides from './AdminHeroSlides/AdminHeroSlides';
 import AdminAnnouncements from './AdminAnnouncements/AdminAnnouncements';
 import AdminSwipeCategories from './AdminSwipeCategories/AdminSwipeCategories';
 import AdminBottomBanner from './AdminBottomBanner/AdminBottomBanner';
-import AdminMedia from './AdminMedia/AdminMedia';
 import AdminUsers from './AdminUsers/AdminUsers';
 import AdminWhatsAppOrders from './AdminWhatsAppOrders/AdminWhatsAppOrders';
 import ItemModal from './AdminCommon/ItemModal';
@@ -723,17 +722,6 @@ export default function AdminDashboard() {
         </button>
         <button
           type="button"
-          className={`admin-mobile-quicktab ${activeTab === 'media' ? 'admin-mobile-quicktab--active' : ''}`}
-          onClick={() => {
-            setActiveTab('media');
-            fetchMediaFiles();
-          }}
-        >
-          <span>Media Vault</span>
-          <span className="admin-mobile-quicktab__badge">{mediaFiles.length}</span>
-        </button>
-        <button
-          type="button"
           className={`admin-mobile-quicktab ${activeTab === 'users' ? 'admin-mobile-quicktab--active' : ''}`}
           onClick={() => setActiveTab('users')}
         >
@@ -833,18 +821,6 @@ export default function AdminDashboard() {
               bannerDataObjects={siteContent?.bottomBannerObjects}
               onSaveBanner={handleSaveBottomBanner}
               isSaving={isSaving}
-            />
-          )}
-
-          {activeTab === 'media' && (
-            <AdminMedia
-              mediaFiles={mediaFiles}
-              loading={loadingMedia}
-              onUploadSuccess={() => {
-                showToast('Image uploaded to media storage.', 'success');
-                fetchMediaFiles();
-              }}
-              onDeleteMedia={handleDeleteMedia}
             />
           )}
 

@@ -171,6 +171,7 @@ export default function HeroSection({
   return (
     <section
       className="hero-carousel-section"
+      id="home"
       aria-label="Featured Collections Infinite Carousel"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

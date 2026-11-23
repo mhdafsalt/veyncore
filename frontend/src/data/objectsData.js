@@ -938,7 +938,8 @@ export const OBJECTS_PRODUCTS = [
 export const OBJECTS_CATEGORY_DATA = {
   bags: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'BAGS'),
   chains: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CHAINS'),
-  caps: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CAPS')
+  caps: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CAPS'),
+  headwear: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CAPS')
 };
 
 /**

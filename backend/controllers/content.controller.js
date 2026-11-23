@@ -101,7 +101,7 @@ const DEFAULT_CONTENT = {
 
     { id: 'swp-bags', targetSection: 'VEYN-OBJECTS', key: 'bags', label: 'BAGS', collectionPath: '/collections/objects-drops?category=bags', sortOrder: 0, active: true },
     { id: 'swp-chains', targetSection: 'VEYN-OBJECTS', key: 'chains', label: 'CHAINS', collectionPath: '/collections/objects-drops?category=chains', sortOrder: 1, active: true },
-    { id: 'swp-caps', targetSection: 'VEYN-OBJECTS', key: 'headwear', label: 'CAPS & HEADWEAR', collectionPath: '/collections/objects-drops?category=caps', sortOrder: 2, active: true },
+    { id: 'swp-caps', targetSection: 'VEYN-OBJECTS', key: 'caps', label: 'CAPS & HEADWEAR', collectionPath: '/collections/objects-drops?category=caps', sortOrder: 2, active: true },
   ],
   bottomBanner: {
     imageDesktop: '/images/ImageBanner.png',

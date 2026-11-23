@@ -175,6 +175,7 @@ export default function ObjectsHero({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <span id="home" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
       <div
         className="objects-hero__viewport"
         onTouchStart={handleTouchStart}

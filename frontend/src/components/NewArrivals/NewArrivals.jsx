@@ -252,6 +252,8 @@ export default function NewArrivals() {
 
   return (
     <section className="new-arrivals" id="new-arrivals">
+      {/* Anchor alias for subcategory flash-sale navigation */}
+      <span id="flash-sale" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
       <div className="new-arrivals__container">
         {/* Section Header */}
         <header className="new-arrivals__header">
