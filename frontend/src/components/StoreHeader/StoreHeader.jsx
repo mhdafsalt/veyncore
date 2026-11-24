@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import AnnouncementBar from '@/components/AnnouncementBar/AnnouncementBar';
 import Navbar from '@/components/Navbar/Navbar';
 import MainCategories from '@/components/MainCategories/MainCategories';
@@ -12,7 +13,21 @@ import SubCategories from '@/components/SubCategories/SubCategories';
  * with interactive synchronized category state across PDP and Collection pages.
  */
 export default function StoreHeader({ initialCategory = 'VEYN-SELECTS' }) {
-  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const pathname = usePathname();
+  const [activeCategory, setActiveCategory] = useState(() => {
+    if (pathname && (pathname.includes('objects') || pathname.includes('veyn-objects'))) {
+      return 'VEYN-OBJECTS';
+    }
+    return initialCategory;
+  });
+
+  useEffect(() => {
+    if (pathname && (pathname.includes('objects') || pathname.includes('veyn-objects'))) {
+      setActiveCategory('VEYN-OBJECTS');
+    } else if (initialCategory) {
+      setActiveCategory(initialCategory);
+    }
+  }, [initialCategory, pathname]);
 
   return (
     <>

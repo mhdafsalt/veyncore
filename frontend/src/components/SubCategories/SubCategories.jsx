@@ -7,9 +7,9 @@ import { matchProductCategory, toCategorySlug } from '@/lib/categoryFilterUtils'
 import './SubCategories.css';
 
 const DEFAULT_SELECTS_SUBCATEGORIES = [
-  { id: 'home', label: 'HOME', href: '#home' },
+  { id: 'home', label: 'HOME', href: '/' },
   { id: 'flash-sale', label: 'FLASH SALE', href: '#flash-sale', isGlow: true },
-  { id: 'new-drops', label: 'NEW DROPS', href: '/collections/all-drops', isGlow: true },
+  { id: 'new-drops', label: 'NEW DROPS', href: '/collections/all-drops?badge=new', isGlow: true },
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops' },
   { id: 'baggy', label: 'BAGGY', href: '/collections/all-drops?category=baggy' },
   { id: 'bootcut', label: 'BOOTCUT', href: '/collections/all-drops?category=bootcut' },
@@ -27,6 +27,9 @@ const DEFAULT_OBJECTS_SUBCATEGORIES = [
   { id: 'chains', label: 'CHAINS', href: '/collections/objects-drops?category=chains' },
   { id: 'caps', label: 'CAPS', href: '/collections/objects-drops?category=caps' },
   { id: 'shades', label: 'SHADES', href: '/collections/objects-drops?category=shades' },
+  { id: 'bracelets', label: 'BRACELETS', href: '/collections/objects-drops?category=bracelets' },
+  { id: 'watches', label: 'WATCHES', href: '/collections/objects-drops?category=watches' },
+  { id: 'belts', label: 'BELTS', href: '/collections/objects-drops?category=belts' },
 ];
 
 const LEGACY_STATIC_CATEGORIES = new Set([
@@ -114,43 +117,49 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     const result = [];
     const seenLabels = new Set();
     const seenIds = new Set();
+    const seenSlugs = new Set();
 
     const addUnique = (item) => {
       if (!item) return;
       const labelNorm = norm(item.label);
       const idNorm = (item.id || toSlug(item.label)).toLowerCase().trim();
+      const slugNorm = toCategorySlug(item.label || item.id);
 
       // Filter out any legacy or unwanted ALL OBJECTS
       if (labelNorm === 'ALL OBJECTS' || idNorm === 'obj-all') {
         return;
       }
 
-      // Skip if already in list by normalized label or ID
-      if (seenLabels.has(labelNorm) || seenIds.has(idNorm)) {
+      // Skip if already in list by normalized label, ID, or unified category slug
+      if (
+        seenLabels.has(labelNorm) ||
+        seenIds.has(idNorm) ||
+        (slugNorm && seenSlugs.has(slugNorm))
+      ) {
         return;
       }
 
       seenLabels.add(labelNorm);
       seenIds.add(idNorm);
+      if (slugNorm) seenSlugs.add(slugNorm);
       result.push(item);
     };
 
-    // 1. Dynamic subcategories configured in backend / admin
+    // 1. Dynamic subcategories configured in backend / admin (priority)
     const adminItems = (dynamicSubcategories || []).filter(
       (sub) => sub.mainCategory === activeMainCategory && sub.active !== false
     );
+
+    if (adminItems && adminItems.length > 0) {
+      adminItems.forEach((item) => addUnique(item));
+    }
 
     // 2. Add base navigation defaults (core streetwear fits & object categories)
     baseDefaults.forEach((base) => {
       addUnique(base);
     });
 
-    // 3. Add / merge admin-managed custom items
-    if (adminItems && adminItems.length > 0) {
-      adminItems.forEach((item) => addUnique(item));
-    }
-
-    // 4. Dynamically append any categories from real products if not already present
+    // 3. Dynamically append any categories from real products if not already present
     const dropsPage = isObjects ? '/collections/objects-drops' : '/collections/all-drops';
     const counts = {};
 
@@ -163,7 +172,8 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
           if (catName) {
             const key = toSlug(catName);
             const labelNorm = norm(catName);
-            if (!seenLabels.has(labelNorm) && !seenIds.has(key)) {
+            const slugNorm = toCategorySlug(catName);
+            if (!seenLabels.has(labelNorm) && !seenIds.has(key) && !seenSlugs.has(slugNorm)) {
               counts[key] = counts[key] || { count: 0, label: labelNorm };
               counts[key].count += 1;
             }
@@ -342,10 +352,14 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     const subLabel = (sub.label || '').toUpperCase().trim();
     const subHref = (sub.href || '').trim();
 
-    // 1. HOME tab -> Navigate home
-    if (subId === 'home' || subHref === '#home' || subLabel === 'HOME') {
+    // 1. HOME tab -> Navigate home or scroll to top if already there
+    if (subId === 'home' || subHref === '#home' || subHref === '/' || subLabel === 'HOME') {
       const homeUrl = activeMainCategory === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
-      router.push(homeUrl);
+      if (pathname === homeUrl) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        router.push(homeUrl);
+      }
       return;
     }
 
@@ -366,7 +380,24 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       return;
     }
 
-    // 3. ALL DROPS -> Navigate to All Drops without category filter
+    // 3. OBJECT DROPS tab -> Scroll on veyn-objects or navigate to /veyn-objects#object-drops
+    if (subId === 'obj-drops' || subLabel === 'OBJECT DROPS') {
+      if (pathname === '/veyn-objects') {
+        const element = document.getElementById('object-drops') || document.querySelector('.obj-drops') || document.querySelector('.obj-hero');
+        if (element) {
+          const yOffset = -90;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+          return;
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      router.push('/veyn-objects#object-drops');
+      return;
+    }
+
+    // 4. ALL DROPS -> Navigate to All Drops without category filter
     if (
       subId === 'all-drops' ||
       subId === 'all-drops-obj' ||
@@ -377,21 +408,20 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       return;
     }
 
-    // 4. NEW DROPS tab -> Navigate to All Drops with new drops filter
+    // 5. NEW DROPS tab -> Navigate to All Drops with new drops filter
     if (subId === 'new-drops' || subLabel === 'NEW DROPS') {
       const dropsUrl = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
       router.push(`${dropsUrl}?badge=new`);
       return;
     }
 
-    // 5. Configured direct route with query parameter (e.g. /collections/all-drops?category=xyz)
-    if (subHref && (subHref.startsWith('/collections/') || subHref.startsWith('/products/') || subHref.startsWith('/'))) {
+    // 6. Configured direct route with query parameter (e.g. /collections/all-drops?category=xyz)
+    if (subHref && (subHref.startsWith('/collections/') || subHref.startsWith('/products/'))) {
       router.push(subHref);
       return;
     }
 
-    // 6. ANY CATEGORY (BAGGY, BOOTCUT, WIDE, STRAIGHT, CARGO, DENIMS, TOPS, ACCESSORIES, or any newly added category)
-    // Dynamically identify category key from sub.id or sub.label
+    // 7. General category filter (BAGGY, BOOTCUT, WIDE, STRAIGHT, CARGO, DENIMS, TOPS, BAGS, CHAINS, etc.)
     const categoryKey = subId.replace(/^obj-/, '') || subLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const targetDropsPage = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
     router.push(`${targetDropsPage}?category=${encodeURIComponent(categoryKey)}`);

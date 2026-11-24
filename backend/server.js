@@ -1,13 +1,18 @@
 
 import dns from 'node:dns';
 import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config();
 
 if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME && !process.env.AWS_EXECUTION_ENV) {
   try {
     dns.setServers(['8.8.8.8', '1.1.1.1']);
   } catch (e) {}
 }
-dotenv.config();
 
 const { default: app } = await import('./app.js');
 const { default: connectDB } = await import('./config/db.js');

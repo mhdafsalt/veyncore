@@ -44,9 +44,11 @@ export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSele
     } else {
       // From PDP or collection catalog, navigate to destination
       if (cat.id === 'VEYN-OBJECTS') {
-        router.push('/veyn-objects');
+        const target = pathname && pathname.includes('drops') ? '/collections/objects-drops' : '/veyn-objects';
+        router.push(target);
       } else {
-        router.push('/');
+        const target = pathname && pathname.includes('drops') ? '/collections/all-drops' : '/';
+        router.push(target);
       }
     }
   };
