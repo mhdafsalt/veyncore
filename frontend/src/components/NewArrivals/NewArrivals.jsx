@@ -5,8 +5,17 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { NEW_ARRIVALS_PRODUCTS } from '@/data/newArrivalsData';
+import { ALL_DROPS_PRODUCTS } from '@/data/allDropsData';
 import { API_BASE_URL } from '@/lib/constants';
 import './NewArrivals.css';
+
+// Initial fallback guaranteed to have up to 12 products
+const INITIAL_12_PRODUCTS = [
+  ...NEW_ARRIVALS_PRODUCTS,
+  ...ALL_DROPS_PRODUCTS.filter(
+    (p) => !NEW_ARRIVALS_PRODUCTS.some((n) => n.handle === p.handle)
+  ),
+].slice(0, 12);
 
 /**
  * Format price to ensure Rs. and amount stay joined by non-breaking space
@@ -210,17 +219,29 @@ function ProductCard({ product }) {
  * Main Shop New Arrivals Section
  */
 export default function NewArrivals() {
-  const [products, setProducts] = useState(NEW_ARRIVALS_PRODUCTS);
+  const [products, setProducts] = useState(INITIAL_12_PRODUCTS);
 
   useEffect(() => {
     let isMounted = true;
     const fetchNewArrivals = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=20`);
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=100`);
         const json = await res.json();
         if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
-          const arrivals = json.data.filter((p) => p.newArrival === true);
-          const list = arrivals.length > 0 ? arrivals : json.data.slice(0, 8);
+          // Sort newest added products first
+          const sorted = [...json.data].sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          });
+
+          // Priority condition: products marked with newArrival === true first, then other latest products
+          const markedArrivals = sorted.filter((p) => p.newArrival === true);
+          const otherLatest = sorted.filter((p) => !p.newArrival);
+
+          // Condition: exactly latest added 12 products
+          const list = [...markedArrivals, ...otherLatest].slice(0, 12);
+
           const mapped = list.map((p) => ({
             id: p._id || p.id,
             title: p.title,
@@ -239,7 +260,7 @@ export default function NewArrivals() {
           }
         }
       } catch (err) {
-        // Fallback to static
+        // Fallback to static INITIAL_12_PRODUCTS
       }
     };
 

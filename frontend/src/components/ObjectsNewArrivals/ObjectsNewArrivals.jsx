@@ -204,17 +204,29 @@ function ObjectCard({ product }) {
 }
 
 export default function ObjectsNewArrivals() {
-  const [products, setProducts] = useState(OBJECTS_PRODUCTS);
+  const [products, setProducts] = useState((OBJECTS_PRODUCTS || []).slice(0, 12));
 
   useEffect(() => {
     let isMounted = true;
     const fetchObjects = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=20`);
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
         const json = await res.json();
         if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
-          const arrivals = json.data.filter((p) => p.newArrival === true);
-          const list = arrivals.length > 0 ? arrivals : json.data.slice(0, 8);
+          // Sort newest added products first
+          const sorted = [...json.data].sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          });
+
+          // Priority condition: explicit new arrivals first, then other latest products
+          const markedArrivals = sorted.filter((p) => p.newArrival === true);
+          const otherLatest = sorted.filter((p) => !p.newArrival);
+
+          // Condition: latest added 12 products
+          const list = [...markedArrivals, ...otherLatest].slice(0, 12);
+
           const mapped = list.map((p) => ({
             id: p._id || p.id,
             title: p.title,
