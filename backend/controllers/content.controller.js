@@ -81,16 +81,7 @@ const DEFAULT_CONTENT = {
       active: true,
     },
   ],
-  swipeCategories: [
-    { id: 'swp-baggy', targetSection: 'VEYN-SELECTS', key: 'baggy', label: 'BAGGY', collectionPath: '/collections/baggy', sortOrder: 0, active: true },
-    { id: 'swp-bootcut', targetSection: 'VEYN-SELECTS', key: 'bootcut', label: 'BOOTCUT', collectionPath: '/collections/bootcut', sortOrder: 1, active: true },
-    { id: 'swp-wide', targetSection: 'VEYN-SELECTS', key: 'wide', label: 'WIDE', collectionPath: '/collections/wide', sortOrder: 2, active: true },
-    { id: 'swp-straight', targetSection: 'VEYN-SELECTS', key: 'straight', label: 'STRAIGHT', collectionPath: '/collections/straight', sortOrder: 3, active: true },
-
-    { id: 'swp-bags', targetSection: 'VEYN-OBJECTS', key: 'bags', label: 'BAGS', collectionPath: '/collections/objects-drops?category=bags', sortOrder: 0, active: true },
-    { id: 'swp-chains', targetSection: 'VEYN-OBJECTS', key: 'chains', label: 'CHAINS', collectionPath: '/collections/objects-drops?category=chains', sortOrder: 1, active: true },
-    { id: 'swp-caps', targetSection: 'VEYN-OBJECTS', key: 'caps', label: 'CAPS & HEADWEAR', collectionPath: '/collections/objects-drops?category=caps', sortOrder: 2, active: true },
-  ],
+  swipeCategories: [],
   bottomBanner: {
     imageDesktop: '/images/ImageBanner.png',
     imageMobile: '/images/ImageBanner-Mob.png',
@@ -119,9 +110,28 @@ export const getContent = async (req, res) => {
       content = await SiteContent.create(DEFAULT_CONTENT);
     }
 
+    const contentObj = content.toObject ? content.toObject() : { ...content };
+    const legacyStaticIds = new Set([
+      'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
+      'bags', 'chains', 'headwear', 'hardware'
+    ]);
+    if (Array.isArray(contentObj.subcategories)) {
+      contentObj.subcategories = contentObj.subcategories.filter(item => {
+        if (legacyStaticIds.has(item.id) && (item.href === `#${item.id}` || !item.href)) return false;
+        return true;
+      });
+    }
+    const legacySwipeKeys = new Set(['baggy', 'bootcut', 'wide', 'straight', 'bags', 'chains', 'caps']);
+    if (Array.isArray(contentObj.swipeCategories)) {
+      contentObj.swipeCategories = contentObj.swipeCategories.filter(item => {
+        const key = (item.key || item.id || '').replace(/^swp-/, '').toLowerCase();
+        return !legacySwipeKeys.has(key);
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      data: content,
+      data: contentObj,
     });
   } catch (error) {
     console.error('[Content Controller] Error fetching content:', error);
@@ -164,6 +174,14 @@ export const getSectionContent = async (req, res) => {
           return false;
         }
         return true;
+      });
+    }
+
+    if (section === 'swipeCategories' && Array.isArray(sectionData)) {
+      const legacySwipeKeys = new Set(['baggy', 'bootcut', 'wide', 'straight', 'bags', 'chains', 'caps']);
+      sectionData = sectionData.filter(item => {
+        const key = (item.key || item.id || '').replace(/^swp-/, '').toLowerCase();
+        return !legacySwipeKeys.has(key);
       });
     }
 

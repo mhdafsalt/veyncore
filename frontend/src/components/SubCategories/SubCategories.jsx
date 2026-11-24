@@ -81,38 +81,68 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   }, []);
 
   const subcategories = useMemo(() => {
-    const baseItems =
-      activeMainCategory === 'VEYN-OBJECTS'
-        ? [...DEFAULT_OBJECTS_SUBCATEGORIES]
-        : [...DEFAULT_SELECTS_SUBCATEGORIES];
+    const isObjects = activeMainCategory === 'VEYN-OBJECTS';
+    const baseDefaults = isObjects
+      ? DEFAULT_OBJECTS_SUBCATEGORIES
+      : DEFAULT_SELECTS_SUBCATEGORIES;
 
-    // Filter dynamic subcategories from admin (excluding legacy static # anchor categories)
-    const adminCustomItems = (dynamicSubcategories || []).filter((sub) => {
-      if (sub.mainCategory !== activeMainCategory || sub.active === false) return false;
-      const subId = (sub.id || '').toLowerCase().trim();
-      if (['home', 'flash-sale', 'new-drops', 'all-drops', 'obj-all', 'obj-drops'].includes(subId)) return false;
-      // Filter out legacy static categories (e.g. #denims, #cargo, etc.)
-      if (LEGACY_STATIC_CATEGORIES.has(subId) && (sub.href === `#${subId}` || !sub.href)) return false;
-      return true;
+    // Normalization helper for labels
+    const norm = (str = '') =>
+      String(str)
+        .toUpperCase()
+        .replace(/⚡|⚡️/g, '')
+        .trim();
+
+    // Normalization helper for slugs / IDs
+    const toSlug = (str = '') =>
+      norm(str)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-');
+
+    const result = [];
+    const seenLabels = new Set();
+    const seenIds = new Set();
+
+    const addUnique = (item) => {
+      if (!item) return;
+      const labelNorm = norm(item.label);
+      const idNorm = (item.id || toSlug(item.label)).toLowerCase().trim();
+
+      // Skip if already in list by normalized label or ID
+      if (seenLabels.has(labelNorm) || seenIds.has(idNorm)) {
+        return;
+      }
+
+      seenLabels.add(labelNorm);
+      seenIds.add(idNorm);
+      result.push(item);
+    };
+
+    // 1. Dynamic subcategories configured in backend / admin
+    const adminItems = (dynamicSubcategories || []).filter(
+      (sub) => sub.mainCategory === activeMainCategory && sub.active !== false
+    );
+
+    // If HOME is not in adminItems for VEYN-SELECTS, ensure HOME is added first
+    if (!isObjects) {
+      const hasHome = adminItems.some((s) => norm(s.label) === 'HOME' || s.id === 'home');
+      if (!hasHome) {
+        addUnique(baseDefaults[0]); // HOME
+      }
+    }
+
+    // 2. Add admin-managed items (they take priority and define custom routes/labels)
+    if (adminItems.length > 0) {
+      adminItems.forEach((item) => addUnique(item));
+    }
+
+    // 3. Ensure core base navigation tabs exist (FLASH SALE, NEW DROPS, ALL DROPS) without duplicates
+    baseDefaults.forEach((base) => {
+      addUnique(base);
     });
 
-    // Extract dynamic categories from real products
-    const dropsPage =
-      activeMainCategory === 'VEYN-OBJECTS'
-        ? '/collections/objects-drops'
-        : '/collections/all-drops';
-
-    const seenCatKeys = new Set([
-      'home',
-      'flash-sale',
-      'new-drops',
-      'all-drops',
-      'obj-all',
-      'obj-drops',
-      ...adminCustomItems.map((item) => (item.id || '').toLowerCase().trim()),
-    ]);
-
-    const dynamicProductCategories = [];
+    // 4. Dynamically append any categories from real products if not already present
+    const dropsPage = isObjects ? '/collections/objects-drops' : '/collections/all-drops';
     const counts = {};
 
     productCatalog.forEach((p) => {
@@ -122,9 +152,10 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         candidates.forEach((cand) => {
           const catName = String(cand).trim();
           if (catName) {
-            const key = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            if (key && !seenCatKeys.has(key)) {
-              counts[key] = counts[key] || { count: 0, label: catName.toUpperCase() };
+            const key = toSlug(catName);
+            const labelNorm = norm(catName);
+            if (!seenLabels.has(labelNorm) && !seenIds.has(key)) {
+              counts[key] = counts[key] || { count: 0, label: labelNorm };
               counts[key].count += 1;
             }
           }
@@ -135,7 +166,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     Object.keys(counts)
       .sort((a, b) => counts[b].count - counts[a].count)
       .forEach((key) => {
-        dynamicProductCategories.push({
+        addUnique({
           id: key,
           label: counts[key].label,
           href: `${dropsPage}?category=${encodeURIComponent(key)}`,
@@ -143,7 +174,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         });
       });
 
-    return [...baseItems, ...adminCustomItems, ...dynamicProductCategories];
+    return result;
   }, [dynamicSubcategories, activeMainCategory, productCatalog]);
 
   const categoryParam = searchParams ? searchParams.get('category')?.toLowerCase().trim() : '';

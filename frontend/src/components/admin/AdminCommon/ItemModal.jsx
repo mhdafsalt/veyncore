@@ -361,7 +361,7 @@ export default function ItemModal({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, label: e.target.value }))
                   }
-                  placeholder="e.g. BAGGY"
+                  placeholder="e.g. YOUR CATEGORY NAME"
                   required
                 />
               </div>
@@ -378,7 +378,7 @@ export default function ItemModal({
                       key: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''),
                     }))
                   }
-                  placeholder="e.g. baggy (matches product fit/swipeCategory)"
+                  placeholder="e.g. category-key (matches product category)"
                   required
                 />
               </div>
@@ -392,7 +392,7 @@ export default function ItemModal({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, collectionPath: e.target.value }))
                   }
-                  placeholder="e.g. /collections/baggy"
+                  placeholder="e.g. /collections/all-drops?category=your-category"
                 />
               </div>
             </>

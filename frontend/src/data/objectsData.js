@@ -897,28 +897,9 @@ export const ALL_OBJECTS_PRODUCTS = [
 ];
 
 /**
- * Filter Categories for Drop Navigation & All Drops Page
+ * Dynamic Categories for Drop Navigation & All Drops Page (Static categories data completely removed)
  */
-export const OBJECTS_DROP_CATEGORIES = [
-  {
-    id: 'bags',
-    label: 'BAGS & UTILITY',
-    anchorId: 'bags',
-    collectionPath: '/collections/objects-drops?category=bags'
-  },
-  {
-    id: 'chains',
-    label: 'CHAINS & HARDWARE',
-    anchorId: 'chains',
-    collectionPath: '/collections/objects-drops?category=chains'
-  },
-  {
-    id: 'caps',
-    label: 'CAPS & HEADWEAR',
-    anchorId: 'headwear',
-    collectionPath: '/collections/objects-drops?category=caps'
-  }
-];
+export const OBJECTS_DROP_CATEGORIES = [];
 
 /**
  * 6 Primary Featured Objects for Home Grid (Chains, Caps, and Bags)
@@ -933,14 +914,9 @@ export const OBJECTS_PRODUCTS = [
 ].filter(Boolean);
 
 /**
- * Category-based lookup for homepage swipe rows
+ * Dynamic Category lookup for homepage swipe rows (Static categories data completely removed)
  */
-export const OBJECTS_CATEGORY_DATA = {
-  bags: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'BAGS'),
-  chains: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CHAINS'),
-  caps: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CAPS'),
-  headwear: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CAPS')
-};
+export const OBJECTS_CATEGORY_DATA = {};
 
 /**
  * Helper to retrieve an object product by handle or alias

@@ -397,8 +397,8 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
  * 3. CAPS & HEADWEAR (#headwear)
  */
 export default function ObjectsCategoryDrops() {
-  const [categories, setCategories] = useState(OBJECTS_DROP_CATEGORIES);
-  const [categoryData, setCategoryData] = useState(OBJECTS_CATEGORY_DATA);
+  const [categories, setCategories] = useState([]);
+  const [categoryData, setCategoryData] = useState({});
 
   // Fetch dynamic categories and products for VEYN-OBJECTS
   useEffect(() => {
@@ -434,14 +434,12 @@ export default function ObjectsCategoryDrops() {
         const prodJson = await prodRes.json();
 
         if (isMounted) {
-          if (dynamicCats && dynamicCats.length > 0) {
-            setCategories(dynamicCats);
-          }
+          let activeCats = dynamicCats;
 
           if (prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
             const grouped = {};
             prodJson.data.forEach((p) => {
-              const rawKey = (p.swipeCategory || p.subCategory || p.fit || '').toLowerCase();
+              const rawKey = (p.swipeCategory || p.subCategory || p.fit || '').toLowerCase().trim();
               if (!rawKey) return;
               const key = (rawKey === 'headwear' || rawKey === 'caps' || rawKey.includes('cap')) ? 'caps' : rawKey;
               if (!grouped[key]) grouped[key] = [];
@@ -462,24 +460,26 @@ export default function ObjectsCategoryDrops() {
               });
             });
 
-            setCategoryData((prev) => {
-              const updated = { ...prev };
-              Object.keys(grouped).forEach((k) => {
-                if (grouped[k].length > 0) {
-                  updated[k] = grouped[k];
-                  if (k === 'caps') {
-                    updated['headwear'] = grouped[k];
-                  } else if (k === 'headwear') {
-                    updated['caps'] = grouped[k];
-                  }
-                }
-              });
-              return updated;
-            });
+            // If no custom swipeCategories configured, dynamically generate from real products
+            if (!activeCats || activeCats.length === 0) {
+              activeCats = Object.keys(grouped).map((k) => ({
+                id: k,
+                rawKey: k,
+                label: k.toUpperCase(),
+                anchorId: k,
+                collectionPath: `/collections/objects-drops?category=${encodeURIComponent(k)}`,
+              }));
+            }
+
+            setCategoryData(grouped);
+          }
+
+          if (activeCats && activeCats.length > 0) {
+            setCategories(activeCats);
           }
         }
       } catch (err) {
-        // Silently fallback to static data
+        // Dynamic fetch failed
       }
     };
 
@@ -495,17 +495,11 @@ export default function ObjectsCategoryDrops() {
       <div className="objects-cat-drops__container">
         {categories.map((cat) => {
           const catId = (cat.id || '').toLowerCase();
-          const fallbackStatic =
-            OBJECTS_CATEGORY_DATA[catId] ||
-            (catId === 'headwear' ? OBJECTS_CATEGORY_DATA.caps : null) ||
-            (catId === 'caps' ? OBJECTS_CATEGORY_DATA.headwear : null) ||
-            [];
-
           const products =
             categoryData[catId] ||
             (catId === 'headwear' ? categoryData.caps : null) ||
             (catId === 'caps' ? categoryData.headwear : null) ||
-            fallbackStatic;
+            [];
 
           if (!products || products.length === 0) return null;
 

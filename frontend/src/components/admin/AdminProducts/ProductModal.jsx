@@ -118,7 +118,6 @@ export default function ProductModal({
                   setFormData((prev) => ({
                     ...prev,
                     category: e.target.value,
-                    subCategory: e.target.value === 'VEYN-OBJECTS' ? 'BAGS' : 'BAGGY',
                   }))
                 }
               >
@@ -132,7 +131,8 @@ export default function ProductModal({
               <input
                 type="text"
                 className="admin-form-input"
-                value={formData.subCategory}
+                style={{ textTransform: 'uppercase' }}
+                value={formData.subCategory || ''}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
@@ -141,11 +141,7 @@ export default function ProductModal({
                     swipeCategory: e.target.value.toLowerCase(),
                   }))
                 }
-                placeholder={
-                  formData.category === 'VEYN-OBJECTS'
-                    ? 'BAGS, CHAINS, HARDWARE'
-                    : 'BAGGY, BOOTCUT, WIDE, STRAIGHT'
-                }
+                placeholder="Enter category name"
               />
             </div>
           </div>

@@ -413,8 +413,8 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
  * and a centered bottom "View all" button.
  */
 export default function CategoryFits() {
-  const [categories, setCategories] = useState(FIT_CATEGORIES);
-  const [categoryData, setCategoryData] = useState(CATEGORY_FITS_DATA);
+  const [categories, setCategories] = useState([]);
+  const [categoryData, setCategoryData] = useState({});
 
   // Fetch dynamic categories and products from backend
   useEffect(() => {
@@ -444,14 +444,12 @@ export default function CategoryFits() {
         const prodJson = await prodRes.json();
 
         if (isMounted) {
-          if (dynamicCats && dynamicCats.length > 0) {
-            setCategories(dynamicCats);
-          }
+          let activeCats = dynamicCats;
 
           if (prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
             const grouped = {};
             prodJson.data.forEach((p) => {
-              const key = (p.swipeCategory || p.fit || p.subCategory || '').toLowerCase();
+              const key = (p.swipeCategory || p.fit || p.subCategory || '').toLowerCase().trim();
               if (!key) return;
               if (!grouped[key]) grouped[key] = [];
               grouped[key].push({
@@ -470,19 +468,24 @@ export default function CategoryFits() {
               });
             });
 
-            setCategoryData((prev) => {
-              const updated = { ...prev };
-              Object.keys(grouped).forEach((k) => {
-                if (grouped[k].length > 0) {
-                  updated[k] = grouped[k];
-                }
-              });
-              return updated;
-            });
+            // If no custom swipeCategories configured, dynamically generate from real products
+            if (!activeCats || activeCats.length === 0) {
+              activeCats = Object.keys(grouped).map((k) => ({
+                id: k,
+                label: k.toUpperCase(),
+                collectionPath: `/collections/all-drops?category=${encodeURIComponent(k)}`,
+              }));
+            }
+
+            setCategoryData(grouped);
+          }
+
+          if (activeCats && activeCats.length > 0) {
+            setCategories(activeCats);
           }
         }
       } catch (err) {
-        // Silently fallback to static data
+        // Dynamic fetch failed
       }
     };
 
