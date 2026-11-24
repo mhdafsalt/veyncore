@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
-import { ALL_DROPS_PRODUCTS, SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
+import { SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
 import { API_BASE_URL } from '@/lib/constants';
 import './AllDrops.css';
 
@@ -276,7 +276,7 @@ function AllDropsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [productsList, setProductsList] = useState(ALL_DROPS_PRODUCTS);
+  const [productsList, setProductsList] = useState([]);
   const [dynamicSubcategories, setDynamicSubcategories] = useState(null);
 
   // Category filter state synced with URL ?category=...
@@ -786,7 +786,7 @@ function AllDropsContent() {
                         className="all-drops__checkbox-input"
                       />
                       <span className="all-drops__checkbox-custom" />
-                      <span>In stock ({ALL_DROPS_PRODUCTS.filter((p) => p.inStock).length})</span>
+                      <span>In stock ({productsList.filter((p) => p.inStock).length})</span>
                     </label>
                     <label className="all-drops__checkbox-label">
                       <input
@@ -796,7 +796,7 @@ function AllDropsContent() {
                         className="all-drops__checkbox-input"
                       />
                       <span className="all-drops__checkbox-custom" />
-                      <span>Out of stock (0)</span>
+                      <span>Out of stock ({productsList.filter((p) => !p.inStock).length})</span>
                     </label>
                   </div>
                 </div>
@@ -1145,7 +1145,7 @@ function AllDropsContent() {
                       className="all-drops__checkbox-input"
                     />
                     <span className="all-drops__checkbox-custom" />
-                    <span>In stock ({ALL_DROPS_PRODUCTS.filter((p) => p.inStock).length})</span>
+                    <span>In stock ({productsList.filter((p) => p.inStock).length})</span>
                   </label>
                   <label className="all-drops__checkbox-label">
                     <input
@@ -1155,7 +1155,7 @@ function AllDropsContent() {
                       className="all-drops__checkbox-input"
                     />
                     <span className="all-drops__checkbox-custom" />
-                    <span>Out of stock (0)</span>
+                    <span>Out of stock ({productsList.filter((p) => !p.inStock).length})</span>
                   </label>
                 </div>
               </div>

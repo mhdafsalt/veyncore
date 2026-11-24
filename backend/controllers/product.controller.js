@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
-import Product from '../models/product.model.js';
+import Product, {
+  DEFAULT_PRODUCT_DETAILS,
+  DEFAULT_PRODUCT_SHIPPING,
+  DEFAULT_SELECT_STORY,
+} from '../models/product.model.js';
 
 /**
  * GET /api/products
@@ -22,7 +26,13 @@ export const getProducts = async (req, res) => {
     const filter = {};
 
     if (category) {
-      filter.category = category;
+      if (category === 'VEYN-OBJECTS') {
+        filter.$or = [{ category: 'VEYN-OBJECTS' }, { isObject: true }];
+      } else if (category === 'VEYN-SELECTS') {
+        filter.$or = [{ category: 'VEYN-SELECTS' }, { isObject: false }, { isObject: { $exists: false } }];
+      } else {
+        filter.category = category;
+      }
     }
 
     if (subCategory) {
@@ -108,9 +118,20 @@ export const getProductByHandleOrId = async (req, res) => {
       });
     }
 
+    const prodObj = product.toObject ? product.toObject() : { ...product };
+    if (!prodObj.details || !Array.isArray(prodObj.details) || prodObj.details.length === 0) {
+      prodObj.details = [...DEFAULT_PRODUCT_DETAILS];
+    }
+    if (!prodObj.shipping || !Array.isArray(prodObj.shipping) || prodObj.shipping.length === 0) {
+      prodObj.shipping = [...DEFAULT_PRODUCT_SHIPPING];
+    }
+    if (!prodObj.selectStory) {
+      prodObj.selectStory = DEFAULT_SELECT_STORY;
+    }
+
     return res.status(200).json({
       success: true,
-      data: product,
+      data: prodObj,
     });
   } catch (error) {
     console.error('[Product Controller] Error fetching product:', error);
@@ -136,6 +157,8 @@ export const createProduct = async (req, res) => {
         message: 'Product title and price are required.',
       });
     }
+
+    data.title = String(data.title).toUpperCase().trim();
 
     // Auto-generate handle if missing
     if (!data.handle) {
@@ -180,6 +203,16 @@ export const createProduct = async (req, res) => {
       data.sizeChartImage = String(data.sizeChartImage).trim();
     }
 
+    if (!data.details || !Array.isArray(data.details) || data.details.length === 0) {
+      data.details = [...DEFAULT_PRODUCT_DETAILS];
+    }
+    if (!data.shipping || !Array.isArray(data.shipping) || data.shipping.length === 0) {
+      data.shipping = [...DEFAULT_PRODUCT_SHIPPING];
+    }
+    if (!data.selectStory) {
+      data.selectStory = DEFAULT_SELECT_STORY;
+    }
+
     const product = await Product.create(data);
 
     return res.status(201).json({
@@ -205,6 +238,10 @@ export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    if (updates.title) {
+      updates.title = String(updates.title).toUpperCase().trim();
+    }
 
     if (updates.price) {
       updates.price = Number(updates.price);

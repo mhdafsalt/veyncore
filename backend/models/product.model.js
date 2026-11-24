@@ -1,5 +1,25 @@
 import mongoose from 'mongoose';
 
+export const DEFAULT_PRODUCT_DETAILS = [
+  'Handpicked by VEYNCORE',
+  'Not manufactured by VEYNCORE',
+  'Carefully selected from trusted suppliers',
+  'Premium quality standards',
+  'Quality checked before dispatch',
+  'Designed for everyday comfort and style',
+  'Easy 7-day returns and exchanges on eligible products'
+];
+
+export const DEFAULT_PRODUCT_SHIPPING = [
+  'Orders are carefully packed and dispatched within 24–48 business hours.',
+  'Standard delivery takes approximately 3–5 working days.',
+  'Real-time order tracking available after dispatch.',
+  'Easy 7-day returns and exchanges on eligible products.'
+];
+
+export const DEFAULT_SELECT_STORY =
+  'VEYN SELECTS is an exclusive collection of carefully curated fashion pieces, handpicked to match VEYNCORE’s distinctive style and vision. Each piece is thoughtfully sourced and quality-checked, bringing together unique designs, premium appeal, and everyday comfort. A collection made for those who value individuality, detail, and effortless style.';
+
 const productSchema = new mongoose.Schema(
   {
     title: {
@@ -70,7 +90,7 @@ const productSchema = new mongoose.Schema(
     },
     details: {
       type: [String],
-      default: [],
+      default: () => [...DEFAULT_PRODUCT_DETAILS],
     },
     specs: [
       {
@@ -80,7 +100,11 @@ const productSchema = new mongoose.Schema(
     ],
     shipping: {
       type: [String],
-      default: [],
+      default: () => [...DEFAULT_PRODUCT_SHIPPING],
+    },
+    selectStory: {
+      type: String,
+      default: DEFAULT_SELECT_STORY,
     },
     isObject: {
       type: Boolean,
@@ -142,6 +166,15 @@ productSchema.pre('save', function (next) {
   }
   if (this.stock !== undefined) {
     this.inStock = Number(this.stock) > 0;
+  }
+  if (!this.details || this.details.length === 0) {
+    this.details = [...DEFAULT_PRODUCT_DETAILS];
+  }
+  if (!this.shipping || this.shipping.length === 0) {
+    this.shipping = [...DEFAULT_PRODUCT_SHIPPING];
+  }
+  if (!this.selectStory) {
+    this.selectStory = DEFAULT_SELECT_STORY;
   }
   next();
 });

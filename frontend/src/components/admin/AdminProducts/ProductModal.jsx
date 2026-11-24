@@ -196,7 +196,7 @@ export default function ProductModal({
       .replace(/(^-|-$)+/g, '');
 
   const handleTitleChange = (e) => {
-    const titleVal = e.target.value;
+    const titleVal = e.target.value.toUpperCase();
     const newSlug = generateSlug(titleVal);
     setFormData((prev) => {
       // Auto-sync handle if handle is empty, or if it matched previous title slug, or not customized
@@ -229,20 +229,24 @@ export default function ProductModal({
   };
 
   const currentCategory = formData.category || 'VEYN-SELECTS';
+  const isObjectCategory = useMemo(() => {
+    return String(formData.category || '').toUpperCase().includes('OBJECT');
+  }, [formData.category]);
 
   // Dynamically extract available subcategories for the selected main category
   const availableSubcategories = useMemo(() => {
     const list = [];
     const seen = new Set();
+    const isCurrentCategoryObject = String(currentCategory).toUpperCase().includes('OBJECT');
 
     // 1. From dynamic subcategories configured in backend
     if (siteContent?.subcategories && Array.isArray(siteContent.subcategories)) {
       siteContent.subcategories
-        .filter(
-          (s) =>
-            (s.mainCategory || 'VEYN-SELECTS') === currentCategory &&
-            s.active !== false
-        )
+        .filter((s) => {
+          const isSubObject = String(s.mainCategory || '').toUpperCase().includes('OBJECT');
+          return isCurrentCategoryObject ? isSubObject : !isSubObject;
+        })
+        .filter((s) => s.active !== false)
         .forEach((s) => {
           const raw = String(s.label || '').replace(/⚡|⚡️/g, '').trim().toUpperCase();
           if (
@@ -259,7 +263,10 @@ export default function ProductModal({
     // 2. From real products in catalog
     if (products && Array.isArray(products)) {
       products
-        .filter((p) => (p.category || 'VEYN-SELECTS') === currentCategory)
+        .filter((p) => {
+          const isProdObject = String(p.category || '').toUpperCase().includes('OBJECT');
+          return isCurrentCategoryObject ? isProdObject : !isProdObject;
+        })
         .forEach((p) => {
           const cat = String(p.subCategory || p.fit || p.swipeCategory || '').trim().toUpperCase();
           if (cat && !seen.has(cat)) {
@@ -271,7 +278,7 @@ export default function ProductModal({
 
     // Standard defaults if none exists
     if (list.length === 0) {
-      if (currentCategory === 'VEYN-OBJECTS') {
+      if (isCurrentCategoryObject) {
         ['BAGS', 'CHAINS', 'CAPS', 'SHADES', 'BRACELETS', 'WATCHES', 'BELTS'].forEach(c => list.push(c));
       } else {
         ['WIDE LEG', 'BAGGY', 'BOOTCUT', 'STRAIGHT', 'CARGO', 'DENIMS', 'TOPS'].forEach(c => list.push(c));
@@ -352,6 +359,7 @@ export default function ProductModal({
                 onChange={handleTitleChange}
                 placeholder="e.g. VEXO BLUE BAGGY"
                 required
+                style={{ textTransform: 'uppercase' }}
               />
             </div>
 
@@ -405,12 +413,25 @@ export default function ProductModal({
               <select
                 className="admin-form-select"
                 value={formData.category}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const newCat = e.target.value;
+                  const isObj = String(newCat).toUpperCase().includes('OBJECT');
+                  const defaultSub = isObj ? 'BAGS' : 'BAGGY';
                   setFormData((prev) => ({
                     ...prev,
-                    category: e.target.value,
-                  }))
-                }
+                    category: newCat,
+                    subCategory: defaultSub,
+                    fit: defaultSub.toLowerCase(),
+                    swipeCategory: defaultSub.toLowerCase(),
+                    availableSizes: isObj
+                      ? 'ONE SIZE'
+                      : prev.availableSizes === 'ONE SIZE'
+                      ? '28, 30, 32, 34, 36'
+                      : prev.availableSizes || '28, 30, 32, 34, 36',
+                    measurements: isObj ? null : prev.measurements,
+                    sizeChartImage: isObj ? '' : prev.sizeChartImage,
+                  }));
+                }}
               >
                 <option value="VEYN-SELECTS">VEYN-SELECTS (Denims &amp; Apparel)</option>
                 <option value="VEYN-OBJECTS">VEYN-OBJECTS (Utilitarian Hardware &amp; Chains)</option>
@@ -494,22 +515,25 @@ export default function ProductModal({
               </select>
             </div>
 
-            <div className="admin-form-group">
-              <label className="admin-form-label">AVAILABLE SIZES (COMMA SEPARATED)</label>
-              <input
-                type="text"
-                className="admin-form-input"
-                value={formData.availableSizes}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, availableSizes: e.target.value }))
-                }
-                placeholder="28, 30, 32, 34, 36 or ONE SIZE"
-              />
-            </div>
+            {!isObjectCategory && (
+              <div className="admin-form-group">
+                <label className="admin-form-label">AVAILABLE SIZES (COMMA SEPARATED)</label>
+                <input
+                  type="text"
+                  className="admin-form-input"
+                  value={formData.availableSizes}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, availableSizes: e.target.value }))
+                  }
+                  placeholder="28, 30, 32, 34, 36"
+                />
+              </div>
+            )}
           </div>
 
-          {/* Dynamic Size Chart & Measurements */}
-          <div className="admin-sizechart-box">
+          {/* Dynamic Size Chart & Measurements (Only for VEYN-SELECTS / Apparel) */}
+          {!isObjectCategory && (
+            <div className="admin-sizechart-box">
             <div className="admin-sizechart-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <label className="admin-form-label" style={{ marginBottom: 0, fontWeight: 700 }}>
@@ -810,6 +834,7 @@ export default function ProductModal({
               />
             </div>
           </div>
+          )}
 
           {/* Main Thumbnail Upload */}
           <AdminImageUploader
@@ -864,17 +889,6 @@ export default function ProductModal({
 
           {/* Checkbox Toggles & Stock Inventory */}
           <div className="product-modal__checkboxes">
-            <label className="admin-checkbox-label">
-              <input
-                type="checkbox"
-                checked={Boolean(formData.newArrival)}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, newArrival: e.target.checked }))
-                }
-              />
-              <span>Display in &quot;Shop New Arrivals&quot; Section</span>
-            </label>
-
             <label className="admin-checkbox-label">
               <input
                 type="checkbox"

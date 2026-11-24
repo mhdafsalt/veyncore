@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
-import { ALL_OBJECTS_PRODUCTS } from '@/data/objectsData';
 import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsAllDrops.css';
 
@@ -246,7 +245,7 @@ function ObjectsAllDropsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [productsList, setProductsList] = useState(ALL_OBJECTS_PRODUCTS);
+  const [productsList, setProductsList] = useState([]);
 
   // Read initial category filter from URL search params (e.g. ?category=bags)
   const initialCategoryParam = searchParams.get('category')?.toLowerCase().trim() || 'all';

@@ -4,10 +4,12 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
-import { getProductByHandle } from '@/data/productsData';
+import { API_BASE_URL } from '@/lib/constants';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
 import { parseNumericPrice } from '@/lib/priceUtils';
 import { generateDynamicMeasurements, isTopCategory } from '@/lib/sizeChartUtils';
+import { DEFAULT_SELECT_STORY, DEFAULT_DETAILS, DEFAULT_SHIPPING } from '@/data/productsData';
+import { OBJECTS_BRAND_STORY, OBJECTS_DETAILS, OBJECTS_SHIPPING } from '@/data/objectsData';
 import './ProductDetail.css';
 
 /**
@@ -69,11 +71,51 @@ export default function ProductDetail({ product }) {
     );
   }, [product?.measurements, sizeUnit, sizes, product?.subCategory, product?.category]);
 
-  // Get Related Products
-  const relatedProducts = (product?.relatedHandles || [])
-    .map((handle) => getProductByHandle(handle))
-    .filter(Boolean)
-    .slice(0, 4);
+  // Brand story, details, and shipping content with requested defaults
+  const brandStoryText =
+    product?.selectStory ||
+    (isObject ? (OBJECTS_BRAND_STORY || DEFAULT_SELECT_STORY) : DEFAULT_SELECT_STORY);
+
+  const productDetails =
+    product?.details && Array.isArray(product.details) && product.details.length > 0
+      ? product.details
+      : (isObject ? (OBJECTS_DETAILS?.length ? OBJECTS_DETAILS : DEFAULT_DETAILS) : DEFAULT_DETAILS);
+
+  const productShipping =
+    product?.shipping && Array.isArray(product.shipping) && product.shipping.length > 0
+      ? product.shipping
+      : (isObject ? (OBJECTS_SHIPPING?.length ? OBJECTS_SHIPPING : DEFAULT_SHIPPING) : DEFAULT_SHIPPING);
+
+  // Get Related Products dynamically from MongoDB
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchRelated() {
+      if (!product) return;
+      try {
+        const cat = product.category || 'VEYN-SELECTS';
+        const res = await fetch(
+          `${API_BASE_URL}/api/products?category=${encodeURIComponent(cat)}&limit=8`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data)) {
+            const filtered = json.data
+              .filter((p) => p.handle !== product.handle)
+              .slice(0, 4);
+            if (isMounted) setRelatedProducts(filtered);
+          }
+        }
+      } catch (e) {
+        // silently ignore network errors
+      }
+    }
+    fetchRelated();
+    return () => {
+      isMounted = false;
+    };
+  }, [product?.handle, product?.category]);
 
   // Keyboard navigation & modal escape
   useEffect(() => {
@@ -555,7 +597,7 @@ export default function ProductDetail({ product }) {
                 {isBrandStoryOpen && (
                   <div className="product-accordion__content">
                     <p className="product-accordion__text">
-                      {product.selectStory}
+                      {brandStoryText}
                     </p>
                   </div>
                 )}
@@ -603,10 +645,10 @@ export default function ProductDetail({ product }) {
                         </div>
                       )}
                       <ul className="product-tabs__list">
-                        {(product.details || []).map((item, idx) => (
+                        {(productDetails || []).map((item, idx) => (
                           <li key={idx} className="product-tabs__list-item">
                             <span className="product-tabs__bullet">&bull;</span>
-                            <span>{item.replace(/•\s*/, '')}</span>
+                            <span>{item.replace(/^[•\s-]+/, '')}</span>
                           </li>
                         ))}
                       </ul>
@@ -616,10 +658,10 @@ export default function ProductDetail({ product }) {
                   {activeTab === 'shipping' && (
                     <div className="product-tabs__pane">
                       <ul className="product-tabs__list">
-                        {(product.shipping || []).map((item, idx) => (
+                        {(productShipping || []).map((item, idx) => (
                           <li key={idx} className="product-tabs__list-item">
                             <span className="product-tabs__bullet">&bull;</span>
-                            <span>{item.replace(/•\s*/, '')}</span>
+                            <span>{item.replace(/^[•\s-]+/, '')}</span>
                           </li>
                         ))}
                       </ul>

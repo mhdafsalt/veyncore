@@ -3,40 +3,37 @@ import { notFound } from 'next/navigation';
 import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import ProductDetail from '@/components/ProductDetail/ProductDetail';
-import { getProductByHandle, getAllProductHandles } from '@/data/productsData';
 import { API_BASE_URL } from '@/lib/constants';
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
 /**
- * Helper to resolve product from local dataset or backend API
+ * Helper to resolve product from backend MongoDB API
  */
 async function resolveProduct(handle) {
-  let product = getProductByHandle(handle);
-  if (!product && handle) {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/products/${encodeURIComponent(handle)}`, {
-        cache: 'no-store',
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          product = json.data;
-        }
+  if (!handle) return null;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/products/${encodeURIComponent(handle)}`, {
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        return json.data;
       }
-    } catch (e) {
-      // Ignore network errors during static build
     }
+  } catch (e) {
+    // Ignore network errors
   }
-  return product;
+  return null;
 }
 
 /**
- * Generate Static Params for Next.js prerendering
+ * Generate Static Params for Next.js prerendering (Dynamic resolution on demand)
  */
 export async function generateStaticParams() {
-  const handles = getAllProductHandles();
-  return handles.map((handle) => ({
-    handle: handle
-  }));
+  return [];
 }
 
 /**

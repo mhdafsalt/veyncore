@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
-import { OBJECTS_PRODUCTS } from '@/data/objectsData';
 import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsNewArrivals.css';
 
@@ -204,7 +203,7 @@ function ObjectCard({ product }) {
 }
 
 export default function ObjectsNewArrivals() {
-  const [products, setProducts] = useState((OBJECTS_PRODUCTS || []).slice(0, 12));
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -212,40 +211,41 @@ export default function ObjectsNewArrivals() {
       try {
         const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
         const json = await res.json();
-        if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
-          // Sort newest added products first
-          const sorted = [...json.data].sort((a, b) => {
-            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dateB - dateA;
-          });
+        const dbItems = res.ok && json.success && Array.isArray(json.data) ? json.data : [];
 
-          // Priority condition: explicit new arrivals first, then other latest products
-          const markedArrivals = sorted.filter((p) => p.newArrival === true);
-          const otherLatest = sorted.filter((p) => !p.newArrival);
+        // Sort newest added products first
+        const sorted = [...dbItems].sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
 
-          // Condition: latest added 12 products
-          const list = [...markedArrivals, ...otherLatest].slice(0, 12);
+        // Priority condition: explicit new arrivals first, then other latest products
+        const markedArrivals = sorted.filter((p) => p.newArrival === true);
+        const otherLatest = sorted.filter((p) => !p.newArrival);
+        const dbList = [...markedArrivals, ...otherLatest];
 
-          const mapped = list.map((p) => ({
-            id: p._id || p.id,
-            title: p.title,
-            handle: p.handle,
-            salePrice: p.salePrice || (p.price ? `Rs. ${p.price.toLocaleString('en-IN')}.00` : ''),
-            regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
-            price: p.price,
-            comparePrice: p.comparePrice,
-            images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
-            thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
-            badge: p.badge || (p.newArrival ? 'New' : ''),
-            availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
-          }));
-          if (isMounted && mapped.length > 0) {
-            setProducts(mapped);
-          }
+        // Ensure exactly latest 12 products
+        const combined = dbList.slice(0, 12);
+
+        const mapped = combined.map((p) => ({
+          id: p._id || p.id,
+          title: p.title,
+          handle: p.handle,
+          salePrice: p.salePrice || (p.price ? `Rs. ${p.price.toLocaleString('en-IN')}.00` : ''),
+          regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+          price: p.price,
+          comparePrice: p.comparePrice,
+          images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
+          thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
+          badge: p.badge || (p.newArrival ? 'New' : ''),
+          availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
+        }));
+        if (isMounted) {
+          setProducts(mapped);
         }
       } catch (err) {
-        // Fallback to static
+        // Silently catch network errors
       }
     };
 
@@ -255,6 +255,10 @@ export default function ObjectsNewArrivals() {
       isMounted = false;
     };
   }, []);
+
+  if (!products || products.length === 0) {
+    return null;
+  }
 
   return (
     <section className="new-arrivals" id="object-drops">

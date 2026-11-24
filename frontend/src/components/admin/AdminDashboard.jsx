@@ -330,7 +330,10 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       setIsSaving(true);
-      const parsedSizes = productFormData.availableSizes
+      const isObject = productFormData.category === 'VEYN-OBJECTS';
+      const parsedSizes = isObject
+        ? ['ONE SIZE']
+        : productFormData.availableSizes
         ? productFormData.availableSizes.split(',').map((s) => s.trim()).filter(Boolean)
         : ['28', '30', '32', '34', '36'];
 
@@ -344,7 +347,7 @@ export default function AdminDashboard() {
           : (productFormData.inStock !== false ? 50 : 0);
 
       const payload = {
-        title: productFormData.title,
+        title: (productFormData.title || '').toUpperCase().trim(),
         handle:
           productFormData.handle ||
           productFormData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
@@ -365,8 +368,8 @@ export default function AdminDashboard() {
         newArrival: productFormData.newArrival,
         stock: stockNum,
         inStock: stockNum > 0,
-        measurements: productFormData.measurements || null,
-        sizeChartImage: productFormData.sizeChartImage || '',
+        measurements: isObject ? null : (productFormData.measurements || null),
+        sizeChartImage: isObject ? '' : (productFormData.sizeChartImage || ''),
       };
 
       const isEdit = Boolean(editingProduct && (editingProduct._id || editingProduct.handle));
