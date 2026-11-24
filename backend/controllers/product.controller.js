@@ -77,13 +77,27 @@ export const getProducts = async (req, res) => {
       filter.newArrival = true;
     }
 
-    if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { handle: { $regex: search, $options: 'i' } },
-        { subCategory: { $regex: search, $options: 'i' } },
-        { fit: { $regex: search, $options: 'i' } },
+    if (search && String(search).trim()) {
+      const cleanSearch = String(search).trim();
+      const searchConditions = [
+        { title: { $regex: cleanSearch, $options: 'i' } },
+        { handle: { $regex: cleanSearch, $options: 'i' } },
+        { subCategory: { $regex: cleanSearch, $options: 'i' } },
+        { fit: { $regex: cleanSearch, $options: 'i' } },
+        { swipeCategory: { $regex: cleanSearch, $options: 'i' } },
       ];
+
+      if (filter.$or) {
+        filter.$and = (filter.$and || []).concat([
+          { $or: filter.$or },
+          { $or: searchConditions },
+        ]);
+        delete filter.$or;
+      } else if (filter.$and) {
+        filter.$and.push({ $or: searchConditions });
+      } else {
+        filter.$or = searchConditions;
+      }
     }
 
     let query = Product.find(filter);

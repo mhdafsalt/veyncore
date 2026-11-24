@@ -412,7 +412,32 @@
   background-color: #1a1a1a;
 }
 
-/* Discount Code Accordion */
+.cart-drawer__item-media-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cart-drawer__item-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cart-drawer__item-title-link:hover .cart-drawer__item-title {
+  color: #000000;
+  text-decoration: underline;
+}
+
+.cart-drawer__shipping-text--success {
+  color: #059669;
+  font-weight: 600;
+}
+
+.cart-drawer__shipping-fill--unlocked {
+  background: linear-gradient(90deg, #10b981, #059669) !important;
+}
+
+/* Discount Code Accordion & Dynamic Form */
 .cart-drawer__discount {
   border-top: 1px solid #f3f4f6;
   padding: 14px 24px;
@@ -451,10 +476,13 @@
   transform: rotate(45deg);
 }
 
+.cart-drawer__discount-form-wrap {
+  margin-top: 12px;
+}
+
 .cart-drawer__discount-form {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
 }
 
 .cart-drawer__discount-input {
@@ -465,6 +493,8 @@
   font-size: 13px;
   font-family: 'Inter', sans-serif !important;
   outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .cart-drawer__discount-input:focus {
@@ -490,8 +520,74 @@
   background-color: #1a1a1a;
 }
 
+/* Applied Discount Pill */
+.cart-drawer__discount-applied-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.cart-drawer__discount-applied-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-drawer__discount-applied-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: #16a34a;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cart-drawer__discount-applied-code {
+  font-size: 13px;
+  font-weight: 700;
+  color: #15803d;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cart-drawer__discount-applied-desc {
+  font-size: 12px;
+  color: #166534;
+  font-weight: 500;
+}
+
+.cart-drawer__discount-remove-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 14px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.cart-drawer__discount-remove-btn:hover {
+  color: #dc2626;
+}
+
+.cart-drawer__discount-error {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 500;
+}
+
 /* =========================================================
-   Footer & Direct WhatsApp Order Button
+   Footer & Dynamic Breakdown
    ========================================================= */
 
 .cart-drawer__footer {
@@ -499,6 +595,26 @@
   border-top: 1px solid #e5e7eb;
   background-color: #ffffff;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.cart-drawer__subtotal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.cart-drawer__discount-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #15803d;
+  font-weight: 600;
 }
 
 .cart-drawer__total-row {
@@ -706,6 +822,94 @@
 .cart-drawer__empty-collection-card:hover .cart-drawer__empty-collection-arrow {
   background-color: #ffffff;
   transform: translateX(3px);
+}
+
+/* Quick Add Featured Drops in Empty State */
+.cart-drawer__empty-featured {
+  width: 100%;
+  margin-top: 20px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 18px;
+}
+
+.cart-drawer__empty-featured-title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #000000;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.cart-drawer__empty-featured-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-drawer__empty-featured-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background-color: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: 4px;
+}
+
+.cart-drawer__empty-featured-media {
+  flex: 0 0 44px;
+  height: 56px;
+  border-radius: 3px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+.cart-drawer__empty-featured-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-drawer__empty-featured-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cart-drawer__empty-featured-name {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-drawer__empty-featured-price {
+  font-size: 12px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.cart-drawer__empty-featured-add-btn {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cart-drawer__empty-featured-add-btn:hover {
+  background-color: #1f2937;
 }
 
 /* =========================================================

@@ -5,44 +5,8 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { API_BASE_URL } from '@/lib/constants';
 import './Navbar.css';
-
-const POPULAR_SEARCHES = ['Baggy', 'Bootcut', 'Bracelet', 'Cargo', 'Denims', 'Raw Wide', 'Tops'];
-
-const SEARCH_PRODUCTS = [
-  {
-    id: 'artic-blue-wide',
-    title: 'ARTIC BLUE WIDE',
-    originalPrice: 'Rs. 1,599.00',
-    salePrice: 'Rs. 1,199.00',
-    image: '/images/products/artic-blue-wide.jpg',
-    href: '#artic-blue-wide'
-  },
-  {
-    id: 'brick-dark-wide',
-    title: 'BRICK DARK WIDE',
-    originalPrice: 'Rs. 1,499.00',
-    salePrice: 'Rs. 1,099.00',
-    image: '/images/products/brick-dark-wide.jpg',
-    href: '#brick-dark-wide'
-  },
-  {
-    id: 'cloud-blue-wide',
-    title: 'CLOUD BLUE WIDE',
-    originalPrice: 'Rs. 1,699.00',
-    salePrice: 'Rs. 1,149.00',
-    image: '/images/products/cloud-blue-wide.jpg',
-    href: '#cloud-blue-wide'
-  },
-  {
-    id: 'core-blue-wide',
-    title: 'CORE BLUE WIDE',
-    originalPrice: 'Rs. 1,399.00',
-    salePrice: 'Rs. 1,049.00',
-    image: '/images/products/core-blue-wide.jpg',
-    href: '#core-blue-wide'
-  }
-];
 
 export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCategory }) {
   const router = useRouter();
@@ -55,9 +19,102 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [isLogoSmall, setIsLogoSmall] = useState(false);
 
+  // Dynamic Search States
+  const [popularTags, setPopularTags] = useState(['BAGGY', 'BOOTCUT', 'WIDE', 'STRAIGHT', 'CARGO', 'DENIMS', 'TOPS']);
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   const searchInputRef = useRef(null);
   const lastScrollYRef = useRef(0);
   const scrollDeltaRef = useRef(0);
+
+  // Fetch real catalog products & dynamic tags on mount for instant search preview
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSearchData = async () => {
+      try {
+        const prodRes = await fetch(`${API_BASE_URL}/api/products?limit=16`);
+        const prodJson = await prodRes.json();
+        if (isMounted && prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
+          const formatted = prodJson.data.map((p) => {
+            const rawPrice = p.price ?? p.salePrice ?? 1299;
+            const rawCompare = p.comparePrice ?? p.regularPrice ?? null;
+            return {
+              id: p._id || p.id,
+              title: p.title,
+              handle: p.handle || String(p.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              originalPrice: rawCompare ? `Rs. ${Number(rawCompare).toLocaleString('en-IN')}.00` : null,
+              salePrice: `Rs. ${Number(rawPrice).toLocaleString('en-IN')}.00`,
+              image: p.thumbnail || (p.images && p.images[0]) || '/images/products/artic-blue-wide.jpg',
+              href: `/products/${p.handle || p._id}`,
+              subCategory: p.subCategory || p.fit,
+            };
+          });
+
+          setTrendingProducts(formatted.slice(0, 4));
+
+          // Derive dynamic popular tags from real products
+          const tags = new Set();
+          formatted.forEach((p) => {
+            if (p.subCategory) tags.add(p.subCategory.toUpperCase().trim());
+          });
+          if (tags.size > 0) {
+            setPopularTags(Array.from(tags).slice(0, 8));
+          }
+        }
+      } catch (e) {
+        // Fallback silently
+      }
+    };
+
+    fetchSearchData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Live dynamic search debouncer (calls backend search endpoint)
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/products?search=${encodeURIComponent(query)}&limit=12`);
+        const json = await res.json();
+        if (res.ok && json.success && Array.isArray(json.data)) {
+          const formatted = json.data.map((p) => {
+            const rawPrice = p.price ?? p.salePrice ?? 1299;
+            const rawCompare = p.comparePrice ?? p.regularPrice ?? null;
+            return {
+              id: p._id || p.id,
+              title: p.title,
+              handle: p.handle || String(p.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              originalPrice: rawCompare ? `Rs. ${Number(rawCompare).toLocaleString('en-IN')}.00` : null,
+              salePrice: `Rs. ${Number(rawPrice).toLocaleString('en-IN')}.00`,
+              image: p.thumbnail || (p.images && p.images[0]) || '/images/products/artic-blue-wide.jpg',
+              href: `/products/${p.handle || p._id}`,
+            };
+          });
+          setSearchResults(formatted);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (err) {
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 220);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Smooth logo scaling on scroll
   useEffect(() => {
@@ -165,11 +222,23 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
     }
   };
 
-  const filteredProducts = searchQuery.trim()
-    ? SEARCH_PRODUCTS.filter((p) =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : SEARCH_PRODUCTS;
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    setIsSearchOpen(false);
+    const target = activeMainCategory === 'VEYN-OBJECTS'
+      ? `/collections/objects-drops?search=${encodeURIComponent(q)}`
+      : `/collections/all-drops?search=${encodeURIComponent(q)}`;
+    router.push(target);
+  };
+
+  const handleTagClick = (tag) => {
+    setSearchQuery(tag);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
 
   return (
     <header className={`navbar ${isMenuOpen || isSearchOpen ? 'navbar--drawer-open' : ''}`}>
@@ -742,8 +811,8 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
         aria-modal="true"
         aria-label="Search Store"
       >
-        {/* Top Search Input Row */}
-        <div className="navbar__search-input-row">
+        {/* Top Search Input Row (Active live search & submit form) */}
+        <form onSubmit={handleSearchSubmit} className="navbar__search-input-row">
           <span className="navbar__search-input-icon">
             <svg
               width="18"
@@ -765,12 +834,26 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
             ref={searchInputRef}
             type="search"
             className="navbar__search-input"
-            placeholder="Search"
+            placeholder="Search products, fits, collections..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             maxLength={128}
             autoComplete="off"
           />
+
+          {searchQuery && (
+            <button
+              type="button"
+              className="navbar__search-clear-btn"
+              onClick={() => {
+                setSearchQuery('');
+                if (searchInputRef.current) searchInputRef.current.focus();
+              }}
+              aria-label="Clear search query"
+            >
+              ✕
+            </button>
+          )}
 
           <button
             type="button"
@@ -793,48 +876,160 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               <line x1="1" y1="13" x2="13" y2="1" />
             </svg>
           </button>
-        </div>
+        </form>
 
         {/* Search Results / Products Section */}
         <div className="navbar__search-products-section">
-          <p className="navbar__search-section-title">Products</p>
+          {!searchQuery.trim() ? (
+            /* 1. INITIAL EMPTY SEARCH STATE: POPULAR SEARCHES & TRENDING DROPS */
+            <div className="navbar__search-empty-content">
+              {popularTags.length > 0 && (
+                <div className="navbar__search-popular-wrap">
+                  <p className="navbar__search-section-title">Popular Searches</p>
+                  <div className="navbar__search-tags">
+                    {popularTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className="navbar__search-tag"
+                        onClick={() => handleTagClick(tag)}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {filteredProducts.length > 0 ? (
-            <div className="navbar__search-products-grid">
-              {filteredProducts.map((product) => (
-                <a
-                  key={product.id}
-                  href={product.href}
-                  className="navbar__search-product-card"
-                  onClick={() => setIsSearchOpen(false)}
-                >
-                  <div className="navbar__search-product-image-wrap">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="navbar__search-product-image"
-                      loading="lazy"
-                    />
+              {trendingProducts.length > 0 && (
+                <div className="navbar__search-trending-wrap">
+                  <p className="navbar__search-section-title">Trending Now</p>
+                  <div className="navbar__search-products-grid">
+                    {trendingProducts.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={product.href}
+                        className="navbar__search-product-card"
+                        onClick={() => setIsSearchOpen(false)}
+                      >
+                        <div className="navbar__search-product-image-wrap">
+                          <img
+                            src={product.image}
+                            alt={product.title}
+                            className="navbar__search-product-image"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = '/images/products/artic-blue-wide.jpg';
+                            }}
+                          />
+                        </div>
+                        <div className="navbar__search-product-info">
+                          <h4 className="navbar__search-product-name">
+                            {product.title}
+                          </h4>
+                          <div className="navbar__search-product-prices">
+                            {product.originalPrice && (
+                              <span className="navbar__search-product-original-price">
+                                {product.originalPrice}
+                              </span>
+                            )}
+                            <span className="navbar__search-product-sale-price">
+                              {product.salePrice}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
-                  <div className="navbar__search-product-info">
-                    <h4 className="navbar__search-product-name">
-                      {product.title}
-                    </h4>
-                    <div className="navbar__search-product-prices">
-                      <span className="navbar__search-product-original-price">
-                        {product.originalPrice}
-                      </span>
-                      <span className="navbar__search-product-sale-price">
-                        {product.salePrice}
-                      </span>
+                </div>
+              )}
+            </div>
+          ) : isSearching ? (
+            /* 2. LOADING STATE */
+            <div className="navbar__search-loading">
+              <div className="navbar__search-spinner" />
+              <p>Searching catalog for &ldquo;{searchQuery}&rdquo;...</p>
+            </div>
+          ) : searchResults.length > 0 ? (
+            /* 3. DYNAMIC SEARCH RESULTS */
+            <div className="navbar__search-results-wrap">
+              <div className="navbar__search-results-header">
+                <p className="navbar__search-section-title">
+                  Results for &ldquo;{searchQuery}&rdquo; ({searchResults.length})
+                </p>
+              </div>
+
+              <div className="navbar__search-products-grid">
+                {searchResults.map((product) => (
+                  <Link
+                    key={product.id}
+                    href={product.href}
+                    className="navbar__search-product-card"
+                    onClick={() => setIsSearchOpen(false)}
+                  >
+                    <div className="navbar__search-product-image-wrap">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="navbar__search-product-image"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/images/products/artic-blue-wide.jpg';
+                        }}
+                      />
                     </div>
-                  </div>
-                </a>
-              ))}
+                    <div className="navbar__search-product-info">
+                      <h4 className="navbar__search-product-name">
+                        {product.title}
+                      </h4>
+                      <div className="navbar__search-product-prices">
+                        {product.originalPrice && (
+                          <span className="navbar__search-product-original-price">
+                            {product.originalPrice}
+                          </span>
+                        )}
+                        <span className="navbar__search-product-sale-price">
+                          {product.salePrice}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="navbar__search-footer">
+                <button
+                  type="button"
+                  className="navbar__search-view-all-btn"
+                  onClick={handleSearchSubmit}
+                >
+                  View all results for &ldquo;{searchQuery}&rdquo; &rarr;
+                </button>
+              </div>
             </div>
           ) : (
+            /* 4. NO RESULTS MATCHING QUERY */
             <div className="navbar__search-no-results">
-              <p>No products found matching &ldquo;{searchQuery}&rdquo;</p>
+              <p className="navbar__search-no-results-text">
+                No products found matching &ldquo;{searchQuery}&rdquo;
+              </p>
+              <p className="navbar__search-no-results-hint">
+                Try searching fits, categories, or select from popular tags:
+              </p>
+              <div className="navbar__search-tags navbar__search-tags--centered">
+                {popularTags.slice(0, 6).map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className="navbar__search-tag"
+                    onClick={() => handleTagClick(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>

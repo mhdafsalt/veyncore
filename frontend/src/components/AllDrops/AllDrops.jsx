@@ -512,6 +512,18 @@ function AllDropsContent() {
       result = result.filter((p) => matchProductCategory(p, selectedCategory));
     }
 
+    // Filter by search query if specified (e.g. ?search=... or ?q=...)
+    const searchParam = searchParams ? (searchParams.get('search') || searchParams.get('q'))?.toLowerCase().trim() : null;
+    if (searchParam) {
+      result = result.filter((p) => {
+        const titleMatch = (p.title || '').toLowerCase().includes(searchParam);
+        const subCatMatch = (p.subCategory || '').toLowerCase().includes(searchParam);
+        const fitMatch = (p.fit || '').toLowerCase().includes(searchParam);
+        const swipeMatch = (p.swipeCategory || '').toLowerCase().includes(searchParam);
+        return titleMatch || subCatMatch || fitMatch || swipeMatch;
+      });
+    }
+
     // Filter by badge if specified (e.g. ?badge=new)
     const badgeParam = searchParams ? searchParams.get('badge')?.toLowerCase() : null;
     if (badgeParam === 'new') {

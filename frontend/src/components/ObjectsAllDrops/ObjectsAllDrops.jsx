@@ -392,6 +392,16 @@ function ObjectsAllDropsContent() {
       }
     }
 
+    // Filter by search query if specified (e.g. ?search=... or ?q=...)
+    const searchParam = searchParams ? (searchParams.get('search') || searchParams.get('q'))?.toLowerCase().trim() : null;
+    if (searchParam) {
+      result = result.filter((p) => {
+        const titleMatch = (p.title || '').toLowerCase().includes(searchParam);
+        const subCatMatch = (p.subCategory || '').toLowerCase().includes(searchParam);
+        return titleMatch || subCatMatch;
+      });
+    }
+
     // Filter by price
     const minVal = parseFloat(minPrice);
     if (!isNaN(minVal)) {

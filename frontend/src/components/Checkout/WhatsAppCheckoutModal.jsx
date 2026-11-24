@@ -110,6 +110,8 @@ export default function WhatsAppCheckoutModal() {
     checkoutItems,
     checkoutSource,
     closeCheckout,
+    appliedDiscount,
+    discountAmount,
   } = useCart();
 
   const { user, isAuthenticated, addresses } = useAuth();
@@ -296,7 +298,8 @@ export default function WhatsAppCheckoutModal() {
   // Dynamic Pincode-Based Shipping Calculation (Kerala = ₹0, Outside Kerala = ₹50)
   const shippingInfo = getShippingDetails(formData.pincode);
   const shippingCharge = shippingInfo.charge;
-  const grandTotal = subtotal + shippingCharge;
+  const discountVal = discountAmount || 0;
+  const grandTotal = Math.max(0, subtotal - discountVal + shippingCharge);
 
   /**
    * Builds the formatted WhatsApp order text in the exact requested structure
@@ -335,6 +338,9 @@ export default function WhatsAppCheckoutModal() {
     lines.push('*ORDER SUMMARY*');
     lines.push('');
     lines.push(`*Subtotal:* ₹${subtotal.toLocaleString('en-IN')}`);
+    if (appliedDiscount && discountVal > 0) {
+      lines.push(`*Discount (${appliedDiscount.code}):* -₹${discountVal.toLocaleString('en-IN')}`);
+    }
     lines.push(`*Shipping Charges:* ₹${shippingCharge}`);
     lines.push(`*Grand Total:* ₹${grandTotal.toLocaleString('en-IN')}`);
     lines.push('');
@@ -647,6 +653,12 @@ export default function WhatsAppCheckoutModal() {
                     <span className="wa-summary__shipping-pending">Enter 6-digit pincode</span>
                   )}
                 </div>
+                {discountVal > 0 && (
+                  <div className="wa-summary__row" style={{ color: '#16a34a', fontWeight: 600 }}>
+                    <span>Discount ({appliedDiscount?.code})</span>
+                    <span>-{formatINR(discountVal)}</span>
+                  </div>
+                )}
                 <div className="wa-summary__divider" />
                 <div className="wa-summary__row wa-summary__row--total">
                   <span>Total</span>

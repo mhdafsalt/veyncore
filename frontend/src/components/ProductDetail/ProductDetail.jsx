@@ -196,6 +196,7 @@ export default function ProductDetail({ product }) {
     addItem({
       id: `${product.id}-${selectedSize}`,
       productId: product.id,
+      handle: product.handle,
       title: product.title,
       size: selectedSize,
       price: numPrice,
