@@ -249,12 +249,10 @@ function ObjectsAllDropsContent() {
   const [productsList, setProductsList] = useState(ALL_OBJECTS_PRODUCTS);
 
   // Read initial category filter from URL search params (e.g. ?category=bags)
-  const initialCategoryParam = searchParams.get('category')?.toLowerCase() || 'all';
+  const initialCategoryParam = searchParams.get('category')?.toLowerCase().trim() || 'all';
 
   const [activeCategoryTab, setActiveCategoryTab] = useState(
-    ['bags', 'chains', 'caps'].includes(initialCategoryParam)
-      ? initialCategoryParam
-      : 'all'
+    initialCategoryParam && initialCategoryParam !== 'all' ? initialCategoryParam : 'all'
   );
 
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -309,10 +307,10 @@ function ObjectsAllDropsContent() {
 
   // Sync category state when URL param changes
   useEffect(() => {
-    const cat = searchParams.get('category')?.toLowerCase();
-    if (cat && ['bags', 'chains', 'caps'].includes(cat)) {
+    const cat = searchParams.get('category')?.toLowerCase().trim();
+    if (cat && cat !== 'all') {
       setActiveCategoryTab(cat);
-    } else if (!cat) {
+    } else {
       setActiveCategoryTab('all');
     }
   }, [searchParams]);
@@ -433,15 +431,37 @@ function ObjectsAllDropsContent() {
   const currentSortLabel =
     SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || 'Featured';
 
-  // Category counts
-  const categoryCounts = useMemo(() => {
-    return {
-      all: ALL_OBJECTS_PRODUCTS.length,
-      bags: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'BAGS').length,
-      chains: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CHAINS').length,
-      caps: ALL_OBJECTS_PRODUCTS.filter((p) => p.subCategory === 'CAPS').length
-    };
-  }, []);
+  // Fully Dynamic Category Extraction from products for Objects
+  const dynamicObjectCategories = useMemo(() => {
+    const map = new Map();
+    map.set('all', { id: 'all', label: 'ALL', count: productsList.length });
+
+    productsList.forEach((p) => {
+      const sub = (p.subCategory || '').trim();
+      if (sub) {
+        const key = sub.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, {
+            id: key,
+            label: sub.toUpperCase(),
+            count: 0,
+          });
+        }
+      }
+    });
+
+    const entries = Array.from(map.values());
+    entries.forEach((cat) => {
+      if (cat.id === 'all') return;
+      const target = cat.id;
+      cat.count = productsList.filter((p) => {
+        const sub = (p.subCategory || '').toLowerCase().trim();
+        return sub === target || sub.startsWith(target);
+      }).length;
+    });
+
+    return entries;
+  }, [productsList]);
 
   return (
     <section className="obj-all">
@@ -815,7 +835,7 @@ function ObjectsAllDropsContent() {
               <div className="obj-all-drawer__section">
                 <h3 className="obj-all-drawer__section-title">Category</h3>
                 <div className="obj-all-drawer__pill-group">
-                  {OBJECT_CATEGORIES.map((cat) => (
+                  {dynamicObjectCategories.map((cat) => (
                     <button
                       key={cat.id}
                       type="button"
@@ -824,7 +844,7 @@ function ObjectsAllDropsContent() {
                       }`}
                       onClick={() => handleTabChange(cat.id)}
                     >
-                      {cat.label} ({categoryCounts[cat.id] || 0})
+                      {cat.label} ({cat.count || 0})
                     </button>
                   ))}
                 </div>

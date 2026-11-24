@@ -13,25 +13,13 @@ const DEFAULT_CONTENT = {
   subcategories: [
     // VEYN-SELECTS
     { id: 'home', mainCategory: 'VEYN-SELECTS', label: 'HOME', href: '#home', isGlow: false, sortOrder: 0, active: true },
-    { id: 'flash-sale', mainCategory: 'VEYN-SELECTS', label: 'FLASH SALE⚡️', href: '#flash-sale', isGlow: true, sortOrder: 1, active: true },
+    { id: 'flash-sale', mainCategory: 'VEYN-SELECTS', label: 'FLASH SALE', href: '#flash-sale', isGlow: true, sortOrder: 1, active: true },
     { id: 'new-drops', mainCategory: 'VEYN-SELECTS', label: 'NEW DROPS', href: '/collections/all-drops', isGlow: true, sortOrder: 2, active: true },
     { id: 'all-drops', mainCategory: 'VEYN-SELECTS', label: 'ALL DROPS', href: '/collections/all-drops', isGlow: false, sortOrder: 3, active: true },
-    { id: 'denims', mainCategory: 'VEYN-SELECTS', label: 'DENIMS', href: '#denims', isGlow: false, sortOrder: 4, active: true },
-    { id: 'cargo', mainCategory: 'VEYN-SELECTS', label: 'CARGO', href: '#cargo', isGlow: false, sortOrder: 5, active: true },
-    { id: 'baggy', mainCategory: 'VEYN-SELECTS', label: 'BAGGY', href: '#baggy', isGlow: false, sortOrder: 6, active: true },
-    { id: 'bootcut', mainCategory: 'VEYN-SELECTS', label: 'BOOTCUT', href: '#bootcut', isGlow: false, sortOrder: 7, active: true },
-    { id: 'wide', mainCategory: 'VEYN-SELECTS', label: 'WIDE', href: '#wide', isGlow: false, sortOrder: 8, active: true },
-    { id: 'straight', mainCategory: 'VEYN-SELECTS', label: 'STRAIGHT', href: '#straight', isGlow: false, sortOrder: 9, active: true },
-    { id: 'tops', mainCategory: 'VEYN-SELECTS', label: 'TOPS', href: '#tops', isGlow: false, sortOrder: 10, active: true },
-    { id: 'accessories', mainCategory: 'VEYN-SELECTS', label: 'ACCESSORIES', href: '#accessories', isGlow: false, sortOrder: 11, active: true },
 
     // VEYN-OBJECTS
     { id: 'obj-all', mainCategory: 'VEYN-OBJECTS', label: 'ALL OBJECTS', href: '/collections/objects-drops', isGlow: false, sortOrder: 0, active: true },
-    { id: 'obj-drops', mainCategory: 'VEYN-OBJECTS', label: 'OBJECT DROPS ⚡️', href: '#object-drops', isGlow: true, sortOrder: 1, active: true },
-    { id: 'bags', mainCategory: 'VEYN-OBJECTS', label: 'BAGS', href: '#bags', isGlow: false, sortOrder: 2, active: true },
-    { id: 'chains', mainCategory: 'VEYN-OBJECTS', label: 'CHAINS', href: '#chains', isGlow: false, sortOrder: 3, active: true },
-    { id: 'headwear', mainCategory: 'VEYN-OBJECTS', label: 'CAPS & HEADWEAR', href: '#headwear', isGlow: false, sortOrder: 4, active: true },
-    { id: 'hardware', mainCategory: 'VEYN-OBJECTS', label: 'HARDWARE', href: '#hardware', isGlow: false, sortOrder: 5, active: true },
+    { id: 'obj-drops', mainCategory: 'VEYN-OBJECTS', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true, sortOrder: 1, active: true },
   ],
   heroSlides: [
     // VEYN-SELECTS
@@ -166,6 +154,19 @@ export const getSectionContent = async (req, res) => {
       });
     }
 
+    if (section === 'subcategories' && Array.isArray(sectionData)) {
+      const legacyStaticIds = new Set([
+        'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
+        'bags', 'chains', 'headwear', 'hardware'
+      ]);
+      sectionData = sectionData.filter(item => {
+        if (legacyStaticIds.has(item.id) && (item.href === `#${item.id}` || !item.href)) {
+          return false;
+        }
+        return true;
+      });
+    }
+
     return res.status(200).json({
       success: true,
       section,
@@ -223,7 +224,7 @@ export const updateSectionContent = async (req, res) => {
         .map((item, idx) => ({
           id: String(item.id || item._id || `sub-${Date.now()}-${idx}`),
           mainCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
-          label: String(item.label || '').trim(),
+          label: String(item.label || '').trim().toUpperCase(),
           href: String(item.href || '#').trim(),
           image: String(item.image || '').trim(),
           isGlow: Boolean(item.isGlow),

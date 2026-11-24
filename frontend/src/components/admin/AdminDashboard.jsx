@@ -438,21 +438,26 @@ export default function AdminDashboard() {
       const { type, isEdit, index } = itemModalConfig;
       const currentList = [...(siteContent?.[type] || [])];
 
+      const preparedData = { ...itemFormData };
+      if (type === 'subcategories' && preparedData.label) {
+        preparedData.label = String(preparedData.label).trim().toUpperCase();
+      }
+
       if (isEdit && index >= 0) {
         const existing = currentList[index] || {};
         currentList[index] = {
           ...existing,
-          ...itemFormData,
-          id: itemFormData.id || existing.id || existing._id || `item-${Date.now()}-${index}`,
+          ...preparedData,
+          id: preparedData.id || existing.id || existing._id || `item-${Date.now()}-${index}`,
         };
       } else {
         const newItem = {
-          ...itemFormData,
+          ...preparedData,
           id:
-            itemFormData.id ||
-            itemFormData.key ||
+            preparedData.id ||
+            preparedData.key ||
             `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-          active: itemFormData.active !== false,
+          active: preparedData.active !== false,
         };
         currentList.push(newItem);
       }

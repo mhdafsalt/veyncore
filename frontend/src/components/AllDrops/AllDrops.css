@@ -34,11 +34,16 @@
    ========================================================================== */
 
 .all-drops__header {
+  margin-bottom: 6px;
+  padding-bottom: 2px;
+}
+
+.all-drops__header-title-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 6px;
-  padding-bottom: 2px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .all-drops__title {
@@ -58,6 +63,38 @@
   color: #666666;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+
+/* Mobile Drawer Pill Group */
+.all-drops-drawer__pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.all-drops-drawer__pill {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #222222;
+}
+
+.all-drops-drawer__pill:hover {
+  background-color: #ebebeb;
+  color: #000000;
+}
+
+.all-drops-drawer__pill--active {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
 }
 
 /* ==========================================================================

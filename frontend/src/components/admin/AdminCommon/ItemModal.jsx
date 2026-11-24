@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminImageUploader from '../AdminImageUploader/AdminImageUploader';
 import './ItemModal.css';
 
@@ -13,7 +13,125 @@ export default function ItemModal({
   onSubmit,
   isSaving = false,
 }) {
+  const [autoSyncRoute, setAutoSyncRoute] = useState(true);
+
+  // Initialize autoSyncRoute based on whether item is being edited or new
+  useEffect(() => {
+    if (isOpen) {
+      if (config.type === 'subcategories') {
+        const isDynamic =
+          !formData.href ||
+          formData.href.includes('?category=') ||
+          formData.href.startsWith('#');
+        setAutoSyncRoute(Boolean(!config.isEdit || isDynamic));
+      }
+    }
+  }, [isOpen, config.type, config.isEdit]);
+
   if (!isOpen) return null;
+
+  const currentMainCategory = formData.mainCategory || 'VEYN-SELECTS';
+  const dropsPath =
+    currentMainCategory === 'VEYN-OBJECTS'
+      ? '/collections/objects-drops'
+      : '/collections/all-drops';
+  const homePath =
+    currentMainCategory === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
+  const newDropsPath = `${dropsPath}?badge=new`;
+
+  // Helper to generate slug from label
+  const getSlugFromLabel = (label = '') =>
+    label
+      .toLowerCase()
+      .replace(/⚡|⚡️/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const currentSlug = getSlugFromLabel(formData.label);
+  const expectedDynamicRoute = currentSlug
+    ? `${dropsPath}?category=${currentSlug}`
+    : `${dropsPath}?category=category-name`;
+
+  const isDynamicCategoryActive =
+    autoSyncRoute ||
+    (formData.href && formData.href.includes('?category='));
+
+  // Handle Label Change with dynamic route auto-sync (Enforce UPPERCASE)
+  const handleLabelChange = (val) => {
+    const upperVal = (val || '').toUpperCase();
+    const slug = getSlugFromLabel(upperVal);
+    const newHref = slug ? `${dropsPath}?category=${slug}` : dropsPath;
+
+    setFormData((prev) => ({
+      ...prev,
+      label: upperVal,
+      ...(autoSyncRoute
+        ? {
+            href: newHref,
+            id: prev.id && config.isEdit ? prev.id : slug || prev.id,
+          }
+        : {}),
+    }));
+  };
+
+  // Handle Main Category Change
+  const handleMainCategoryChange = (newMain) => {
+    const newDropsPath =
+      newMain === 'VEYN-OBJECTS'
+        ? '/collections/objects-drops'
+        : '/collections/all-drops';
+    const newHomePath = newMain === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
+
+    setFormData((prev) => {
+      let updatedHref = prev.href;
+      if (autoSyncRoute) {
+        const slug = getSlugFromLabel(prev.label);
+        updatedHref = slug ? `${newDropsPath}?category=${slug}` : newDropsPath;
+      } else if (
+        prev.href === '/collections/all-drops' ||
+        prev.href === '/collections/objects-drops'
+      ) {
+        updatedHref = newDropsPath;
+      } else if (prev.href === '/' || prev.href === '/veyn-objects') {
+        updatedHref = newHomePath;
+      }
+
+      return {
+        ...prev,
+        mainCategory: newMain,
+        href: updatedHref,
+      };
+    });
+  };
+
+  // Preset click handler
+  const handlePresetSelect = (presetKey) => {
+    const slug = currentSlug;
+
+    if (presetKey === 'dynamic') {
+      setAutoSyncRoute(true);
+      const dynamicHref = slug
+        ? `${dropsPath}?category=${slug}`
+        : `${dropsPath}?category=category-name`;
+      setFormData((prev) => ({
+        ...prev,
+        href: dynamicHref,
+        id: prev.id && config.isEdit ? prev.id : slug || prev.id,
+      }));
+    } else {
+      setAutoSyncRoute(false);
+      let newHref = '';
+      if (presetKey === 'all-drops') newHref = dropsPath;
+      else if (presetKey === 'new-drops') newHref = newDropsPath;
+      else if (presetKey === 'flash-sale') newHref = '#flash-sale';
+      else if (presetKey === 'home') newHref = homePath;
+
+      setFormData((prev) => ({
+        ...prev,
+        href: newHref,
+      }));
+    }
+  };
 
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
@@ -39,11 +157,10 @@ export default function ItemModal({
                 <input
                   type="text"
                   className="admin-form-input"
+                  style={{ textTransform: 'uppercase' }}
                   value={formData.label || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, label: e.target.value }))
-                  }
-                  placeholder="e.g. FLASH SALE⚡️"
+                  onChange={(e) => handleLabelChange(e.target.value)}
+                  placeholder="e.g. BOOTCUT, CARGO, FLASH SALE⚡️"
                   required
                 />
               </div>
@@ -53,27 +170,106 @@ export default function ItemModal({
                 <select
                   className="admin-form-select"
                   value={formData.mainCategory || 'VEYN-SELECTS'}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, mainCategory: e.target.value }))
-                  }
+                  onChange={(e) => handleMainCategoryChange(e.target.value)}
                 >
                   <option value="VEYN-SELECTS">VEYN-SELECTS</option>
                   <option value="VEYN-OBJECTS">VEYN-OBJECTS</option>
                 </select>
               </div>
 
+              {/* Dynamic Target Link / Route Section */}
               <div className="admin-form-group">
-                <label className="admin-form-label">TARGET LINK / ROUTE *</label>
+                <div className="admin-route-header-row">
+                  <label className="admin-form-label" style={{ marginBottom: 0 }}>
+                    TARGET LINK / ROUTE *
+                  </label>
+                  <span className="admin-route-helper-tag">
+                    {autoSyncRoute ? '⚡ Auto-Sync Active' : 'Custom Route Mode'}
+                  </span>
+                </div>
+
+                {/* Quick Presets Strip */}
+                <div className="admin-route-presets" role="group" aria-label="Quick route presets">
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      isDynamicCategoryActive ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => handlePresetSelect('dynamic')}
+                    title="Automatically filter collection by subcategory name"
+                  >
+                    ⚡ Dynamic Category (Auto)
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === dropsPath && !autoSyncRoute
+                        ? 'admin-route-pill--active'
+                        : ''
+                    }`}
+                    onClick={() => handlePresetSelect('all-drops')}
+                    title="Navigate to full collection without category filter"
+                  >
+                    All Drops
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === newDropsPath ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => handlePresetSelect('new-drops')}
+                    title="Filter by New Drops badge"
+                  >
+                    New Drops
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === '#flash-sale' ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => handlePresetSelect('flash-sale')}
+                    title="Scroll to Flash Sale on storefront"
+                  >
+                    ⚡ Flash Sale
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === homePath ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => handlePresetSelect('home')}
+                    title="Navigate to storefront home"
+                  >
+                    Home
+                  </button>
+                </div>
+
+                {/* Route Input */}
                 <input
                   type="text"
                   className="admin-form-input"
                   value={formData.href || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, href: e.target.value }))
-                  }
-                  placeholder="e.g. #baggy or /collections/all-drops"
+                  onChange={(e) => {
+                    setAutoSyncRoute(false);
+                    setFormData((prev) => ({ ...prev, href: e.target.value }));
+                  }}
+                  placeholder="e.g. /collections/all-drops?category=baggy or #flash-sale"
                   required
                 />
+
+                {/* Dynamic Route Info */}
+                <div className="admin-route-hint">
+                  {autoSyncRoute ? (
+                    <span className="admin-route-hint--dynamic">
+                      ✓ <strong>Dynamic Routing Active:</strong> Automatically generates{' '}
+                      <code>{expectedDynamicRoute}</code> based on the label.
+                    </span>
+                  ) : (
+                    <span>
+                      Type any custom path or click a preset above to auto-generate.
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="admin-form-group">

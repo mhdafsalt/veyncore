@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import AllDrops from '@/components/AllDrops/AllDrops';
@@ -16,7 +16,9 @@ export default function AllCollectionsPage() {
       <StoreHeader initialCategory="VEYN-SELECTS" />
 
       {/* 2. Collection View */}
-      <AllDrops />
+      <Suspense fallback={<div className="all-drops-loading" style={{ minHeight: '60vh' }} />}>
+        <AllDrops />
+      </Suspense>
 
       {/* 3. Footer */}
       <Footer />

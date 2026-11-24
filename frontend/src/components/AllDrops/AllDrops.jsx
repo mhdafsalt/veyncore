@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { ALL_DROPS_PRODUCTS, SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
@@ -271,8 +272,22 @@ function DropsProductCard({ product }) {
 /**
  * Main ALL DROPS Collection View
  */
-export default function AllDrops() {
+function AllDropsContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const [productsList, setProductsList] = useState(ALL_DROPS_PRODUCTS);
+  const [dynamicSubcategories, setDynamicSubcategories] = useState(null);
+
+  // Category filter state synced with URL ?category=...
+  const categoryParam = searchParams ? searchParams.get('category')?.toLowerCase().trim() || '' : '';
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
+
+  useEffect(() => {
+    const cat = searchParams ? searchParams.get('category')?.toLowerCase().trim() || '' : '';
+    setSelectedCategory(cat);
+  }, [searchParams]);
+
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [selectedAvailability, setSelectedAvailability] = useState([]);
   const [minPrice, setMinPrice] = useState('');
@@ -302,6 +317,7 @@ export default function AllDrops() {
             category: 'VEYN-SELECTS',
             subCategory: p.subCategory || 'BAGGY',
             fit: p.fit || 'baggy',
+            swipeCategory: p.swipeCategory || '',
             price: p.price,
             comparePrice: p.comparePrice,
             salePrice: p.salePrice || `Rs. ${p.price.toLocaleString('en-IN')}.00`,
@@ -311,6 +327,7 @@ export default function AllDrops() {
             thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/products/artic-blue-wide.jpg',
             availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['28', '30', '32', '34', '36'],
             inStock: p.inStock !== false,
+            newArrival: Boolean(p.newArrival),
             createdAt: p.createdAt || new Date().toISOString(),
           }));
           if (isMounted) {
@@ -326,6 +343,118 @@ export default function AllDrops() {
       isMounted = false;
     };
   }, []);
+
+  // Fetch dynamic subcategories from backend API to discover any newly configured categories
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSubcategories = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/content/subcategories`);
+        const json = await res.json();
+        if (res.ok && json.success && Array.isArray(json.data)) {
+          if (isMounted) {
+            setDynamicSubcategories(json.data);
+          }
+        }
+      } catch (e) {
+        // Silently fallback
+      }
+    };
+    fetchSubcategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fully Dynamic Category Extraction from products & backend subcategories (NO hardcoded category names)
+  const dynamicCategories = useMemo(() => {
+    const map = new Map();
+
+    // 1. "ALL DROPS" option
+    map.set('all', {
+      id: 'all',
+      label: 'ALL DROPS',
+      count: productsList.length,
+    });
+
+    const priorityOrder = ['baggy', 'bootcut', 'wide', 'straight', 'cargo', 'denims', 'tops', 'accessories'];
+
+    // 2. Extract dynamically from products
+    productsList.forEach((p) => {
+      const candidates = [p.subCategory, p.fit, p.swipeCategory].filter(Boolean);
+      candidates.forEach((cand) => {
+        const key = cand.toLowerCase().trim();
+        if (key && key !== 'all' && !map.has(key)) {
+          map.set(key, {
+            id: key,
+            label: cand.toUpperCase(),
+            count: 0,
+          });
+        }
+      });
+    });
+
+    // 3. Extract dynamically from subcategories (if configured in Admin)
+    if (dynamicSubcategories && Array.isArray(dynamicSubcategories)) {
+      dynamicSubcategories
+        .filter((s) => s.mainCategory === 'VEYN-SELECTS' && s.active !== false)
+        .forEach((s) => {
+          const key = (s.id || s.label || '').toLowerCase().trim();
+          if (key && !['home', 'flash-sale', 'new-drops', 'all-drops'].includes(key) && !map.has(key)) {
+            map.set(key, {
+              id: key,
+              label: s.label.toUpperCase(),
+              count: 0,
+            });
+          }
+        });
+    }
+
+    // 4. Calculate exact matching counts for each category
+    const entries = Array.from(map.values());
+    entries.forEach((cat) => {
+      if (cat.id === 'all') return;
+      const target = cat.id;
+      const matches = productsList.filter((p) => {
+        const pFit = (p.fit || '').toLowerCase().trim();
+        const pSub = (p.subCategory || '').toLowerCase().trim();
+        const pSwipe = (p.swipeCategory || '').toLowerCase().trim();
+        const pTitle = (p.title || '').toLowerCase();
+
+        if (pFit === target || pSub === target || pSwipe === target) return true;
+        if (target.endsWith('s') && (pFit === target.slice(0, -1) || pSub === target.slice(0, -1))) return true;
+        if (!target.endsWith('s') && (pFit === target + 's' || pSub === target + 's')) return true;
+        if (target === 'denims') return p.category === 'VEYN-SELECTS';
+        if (pTitle.includes(target)) return true;
+        return false;
+      });
+      cat.count = matches.length;
+    });
+
+    // 5. Sort: "all" first, then priority order, then alphabetically
+    return entries.sort((a, b) => {
+      if (a.id === 'all') return -1;
+      if (b.id === 'all') return 1;
+      const idxA = priorityOrder.indexOf(a.id);
+      const idxB = priorityOrder.indexOf(b.id);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.label.localeCompare(b.label);
+    });
+  }, [productsList, dynamicSubcategories]);
+
+  // Handle category change and reflect in URL query params
+  const handleCategoryChange = (catId) => {
+    const cleanId = (catId || '').toLowerCase().trim();
+    if (!cleanId || cleanId === 'all') {
+      setSelectedCategory('all');
+      router.push('/collections/all-drops', { scroll: false });
+    } else {
+      setSelectedCategory(cleanId);
+      router.push(`/collections/all-drops?category=${encodeURIComponent(cleanId)}`, { scroll: false });
+    }
+  };
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -367,18 +496,48 @@ export default function AllDrops() {
 
   // Reset Filters
   const handleResetFilters = () => {
+    setSelectedCategory('all');
     setSelectedAvailability([]);
     setMinPrice('');
     setMaxPrice('');
     setSortBy('date-desc');
+    router.push('/collections/all-drops', { scroll: false });
   };
 
   const hasActiveFilters =
-    selectedAvailability.length > 0 || minPrice !== '' || maxPrice !== '' || sortBy !== 'date-desc';
+    (selectedCategory !== '' && selectedCategory !== 'all') ||
+    selectedAvailability.length > 0 ||
+    minPrice !== '' ||
+    maxPrice !== '' ||
+    sortBy !== 'date-desc';
 
   // Filtered & Sorted Products
   const filteredProducts = useMemo(() => {
     let result = [...productsList];
+
+    // Filter by Category
+    if (selectedCategory && selectedCategory !== 'all') {
+      const target = selectedCategory.toLowerCase().trim();
+      result = result.filter((p) => {
+        const pFit = (p.fit || '').toLowerCase().trim();
+        const pSub = (p.subCategory || '').toLowerCase().trim();
+        const pSwipe = (p.swipeCategory || '').toLowerCase().trim();
+        const pTitle = (p.title || '').toLowerCase();
+
+        if (pFit === target || pSub === target || pSwipe === target) return true;
+        if (target.endsWith('s') && (pFit === target.slice(0, -1) || pSub === target.slice(0, -1))) return true;
+        if (!target.endsWith('s') && (pFit === target + 's' || pSub === target + 's')) return true;
+        if (target === 'denims') return p.category === 'VEYN-SELECTS';
+        if (pTitle.includes(target)) return true;
+        return false;
+      });
+    }
+
+    // Filter by badge if specified (e.g. ?badge=new)
+    const badgeParam = searchParams ? searchParams.get('badge')?.toLowerCase() : null;
+    if (badgeParam === 'new') {
+      result = result.filter((p) => p.badge === 'NEW' || p.newArrival);
+    }
 
     // Filter by availability
     if (selectedAvailability.length > 0) {
@@ -423,7 +582,7 @@ export default function AllDrops() {
     }
 
     return result;
-  }, [selectedAvailability, minPrice, maxPrice, sortBy]);
+  }, [productsList, selectedCategory, searchParams, selectedAvailability, minPrice, maxPrice, sortBy]);
 
   const visibleProducts = filteredProducts.slice(0, displayCount);
   const remainingCount = filteredProducts.length - visibleProducts.length;
@@ -431,7 +590,13 @@ export default function AllDrops() {
   // Reset display count when any filter changes
   useEffect(() => {
     setDisplayCount(16);
-  }, [selectedAvailability, minPrice, maxPrice, sortBy]);
+  }, [selectedCategory, selectedAvailability, minPrice, maxPrice, sortBy]);
+
+  const activeCategoryLabel =
+    selectedCategory && selectedCategory !== 'all'
+      ? dynamicCategories.find((c) => c.id === selectedCategory)?.label ||
+        selectedCategory.toUpperCase()
+      : null;
 
   // Automated Infinite Scroll / Lazy Loading via IntersectionObserver
   useEffect(() => {
@@ -475,16 +640,99 @@ export default function AllDrops() {
       <div className="all-drops__container">
         {/* Collection Header */}
         <header className="all-drops__header">
-          <h1 className="all-drops__title">ALL DROPS</h1>
-          <span className="all-drops__count-badge">
-            {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
-          </span>
+          <div className="all-drops__header-title-row">
+            <h1 className="all-drops__title">
+              {activeCategoryLabel ? `ALL DROPS • ${activeCategoryLabel}` : 'ALL DROPS'}
+            </h1>
+            <span className="all-drops__count-badge">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
+            </span>
+          </div>
         </header>
 
         {/* Filter and Control Bar */}
         <div className="all-drops__controls" ref={dropdownRef}>
           {/* Desktop Filter Pills */}
           <div className="all-drops__desktop-filters">
+            {/* Category Filter Dropdown */}
+            <div className="all-drops__filter-dropdown">
+              <button
+                type="button"
+                className={`all-drops__filter-trigger ${
+                  selectedCategory && selectedCategory !== 'all'
+                    ? 'all-drops__filter-trigger--active'
+                    : ''
+                }`}
+                onClick={() => toggleDropdown('category')}
+                aria-expanded={activeDropdown === 'category'}
+              >
+                <span>Category</span>
+                {selectedCategory && selectedCategory !== 'all' && (
+                  <span className="all-drops__filter-count">
+                    ({activeCategoryLabel})
+                  </span>
+                )}
+                <svg
+                  className={`all-drops__chevron ${
+                    activeDropdown === 'category' ? 'all-drops__chevron--open' : ''
+                  }`}
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                >
+                  <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+
+              {activeDropdown === 'category' && (
+                <div className="all-drops__popover all-drops__popover--category">
+                  <div className="all-drops__popover-header">
+                    <span>Category</span>
+                    {selectedCategory && selectedCategory !== 'all' && (
+                      <button
+                        type="button"
+                        className="all-drops__popover-reset"
+                        onClick={() => {
+                          handleCategoryChange('all');
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="all-drops__popover-body">
+                    {dynamicCategories.map((cat) => {
+                      const isCatActive =
+                        cat.id === 'all'
+                          ? !selectedCategory || selectedCategory === 'all'
+                          : selectedCategory === cat.id;
+
+                      return (
+                        <label key={cat.id} className="all-drops__checkbox-label">
+                          <input
+                            type="radio"
+                            name="desktop-category"
+                            checked={isCatActive}
+                            onChange={() => {
+                              handleCategoryChange(cat.id);
+                              setActiveDropdown(null);
+                            }}
+                            className="all-drops__checkbox-input"
+                          />
+                          <span className="all-drops__checkbox-custom" />
+                          <span>
+                            {cat.label} ({cat.count})
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Availability Filter */}
             <div className="all-drops__filter-dropdown">
               <button
@@ -856,6 +1104,35 @@ export default function AllDrops() {
             </div>
 
             <div className="all-drops-drawer__body">
+              {/* Category Filter in Drawer */}
+              <div className="all-drops-drawer__section">
+                <h3 className="all-drops-drawer__section-title">Category</h3>
+                <div className="all-drops-drawer__pill-group">
+                  {dynamicCategories.map((cat) => {
+                    const isCatActive =
+                      cat.id === 'all'
+                        ? !selectedCategory || selectedCategory === 'all'
+                        : selectedCategory === cat.id;
+
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        className={`all-drops-drawer__pill ${
+                          isCatActive ? 'all-drops-drawer__pill--active' : ''
+                        }`}
+                        onClick={() => {
+                          handleCategoryChange(cat.id);
+                          setIsMobileDrawerOpen(false);
+                        }}
+                      >
+                        {cat.label} ({cat.count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Availability */}
               <div className="all-drops-drawer__section">
                 <h3 className="all-drops-drawer__section-title">Availability</h3>
@@ -953,5 +1230,13 @@ export default function AllDrops() {
         </div>
       )}
     </section>
+  );
+}
+
+export default function AllDrops() {
+  return (
+    <Suspense fallback={<div className="all-drops" style={{ minHeight: '60vh' }} />}>
+      <AllDropsContent />
+    </Suspense>
   );
 }
