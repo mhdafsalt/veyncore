@@ -5,15 +5,59 @@ import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
 import './HeroSection.css';
 
-const BASE_SLIDES = [];
+let cachedSelectsSlides = null;
+
+// Initial fallback slides so the hero renders instantly on frame 0 without waiting for API
+const INITIAL_SELECTS_SLIDES = [
+  {
+    id: 'item-1795506189161-voni',
+    targetSection: 'VEYN-SELECTS',
+    title: 'Tops Collection',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506172/veyncore_uploads/020d89e8dfd1ce0111c4cc93654e487a-1795506170197-8087.jpg',
+    href: '/collections/all-drops?category=tops',
+    active: true,
+    sortOrder: 1,
+  },
+  {
+    id: 'item-1795506297445-r59l',
+    targetSection: 'VEYN-SELECTS',
+    title: 'Baggy Fit',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506294/veyncore_uploads/c9041be861aafae7dd6f84bbb2c01821-1795506291741-6512.jpg',
+    href: '/collections/all-drops?category=baggy',
+    active: true,
+    sortOrder: 2,
+  },
+  {
+    id: 'item-1795506325430-4mk0',
+    targetSection: 'VEYN-SELECTS',
+    title: 'All Drops',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506323/veyncore_uploads/8b6841c5-91c7-446c-9bd5-a90cc5b1-1795506320244-3695.webp',
+    href: '/collections/all-drops',
+    active: true,
+    sortOrder: 3,
+  },
+];
+
+/**
+ * Optimizes Cloudinary URLs on-the-fly with auto-format (WebP/AVIF),
+ * perceptual quality compression, and size capping for ultra-fast loading.
+ */
+function optimizeImageUrl(url, width = 900) {
+  if (!url || typeof url !== 'string') return url;
+  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+    if (url.includes('/f_auto,q_auto')) return url;
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
+  }
+  return url;
+}
 
 export default function HeroSection({
   slides: propSlides = null,
   autoPlayInterval = 3500,
 }) {
-  const [slides, setSlides] = useState(propSlides || BASE_SLIDES);
+  const [slides, setSlides] = useState(() => propSlides || cachedSelectsSlides || INITIAL_SELECTS_SLIDES);
 
-  // Fetch dynamic hero slides from backend
+  // Fetch dynamic hero slides from backend (keeps state synced in background)
   useEffect(() => {
     let isMounted = true;
     const fetchHeroSlides = async () => {
@@ -24,12 +68,15 @@ export default function HeroSection({
           const selectsSlides = data.data.filter(
             (s) => s.targetSection === 'VEYN-SELECTS' && s.active !== false
           );
-          if (isMounted && selectsSlides.length > 0) {
-            setSlides(selectsSlides);
+          if (selectsSlides.length > 0) {
+            cachedSelectsSlides = selectsSlides;
+            if (isMounted) {
+              setSlides(selectsSlides);
+            }
           }
         }
       } catch (err) {
-        // Fallback to BASE_SLIDES
+        // Silently preserve current slides
       }
     };
 
@@ -180,33 +227,34 @@ export default function HeroSection({
             }}
             onTransitionEnd={handleTransitionEnd}
           >
-            {extendedSlides.map((slide, idx) => (
-              <div
-                key={`${slide.id}-${idx}`}
-                className="hero-carousel__slide"
-                style={{
-                  flex: `0 0 ${100 / itemsPerView}%`,
-                  maxWidth: `${100 / itemsPerView}%`,
-                }}
-              >
-                <Link
-                  href={slide.href || '/collections/all-drops'}
-                  className="hero-carousel__card-link"
-                  aria-label={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
+            {extendedSlides.map((slide, idx) => {
+              const isPrimaryVisible = idx >= baseCount && idx < baseCount + itemsPerView;
+              return (
+                <div
+                  key={`${slide.id}-${idx}`}
+                  className="hero-carousel__slide"
+                  style={{
+                    flex: `0 0 ${100 / itemsPerView}%`,
+                    maxWidth: `${100 / itemsPerView}%`,
+                  }}
                 >
-                  <img
-                    src={slide.image}
-                    alt={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
-                    className="hero-carousel__card-image"
-                    loading={
-                      idx >= baseCount && idx < baseCount + itemsPerView
-                        ? 'eager'
-                        : 'lazy'
-                    }
-                  />
-                </Link>
-              </div>
-            ))}
+                  <Link
+                    href={slide.href || '/collections/all-drops'}
+                    className="hero-carousel__card-link"
+                    aria-label={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
+                  >
+                    <img
+                      src={optimizeImageUrl(slide.image, 900)}
+                      alt={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
+                      className="hero-carousel__card-image"
+                      loading={isPrimaryVisible ? 'eager' : 'lazy'}
+                      fetchPriority={isPrimaryVisible ? 'high' : 'auto'}
+                      decoding={isPrimaryVisible ? 'sync' : 'async'}
+                    />
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

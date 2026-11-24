@@ -305,11 +305,21 @@ export const updateProduct = async (req, res) => {
         new: true,
         runValidators: true,
       });
-    } else {
-      product = await Product.findOneAndUpdate({ handle: id.toLowerCase() }, updates, {
-        new: true,
-        runValidators: true,
-      });
+    }
+    if (!product) {
+      product = await Product.findOneAndUpdate(
+        {
+          $or: [
+            { handle: String(id).toLowerCase().trim() },
+            { id: String(id).trim() },
+          ],
+        },
+        updates,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
     }
 
     if (!product) {
@@ -341,7 +351,21 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
+    let product = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      product = await Product.findByIdAndDelete(id);
+    }
+
+    if (!product) {
+      product = await Product.findOneAndDelete({
+        $or: [
+          { handle: String(id).toLowerCase().trim() },
+          { id: String(id).trim() },
+          { slug: String(id).toLowerCase().trim() },
+        ],
+      });
+    }
 
     if (!product) {
       return res.status(404).json({
@@ -353,7 +377,7 @@ export const deleteProduct = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: `Product "${product.title}" deleted successfully.`,
-      deletedId: id,
+      deletedId: product._id || id,
     });
   } catch (error) {
     console.error('[Product Controller] Error deleting product:', error);

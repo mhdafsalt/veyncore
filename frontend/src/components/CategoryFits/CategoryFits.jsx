@@ -244,6 +244,8 @@ function ViewAllEndCard({ fitLabel, collectionPath }) {
  * 3. Centered bottom "View all" action button
  */
 function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
+  if (!products || products.length === 0) return null;
+
   const trackRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -307,23 +309,25 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
       {/* Row Header with Fit Name and Link */}
       <header className="category-fits__row-header">
         <h2 className="category-fits__row-heading">{fitLabel}</h2>
-        <Link href={collectionPath} className="category-fits__row-header-link" aria-label={`View ${fitLabel}`}>
-          <span>View</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <polyline points="13 5 20 12 13 19" />
-          </svg>
-        </Link>
+        {products.length >= 8 && (
+          <Link href={collectionPath} className="category-fits__row-header-link" aria-label={`View ${fitLabel}`}>
+            <span>View</span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <polyline points="13 5 20 12 13 19" />
+            </svg>
+          </Link>
+        )}
       </header>
 
       {/* Swipeable Track Container */}
@@ -352,7 +356,7 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
           </svg>
         </button>
 
-        {/* Horizontal Swipeable Track: 6 Cards + "View all" card at the end */}
+        {/* Horizontal Swipeable Track: Up to 8 Cards + "View all" card only after 8 cards */}
         <div
           ref={trackRef}
           className="category-fits__slider-track"
@@ -361,17 +365,19 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          {/* Exactly 6 product cards */}
-          {products.slice(0, 6).map((product) => (
+          {/* Latest added up to 8 product cards */}
+          {products.slice(0, 8).map((product) => (
             <div key={product.id} className="category-fits__slider-item">
               <FitProductCard product={product} />
             </div>
           ))}
 
-          {/* "View all" End Card right after the 6th card */}
-          <div className="category-fits__slider-item category-fits__slider-item--view-all">
-            <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} />
-          </div>
+          {/* "View all" End Card appears ONLY after latest added 8 cards */}
+          {products.length >= 8 && (
+            <div className="category-fits__slider-item category-fits__slider-item--view-all">
+              <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} />
+            </div>
+          )}
         </div>
 
         {/* Right Floating Nav Button */}
@@ -447,8 +453,15 @@ export default function CategoryFits() {
           let activeCats = dynamicCats;
 
           if (prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
+            // Sort products newest first by createdAt / _id so latest added 8 cards are displayed
+            const sortedProds = [...prodJson.data].sort((a, b) => {
+              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+              return dateB - dateA;
+            });
+
             const grouped = {};
-            prodJson.data.forEach((p) => {
+            sortedProds.forEach((p) => {
               const key = (p.swipeCategory || p.fit || p.subCategory || '').toLowerCase().trim();
               if (!key) return;
               if (!grouped[key]) grouped[key] = [];
@@ -506,6 +519,7 @@ export default function CategoryFits() {
       <div className="category-fits__container">
         {categories.map((cat) => {
           const products = categoryData[cat.id] || [];
+          if (!products || products.length === 0) return null;
           return (
             <FitSwipeRow
               key={cat.id}

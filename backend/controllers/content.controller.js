@@ -30,13 +30,14 @@ const DEFAULT_CONTENT = {
  */
 export const getContent = async (req, res) => {
   try {
-    let content = await SiteContent.findOne({ key: 'main_site_content' });
+    let content = await SiteContent.findOne({ key: 'main_site_content' }).lean();
 
     if (!content) {
-      content = await SiteContent.create(DEFAULT_CONTENT);
+      const created = await SiteContent.create(DEFAULT_CONTENT);
+      content = created.toObject ? created.toObject() : created;
     }
 
-    const contentObj = content.toObject ? content.toObject() : { ...content };
+    const contentObj = { ...content };
 
     // Reflect active subcategories from MongoDB Atlas subcategories collection
     try {
@@ -48,6 +49,7 @@ export const getContent = async (req, res) => {
       // Fallback to embedded array if query fails
     }
 
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     return res.status(200).json({
       success: true,
       data: contentObj,
@@ -69,10 +71,11 @@ export const getContent = async (req, res) => {
 export const getSectionContent = async (req, res) => {
   try {
     const { section } = req.params;
-    let content = await SiteContent.findOne({ key: 'main_site_content' });
+    let content = await SiteContent.findOne({ key: 'main_site_content' }).lean();
 
     if (!content) {
-      content = await SiteContent.create(DEFAULT_CONTENT);
+      const created = await SiteContent.create(DEFAULT_CONTENT);
+      content = created.toObject ? created.toObject() : created;
     }
 
     let sectionData = content[section] !== undefined ? content[section] : DEFAULT_CONTENT[section];
@@ -94,6 +97,7 @@ export const getSectionContent = async (req, res) => {
       }
     }
 
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     return res.status(200).json({
       success: true,
       section,

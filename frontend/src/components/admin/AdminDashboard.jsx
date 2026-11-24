@@ -430,7 +430,7 @@ export default function AdminDashboard() {
     setDeleteModalConfig({
       isOpen: true,
       type: 'product',
-      id: product.handle || product._id,
+      id: product._id || product.id || product.handle,
       title: product.title,
     });
   };

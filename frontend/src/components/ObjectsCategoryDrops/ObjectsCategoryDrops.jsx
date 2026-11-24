@@ -226,6 +226,8 @@ function ViewAllEndCard({ categoryLabel, collectionPath }) {
  * 3. Left/Right floating navigation buttons
  */
 function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, collectionPath }) {
+  if (!products || products.length === 0) return null;
+
   const trackRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -295,23 +297,25 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
       {/* Row Header with Category Name and Link */}
       <header className="objects-cat-drops__row-header">
         <h2 className="objects-cat-drops__row-heading">{categoryLabel}</h2>
-        <Link href={collectionPath} className="objects-cat-drops__row-header-link" aria-label={`View ${categoryLabel}`}>
-          <span>View</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <polyline points="13 5 20 12 13 19" />
-          </svg>
-        </Link>
+        {products.length >= 8 && (
+          <Link href={collectionPath} className="objects-cat-drops__row-header-link" aria-label={`View ${categoryLabel}`}>
+            <span>View</span>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <polyline points="13 5 20 12 13 19" />
+            </svg>
+          </Link>
+        )}
       </header>
 
       {/* Swipeable Track Container */}
@@ -340,7 +344,7 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
           </svg>
         </button>
 
-        {/* Horizontal Swipeable Track: 6 Cards + "View" end card */}
+        {/* Horizontal Swipeable Track: Up to 8 Cards + "View" end card only after 8 cards */}
         <div
           ref={trackRef}
           className="objects-cat-drops__slider-track"
@@ -349,16 +353,18 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          {products.slice(0, 6).map((product) => (
+          {products.slice(0, 8).map((product) => (
             <div key={product.id} className="objects-cat-drops__slider-item">
               <ObjectProductCard product={product} />
             </div>
           ))}
 
-          {/* "View" End Card */}
-          <div className="objects-cat-drops__slider-item objects-cat-drops__slider-item--view-all">
-            <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} />
-          </div>
+          {/* "View" End Card - only after latest added 8 cards */}
+          {products.length >= 8 && (
+            <div className="objects-cat-drops__slider-item objects-cat-drops__slider-item--view-all">
+              <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} />
+            </div>
+          )}
         </div>
 
         {/* Right Floating Nav Button */}
@@ -437,8 +443,15 @@ export default function ObjectsCategoryDrops() {
           let activeCats = dynamicCats;
 
           if (prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
+            // Sort products newest first by createdAt / _id so latest added 8 cards are displayed
+            const sortedProds = [...prodJson.data].sort((a, b) => {
+              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+              return dateB - dateA;
+            });
+
             const grouped = {};
-            prodJson.data.forEach((p) => {
+            sortedProds.forEach((p) => {
               const rawKey = (p.swipeCategory || p.subCategory || p.fit || '').toLowerCase().trim();
               if (!rawKey) return;
               const key = (rawKey === 'headwear' || rawKey === 'caps' || rawKey.includes('cap')) ? 'caps' : rawKey;

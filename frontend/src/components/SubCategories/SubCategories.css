@@ -195,12 +195,12 @@
 }
 
 /* =========================================================
-   Desktop Layout (>= 960px): Full Width Even Flex Distribution
+   Desktop & Tablet Layout (>= 768px): Full Width Even Flex Distribution
    Matches Image 2: HOME on far left, TOPS on far right,
    with 100% container width evenly divided across tabs
    ========================================================= */
 
-@media (min-width: 960px) {
+@media (min-width: 768px) {
   .subcategories__wrap {
     padding: 0 12px;
   }
@@ -208,6 +208,7 @@
   .subcategories__list {
     overflow-x: visible;
     justify-content: space-between;
+    width: 100%;
   }
 
   .subcategories__item {
@@ -256,11 +257,11 @@
 }
 
 /* =========================================================
-   Tablet & Mobile (< 960px): Smooth Horizontal Touch Scroll
-   Ensures zero squishing or text wrapping on smaller screens
+   Mobile Screens (< 768px): Smooth Horizontal Touch Scroll
+   Ensures zero squishing or text wrapping on mobile devices
    ========================================================= */
 
-@media (max-width: 959px) {
+@media (max-width: 767px) {
   .subcategories__wrap {
     padding: 0 8px;
   }
@@ -293,7 +294,7 @@
   }
 }
 
-@media (max-width: 639px) {
+@media (max-width: 480px) {
   .subcategories__wrap {
     padding: 0 6px;
   }

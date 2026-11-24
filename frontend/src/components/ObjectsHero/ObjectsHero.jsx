@@ -5,15 +5,61 @@ import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsHero.css';
 
-const DEFAULT_HERO_IMAGES = [];
+let cachedObjectsSlides = null;
+
+// Initial fallback slides so VEYN-OBJECTS hero renders instantly on frame 0
+const INITIAL_OBJECTS_SLIDES = [
+  {
+    id: 'obj-slide-3',
+    targetSection: 'VEYN-OBJECTS',
+    title: 'Tactical Artifacts & Caps',
+    image: '/images/hero/ObjectHero03.jpg', // 110 KB optimized JPG instead of 2.06 MB PNG
+    href: '/collections/objects-drops',
+    active: true,
+    sortOrder: 2,
+  },
+  {
+    id: 'item-1795506485735-7nf5',
+    targetSection: 'VEYN-OBJECTS',
+    title: 'Shades',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506476/veyncore_uploads/24bc592b40ca58fc89ae4dc630b3b10f-1795506472410-1309.jpg',
+    href: '/collections/objects-drops?category=shades',
+    active: true,
+    sortOrder: 4,
+  },
+  {
+    id: 'item-1795506542135-1l3n',
+    targetSection: 'VEYN-OBJECTS',
+    title: 'Objects',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506537/veyncore_uploads/unnamed__1_-1795506535210-5755.jpg',
+    href: '/collections/objects-drops?category=baggy',
+    active: true,
+    sortOrder: 5,
+  },
+];
+
+/**
+ * Optimizes image URLs with next-gen formats and compression
+ */
+function optimizeImageUrl(url, width = 900) {
+  if (!url || typeof url !== 'string') return url;
+  if (url === '/images/hero/ObjectHero03.png') {
+    return '/images/hero/ObjectHero03.jpg';
+  }
+  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+    if (url.includes('/f_auto,q_auto')) return url;
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
+  }
+  return url;
+}
 
 export default function ObjectsHero({
   images: propImages = null,
   autoPlayInterval = 3500,
 }) {
-  const [images, setImages] = useState(propImages || DEFAULT_HERO_IMAGES);
+  const [images, setImages] = useState(() => propImages || cachedObjectsSlides || INITIAL_OBJECTS_SLIDES);
 
-  // Fetch dynamic hero slides from backend
+  // Fetch dynamic hero slides from backend (keeps state synced in background)
   useEffect(() => {
     let isMounted = true;
     const fetchHeroSlides = async () => {
@@ -24,12 +70,15 @@ export default function ObjectsHero({
           const objectsSlides = data.data.filter(
             (s) => s.targetSection === 'VEYN-OBJECTS' && s.active !== false
           );
-          if (isMounted && objectsSlides.length > 0) {
-            setImages(objectsSlides);
+          if (objectsSlides.length > 0) {
+            cachedObjectsSlides = objectsSlides;
+            if (isMounted) {
+              setImages(objectsSlides);
+            }
           }
         }
       } catch (err) {
-        // Fallback to defaults
+        // Silently preserve current slides
       }
     };
 
@@ -194,33 +243,34 @@ export default function ObjectsHero({
             }}
             onTransitionEnd={handleTransitionEnd}
           >
-            {extendedSlides.map((item, idx) => (
-              <div
-                key={`${item.id || 'slide'}-${idx}`}
-                className="objects-hero__item"
-                style={{
-                  flex: `0 0 ${100 / itemsPerView}%`,
-                  maxWidth: `${100 / itemsPerView}%`,
-                }}
-              >
-                <Link
-                  href={item.href || '/collections/objects-drops'}
-                  className="objects-hero__link"
-                  aria-label={item.alt || item.title || 'VEYN-OBJECTS'}
+            {extendedSlides.map((item, idx) => {
+              const isPrimaryVisible = idx >= baseCount && idx < baseCount + itemsPerView;
+              return (
+                <div
+                  key={`${item.id || 'slide'}-${idx}`}
+                  className="objects-hero__item"
+                  style={{
+                    flex: `0 0 ${100 / itemsPerView}%`,
+                    maxWidth: `${100 / itemsPerView}%`,
+                  }}
                 >
-                  <img
-                    src={item.image}
-                    alt={item.alt || item.title || 'VEYN-OBJECTS'}
-                    className="objects-hero__image"
-                    loading={
-                      idx >= baseCount && idx < baseCount + itemsPerView
-                        ? 'eager'
-                        : 'lazy'
-                    }
-                  />
-                </Link>
-              </div>
-            ))}
+                  <Link
+                    href={item.href || '/collections/objects-drops'}
+                    className="objects-hero__link"
+                    aria-label={item.alt || item.title || 'VEYN-OBJECTS'}
+                  >
+                    <img
+                      src={optimizeImageUrl(item.image, 900)}
+                      alt={item.alt || item.title || 'VEYN-OBJECTS'}
+                      className="objects-hero__image"
+                      loading={isPrimaryVisible ? 'eager' : 'lazy'}
+                      fetchPriority={isPrimaryVisible ? 'high' : 'auto'}
+                      decoding={isPrimaryVisible ? 'sync' : 'async'}
+                    />
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
