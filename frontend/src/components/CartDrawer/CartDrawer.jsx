@@ -7,6 +7,7 @@ import { FiTrash2 } from 'react-icons/fi';
 import { useCart, UPSELL_PRODUCTS } from '@/context/CartContext';
 import { API_BASE_URL } from '@/lib/constants';
 import { parseNumericPrice } from '@/lib/priceUtils';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './CartDrawer.css';
 
 const FREE_SHIPPING_THRESHOLD = 999;
@@ -295,7 +296,7 @@ export default function CartDrawer() {
                       <div className="cart-drawer__item-media">
                         <Link href={productHref} onClick={closeCart} className="cart-drawer__item-media-link">
                           <img
-                            src={item.image || '/images/products/artic-blue-wide.jpg'}
+                            src={optimizeImageUrl(item.image, 240) || '/images/products/artic-blue-wide.jpg'}
                             alt={item.title}
                             className="cart-drawer__item-image"
                             loading="lazy"
@@ -412,7 +413,7 @@ export default function CartDrawer() {
                   <div className="cart-drawer__recommendations-card">
                     <div className="cart-drawer__recommendations-media">
                       <img
-                        src={currentUpsell.image || '/images/products/brick-dark-wide.jpg'}
+                        src={optimizeImageUrl(currentUpsell.image, 240) || '/images/products/brick-dark-wide.jpg'}
                         alt={currentUpsell.title}
                         className="cart-drawer__recommendations-image"
                         loading="lazy"
@@ -553,7 +554,7 @@ export default function CartDrawer() {
                     >
                       <div className="cart-drawer__empty-collection-media">
                         <img
-                          src={col.image || '/images/hero/hero-card-1.jpg'}
+                          src={optimizeImageUrl(col.image, 300) || '/images/hero/hero-card-1.jpg'}
                           alt={col.title}
                           className="cart-drawer__empty-collection-image"
                           loading="lazy"
@@ -592,7 +593,7 @@ export default function CartDrawer() {
                         <div key={prod.id} className="cart-drawer__empty-featured-item">
                           <div className="cart-drawer__empty-featured-media">
                             <img
-                              src={prod.image}
+                              src={optimizeImageUrl(prod.image, 240)}
                               alt={prod.title}
                               className="cart-drawer__empty-featured-img"
                               onError={(e) => {

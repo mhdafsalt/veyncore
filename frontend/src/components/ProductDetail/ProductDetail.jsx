@@ -10,6 +10,7 @@ import { parseNumericPrice } from '@/lib/priceUtils';
 import { generateDynamicMeasurements, isTopCategory } from '@/lib/sizeChartUtils';
 import { DEFAULT_SELECT_STORY, DEFAULT_DETAILS, DEFAULT_SHIPPING } from '@/data/productsData';
 import { OBJECTS_BRAND_STORY, OBJECTS_DETAILS, OBJECTS_SHIPPING } from '@/data/objectsData';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ProductDetail.css';
 
 /**
@@ -360,7 +361,7 @@ export default function ProductDetail({ product }) {
                   title="Click to zoom in"
                 >
                   <img
-                    src={images[currentImageIndex]}
+                    src={optimizeImageUrl(images[currentImageIndex], 1200)}
                     alt={`${product.title} - View ${currentImageIndex + 1}`}
                     className="product-gallery__main-image"
                     loading="eager"
@@ -426,7 +427,7 @@ export default function ProductDetail({ product }) {
                       aria-label={`Select photo ${idx + 1}`}
                     >
                       <img
-                        src={imgUrl}
+                        src={optimizeImageUrl(imgUrl, 240)}
                         alt={`Thumbnail ${idx + 1}`}
                         className="product-gallery__thumb-image"
                         loading="lazy"
@@ -788,7 +789,7 @@ export default function ProductDetail({ product }) {
                 <article key={rel.handle} className="product-related-card">
                   <Link href={`/products/${rel.handle}`} className="product-related-card__media">
                     <img
-                      src={rel.images[0]}
+                      src={optimizeImageUrl(rel.images[0], 700)}
                       alt={rel.title}
                       className="product-related-card__image"
                       loading="lazy"

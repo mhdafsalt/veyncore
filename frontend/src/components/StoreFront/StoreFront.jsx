@@ -69,21 +69,23 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
         {/* 4. SubCategories (Permanently Sticky directly below Navbar) */}
         <SubCategories activeMainCategory={activeCategory} />
 
-        {/* 5. Dynamic Content: VEYN-SELECTS vs VEYN-OBJECTS (Instant In-Place Zero-Refresh Switch) */}
-        {activeCategory === 'VEYN-OBJECTS' ? (
-          <VeynObjects />
-        ) : (
-          <>
-            {/* Hero Section (3-box seamless auto/manual carousel) */}
-            <HeroSection />
+        {/* 5. Dynamic Content: VEYN-SELECTS vs VEYN-OBJECTS (Instant In-Place Zero-Refresh Switch with Silky Fade) */}
+        <div key={activeCategory} className="storefront-content-fade">
+          {activeCategory === 'VEYN-OBJECTS' ? (
+            <VeynObjects />
+          ) : (
+            <>
+              {/* Hero Section (3-box seamless auto/manual carousel) */}
+              <HeroSection />
 
-            {/* Shop New Arrivals (Responsive 4-col/2-col grid with veyncult styling) */}
-            <NewArrivals />
+              {/* Shop New Arrivals (Responsive 4-col/2-col grid with veyncult styling) */}
+              <NewArrivals />
 
-            {/* Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
-            <CategoryFits />
-          </>
-        )}
+              {/* Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
+              <CategoryFits />
+            </>
+          )}
+        </div>
 
         {/* 6. Modern VEYNCORE Footer with Editorial Image Banner on Homepage */}
         <Footer showBanner={true} activeMainCategory={activeCategory} />

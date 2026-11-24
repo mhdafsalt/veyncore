@@ -423,6 +423,16 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
 
     // 7. General category filter (BAGGY, BOOTCUT, WIDE, STRAIGHT, CARGO, DENIMS, TOPS, BAGS, CHAINS, etc.)
     const categoryKey = subId.replace(/^obj-/, '') || subLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const isStorefront = pathname === '/' || pathname === '/veyn-objects';
+    if (isStorefront) {
+      const targetEl = document.getElementById(categoryKey) || document.getElementById(`fit-${categoryKey}`);
+      if (targetEl) {
+        const yOffset = -90;
+        const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        return;
+      }
+    }
     const targetDropsPage = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
     router.push(`${targetDropsPage}?category=${encodeURIComponent(categoryKey)}`);
   };

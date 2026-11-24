@@ -223,7 +223,7 @@ export default function HeroSection({
               enableTransition ? 'hero-carousel__track--animated' : ''
             }`}
             style={{
-              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+              transform: `translate3d(-${currentIndex * (100 / itemsPerView)}%, 0, 0)`,
             }}
             onTransitionEnd={handleTransitionEnd}
           >
