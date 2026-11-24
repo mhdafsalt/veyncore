@@ -1,6 +1,7 @@
 /* ==========================================================================
-   Objects Hero Banner (Image Height Exactly Matches VEYN-SELECTS HeroSection)
-   Desktop: 2 Images Side-by-Side (Seamless Split)
+   Objects Hero Banner (Image Height & Ratio Exactly Matches VEYN-SELECTS)
+   Desktop: 3 Images Side-by-Side (Seamless Split)
+   Tablet: 2 Images Side-by-Side
    Mobile: 1 Image Per View with Smooth Infinite Auto-Swipe
    ========================================================================== */
 
@@ -12,8 +13,16 @@
   overflow: hidden;
   background-color: #ffffff;
   box-sizing: border-box;
-  container-type: inline-size;
   user-select: none;
+}
+
+.objects-hero__container {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .objects-hero__viewport {
@@ -38,18 +47,11 @@
 }
 
 .objects-hero__track--animated {
-  transition: transform 0.52s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.48s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .objects-hero__item {
   position: relative;
-  width: 100%;
-  /* Desktop (3 boxes in VEYN-SELECTS): card height = (100% / 3) * (405 / 341) */
-  height: calc((100vw / 3) * (405 / 341));
-  height: calc((100cqw / 3) * (405 / 341));
-  overflow: hidden;
-  background-color: #ffffff;
-  border: none;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -59,12 +61,15 @@
 .objects-hero__link {
   display: block;
   width: 100%;
-  height: 100%;
-  cursor: pointer;
+  aspect-ratio: 341 / 405;
+  overflow: hidden;
+  position: relative;
   text-decoration: none;
-  margin: 0;
-  padding: 0;
   border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: #ffffff;
+  cursor: pointer;
 }
 
 .objects-hero__image {
@@ -74,6 +79,8 @@
   object-position: center;
   display: block;
   border: none;
+  border-radius: 0;
+  box-shadow: none;
   margin: 0;
   padding: 0;
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -81,23 +88,4 @@
 
 .objects-hero__item:hover .objects-hero__image {
   transform: scale(1.025);
-}
-
-/* --------------------------------------------------------------------------
-   Responsive Adaptations (Breakpoints match HeroSection)
-   -------------------------------------------------------------------------- */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  /* Tablet (2 boxes in VEYN-SELECTS): card height = (100% / 2) * (405 / 341) */
-  .objects-hero__item {
-    height: calc((100vw / 2) * (405 / 341));
-    height: calc((100cqw / 2) * (405 / 341));
-  }
-}
-
-@media screen and (max-width: 767px) {
-  /* Mobile (1 box in VEYN-SELECTS): card height = 100% * (405 / 341) */
-  .objects-hero__item {
-    height: calc(100vw * (405 / 341));
-    height: calc(100cqw * (405 / 341));
-  }
 }

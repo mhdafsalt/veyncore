@@ -1,27 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
 import './ObjectsHero.css';
 
-const DEFAULT_HERO_IMAGES = [
-  {
-    id: 'hero-obj-1',
-    image: '/images/hero/ObjectHero01.png',
-    href: '#bags',
-    alt: 'VEYN-OBJECTS Tactical Bags'
-  },
-  {
-    id: 'hero-obj-2',
-    image: '/images/hero/ObjectHero02.png',
-    href: '#chains',
-    alt: 'VEYN-OBJECTS Chains & Hardware'
-  }
-];
+const DEFAULT_HERO_IMAGES = [];
 
 export default function ObjectsHero({
   images: propImages = null,
-  autoPlayInterval = 3500
+  autoPlayInterval = 3500,
 }) {
   const [images, setImages] = useState(propImages || DEFAULT_HERO_IMAGES);
 
@@ -55,38 +43,41 @@ export default function ObjectsHero({
 
   const baseCount = images.length;
 
-  // Triplicate the slides for continuous infinite looping
+  // Triplicate the slides for continuous infinite looping (identical to HeroSection)
   const extendedSlides = useMemo(() => {
-    if (baseCount <= 1) return images;
+    if (!images || images.length === 0) return [];
+    if (images.length < 3) {
+      return [...images, ...images, ...images, ...images, ...images, ...images];
+    }
     return [...images, ...images, ...images];
-  }, [images, baseCount]);
+  }, [images]);
 
   const [currentIndex, setCurrentIndex] = useState(baseCount);
   const [enableTransition, setEnableTransition] = useState(true);
-  const [itemsPerView, setItemsPerView] = useState(2);
+  const [itemsPerView, setItemsPerView] = useState(3);
   const [isHovered, setIsHovered] = useState(false);
 
   const isTransitioningRef = useRef(false);
   const touchStartXRef = useRef(0);
   const touchEndXRef = useRef(0);
 
-  // Responsive items-per-view
+  // Responsive items-per-view matching VEYN-SELECTS (3 on desktop, 2 on tablet, 1 on mobile)
   useEffect(() => {
     const handleResize = () => {
       if (typeof window !== 'undefined') {
         if (window.innerWidth < 768) {
-          setItemsPerView(1); // Mobile: 1 image per view (auto-swiping)
+          setItemsPerView(1); // Mobile: 1 image per view
+        } else if (window.innerWidth < 1024) {
+          setItemsPerView(2); // Tablet: 2 images side-by-side
         } else {
-          setItemsPerView(2); // Desktop & Tablet: 2 images side-by-side
+          setItemsPerView(3); // Desktop/Laptop: 3 images side-by-side like VEYN-SELECTS
         }
       }
     };
 
     handleResize();
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Safety unlock: ensure isTransitioningRef never hangs
@@ -104,24 +95,24 @@ export default function ObjectsHero({
 
   // Advance forward continuously (never rewind backwards)
   const handleNext = useCallback(() => {
-    if (baseCount <= 1 || isTransitioningRef.current) return;
+    if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
     setEnableTransition(true);
     setCurrentIndex((prev) => prev + 1);
-  }, [baseCount]);
+  }, []);
 
   // Move backward
   const handlePrev = useCallback(() => {
-    if (baseCount <= 1 || isTransitioningRef.current) return;
+    if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
     setEnableTransition(true);
     setCurrentIndex((prev) => prev - 1);
-  }, [baseCount]);
+  }, []);
 
   // Seamless invisible teleport on transition end
   const handleTransitionEnd = () => {
     isTransitioningRef.current = false;
-    if (baseCount <= 1) return;
+    if (baseCount === 0) return;
 
     if (currentIndex >= baseCount * 2) {
       setEnableTransition(false);
@@ -132,21 +123,20 @@ export default function ObjectsHero({
     }
   };
 
-  // Auto-play timer: auto-swipes when on mobile (itemsPerView < baseCount)
+  // Auto-play timer: continuous forward sliding
   useEffect(() => {
-    if (isHovered || baseCount <= 1 || itemsPerView >= baseCount) return;
+    if (isHovered || baseCount === 0) return;
 
     const interval = setInterval(() => {
       handleNext();
     }, autoPlayInterval);
 
     return () => clearInterval(interval);
-  }, [isHovered, autoPlayInterval, handleNext, itemsPerView, baseCount]);
+  }, [isHovered, autoPlayInterval, handleNext, baseCount]);
 
   // Touch Swipe Handlers for Mobile
   const handleTouchStart = (e) => {
     touchStartXRef.current = e.touches[0].clientX;
-    touchEndXRef.current = e.touches[0].clientX;
   };
 
   const handleTouchMove = (e) => {
@@ -162,10 +152,13 @@ export default function ObjectsHero({
         handlePrev();
       }
     }
+    touchStartXRef.current = 0;
+    touchEndXRef.current = 0;
   };
 
-  const isCarouselActive = itemsPerView < baseCount;
-  const slideOffset = isCarouselActive ? currentIndex : baseCount;
+  if (!images || images.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -175,45 +168,60 @@ export default function ObjectsHero({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <span id="home" style={{ position: 'relative', top: '-90px', display: 'block', height: 0, visibility: 'hidden' }} />
-      <div
-        className="objects-hero__viewport"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
+      <span
+        id="home"
+        style={{
+          position: 'relative',
+          top: '-90px',
+          display: 'block',
+          height: 0,
+          visibility: 'hidden',
+        }}
+      />
+      <div className="objects-hero__container">
         <div
-          className={`objects-hero__track ${
-            enableTransition ? 'objects-hero__track--animated' : ''
-          }`}
-          style={{
-            transform: `translateX(-${slideOffset * (100 / itemsPerView)}%)`,
-          }}
-          onTransitionEnd={handleTransitionEnd}
+          className="objects-hero__viewport"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-          {extendedSlides.map((item, idx) => (
-            <div
-              key={`${item.id || 'slide'}-${idx}`}
-              className="objects-hero__item"
-              style={{
-                flex: `0 0 ${100 / itemsPerView}%`,
-                maxWidth: `${100 / itemsPerView}%`,
-              }}
-            >
-              <a
-                href={item.href || '#object-drops'}
-                className="objects-hero__link"
-                aria-label={item.alt || item.title || 'VEYN-OBJECTS'}
+          <div
+            className={`objects-hero__track ${
+              enableTransition ? 'objects-hero__track--animated' : ''
+            }`}
+            style={{
+              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {extendedSlides.map((item, idx) => (
+              <div
+                key={`${item.id || 'slide'}-${idx}`}
+                className="objects-hero__item"
+                style={{
+                  flex: `0 0 ${100 / itemsPerView}%`,
+                  maxWidth: `${100 / itemsPerView}%`,
+                }}
               >
-                <img
-                  src={item.image}
-                  alt={item.alt || item.title || 'VEYN-OBJECTS'}
-                  className="objects-hero__image"
-                  loading={idx < baseCount + 2 ? 'eager' : 'lazy'}
-                />
-              </a>
-            </div>
-          ))}
+                <Link
+                  href={item.href || '/collections/objects-drops'}
+                  className="objects-hero__link"
+                  aria-label={item.alt || item.title || 'VEYN-OBJECTS'}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.alt || item.title || 'VEYN-OBJECTS'}
+                    className="objects-hero__image"
+                    loading={
+                      idx >= baseCount && idx < baseCount + itemsPerView
+                        ? 'eager'
+                        : 'lazy'
+                    }
+                  />
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

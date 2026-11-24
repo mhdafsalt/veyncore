@@ -13,14 +13,27 @@ const DEFAULT_SELECTS_SUBCATEGORIES = [
 ];
 
 const DEFAULT_OBJECTS_SUBCATEGORIES = [
-  { id: 'obj-all', label: 'ALL OBJECTS', href: '/collections/objects-drops' },
   { id: 'obj-drops', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true },
+  { id: 'all-drops', label: 'ALL DROPS', href: '/collections/objects-drops' },
 ];
 
 const LEGACY_STATIC_CATEGORIES = new Set([
   'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
   'bags', 'chains', 'headwear', 'hardware'
 ]);
+
+// Normalization helper for labels (accessible everywhere)
+const norm = (str = '') =>
+  String(str)
+    .toUpperCase()
+    .replace(/⚡|⚡️/g, '')
+    .trim();
+
+// Normalization helper for slugs / IDs (accessible everywhere)
+const toSlug = (str = '') =>
+  norm(str)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-');
 
 function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   const router = useRouter();
@@ -86,19 +99,6 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       ? DEFAULT_OBJECTS_SUBCATEGORIES
       : DEFAULT_SELECTS_SUBCATEGORIES;
 
-    // Normalization helper for labels
-    const norm = (str = '') =>
-      String(str)
-        .toUpperCase()
-        .replace(/⚡|⚡️/g, '')
-        .trim();
-
-    // Normalization helper for slugs / IDs
-    const toSlug = (str = '') =>
-      norm(str)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-');
-
     const result = [];
     const seenLabels = new Set();
     const seenIds = new Set();
@@ -107,6 +107,11 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       if (!item) return;
       const labelNorm = norm(item.label);
       const idNorm = (item.id || toSlug(item.label)).toLowerCase().trim();
+
+      // Filter out any legacy or unwanted ALL OBJECTS
+      if (labelNorm === 'ALL OBJECTS' || idNorm === 'obj-all') {
+        return;
+      }
 
       // Skip if already in list by normalized label or ID
       if (seenLabels.has(labelNorm) || seenIds.has(idNorm)) {
@@ -126,7 +131,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     // If HOME is not in adminItems for VEYN-SELECTS, ensure HOME is added first
     if (!isObjects) {
       const hasHome = adminItems.some((s) => norm(s.label) === 'HOME' || s.id === 'home');
-      if (!hasHome) {
+      if (!hasHome && adminItems.length === 0) {
         addUnique(baseDefaults[0]); // HOME
       }
     }
@@ -134,12 +139,12 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     // 2. Add admin-managed items (they take priority and define custom routes/labels)
     if (adminItems.length > 0) {
       adminItems.forEach((item) => addUnique(item));
+    } else {
+      // 3. Fallback to base navigation tabs only if no admin items exist
+      baseDefaults.forEach((base) => {
+        addUnique(base);
+      });
     }
-
-    // 3. Ensure core base navigation tabs exist (FLASH SALE, NEW DROPS, ALL DROPS) without duplicates
-    baseDefaults.forEach((base) => {
-      addUnique(base);
-    });
 
     // 4. Dynamically append any categories from real products if not already present
     const dropsPage = isObjects ? '/collections/objects-drops' : '/collections/all-drops';
@@ -199,13 +204,16 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         if (newMatch) return newMatch.id;
       } else {
         const allMatch = subcategories.find(
-          (s) => s.id === 'all-drops' || s.id === 'obj-all' || (s.label && s.label.toUpperCase().includes('ALL'))
+          (s) =>
+            s.id === 'all-drops' ||
+            norm(s.label) === 'ALL DROPS' ||
+            (s.href && (s.href.includes('/collections/objects-drops') || s.href.includes('/collections/all-drops')))
         );
         if (allMatch) return allMatch.id;
       }
     }
 
-    // 2. If URL has a specific hash (e.g. #flash-sale)
+    // 2. If URL has a specific hash (e.g. #flash-sale, #object-drops)
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
       if (hash) {
@@ -214,13 +222,17 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     }
 
-    return activeMainCategory === 'VEYN-OBJECTS' ? 'obj-all' : 'home';
+    const isObjectsMain = activeMainCategory === 'VEYN-OBJECTS';
+    return isObjectsMain
+      ? (subcategories[0]?.id || 'obj-drops')
+      : 'home';
   }, [pathname, categoryParam, badgeParam, subcategories, activeMainCategory]);
 
   const [activeSubId, setActiveSubId] = useState(getInitialSubId);
 
   // Keep active tab synced on route/param/hash navigation or real main category switch
   useEffect(() => {
+    const isObjectsMain = activeMainCategory === 'VEYN-OBJECTS';
     const isDropsPage = pathname && (pathname.startsWith('/collections/all') || pathname.startsWith('/collections/objects'));
 
     // 1. If on drops page with a category query parameter, highlight matching category
@@ -245,7 +257,10 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         }
       } else {
         const allMatch = subcategories.find(
-          (s) => s.id === 'all-drops' || s.id === 'obj-all' || (s.label && s.label.toUpperCase().includes('ALL'))
+          (s) =>
+            s.id === 'all-drops' ||
+            norm(s.label) === 'ALL DROPS' ||
+            (s.href && (s.href.includes('/collections/objects-drops') || s.href.includes('/collections/all-drops')))
         );
         if (allMatch) {
           setActiveSubId(allMatch.id);
@@ -269,14 +284,15 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     // 3. Category switch between SELECTS and OBJECTS
     if (prevMainCategoryRef.current !== activeMainCategory) {
       prevMainCategoryRef.current = activeMainCategory;
-      const defaultId = activeMainCategory === 'VEYN-OBJECTS' ? 'obj-all' : 'home';
+      const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
       setActiveSubId(defaultId);
       return;
     }
 
     // 4. Default home
     if (pathname === '/' || pathname === '/veyn-objects') {
-      setActiveSubId(activeMainCategory === 'VEYN-OBJECTS' ? 'obj-all' : 'home');
+      const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
+      setActiveSubId(defaultId);
     }
   }, [pathname, categoryParam, badgeParam, activeMainCategory, subcategories]);
 
@@ -344,12 +360,11 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       return;
     }
 
-    // 3. ALL DROPS / ALL OBJECTS -> Navigate to All Drops without category filter
+    // 3. ALL DROPS -> Navigate to All Drops without category filter
     if (
       subId === 'all-drops' ||
-      subId === 'obj-all' ||
-      subLabel === 'ALL DROPS' ||
-      subLabel === 'ALL OBJECTS'
+      subId === 'all-drops-obj' ||
+      subLabel === 'ALL DROPS'
     ) {
       const dropsUrl = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
       router.push(dropsUrl);

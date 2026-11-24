@@ -3,26 +3,7 @@
  * Hardware, utilitarian bags, heavyweight chains, distressed caps, and tactical artifacts.
  */
 
-export const OBJECTS_HERO_SLIDES = [
-  {
-    id: 'hero-obj-1',
-    title: 'Tactical Utility Bags',
-    subtitle: 'FUNCTION OVER ADORNMENT',
-    tag: 'NEW RELEASE',
-    image: '/images/hero/ObjectHero01.png',
-    href: '/collections/objects-drops?category=bags',
-    description: 'Structured high-density canvas and raw hardware. Built for urban movement and extreme daily resilience.'
-  },
-  {
-    id: 'hero-obj-2',
-    title: 'Solid Hardware & Bags Archive',
-    subtitle: 'ENGINEERED ARTIFACTS',
-    tag: 'DROP 01 // OBJECTS',
-    image: '/images/hero/ObjectHero02.png',
-    href: '/collections/objects-drops',
-    description: 'Heavyweight stainless steel chains, tactical carabiners, and industrial signet rings built to outlast trends.'
-  }
-];
+export const OBJECTS_HERO_SLIDES = [];
 
 export const OBJECTS_BRAND_STORY =
   'VEYN-OBJECTS is our dedicated research laboratory for utilitarian hardware, tactical bags, and raw architectural metal accessories. Rejecting delicate decorum, every piece is engineered from surgical-grade 316L stainless steel, high-density tactical canvas, and military-spec components to anchor and complete the brutalist streetwear silhouette.';

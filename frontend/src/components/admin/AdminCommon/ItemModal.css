@@ -61,6 +61,19 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.admin-form-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .admin-form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
 .admin-route-hint {
   font-size: 11.5px;
   color: #64748b;

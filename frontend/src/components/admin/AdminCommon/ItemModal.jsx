@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AdminImageUploader from '../AdminImageUploader/AdminImageUploader';
 import './ItemModal.css';
 
@@ -12,6 +12,8 @@ export default function ItemModal({
   setFormData,
   onSubmit,
   isSaving = false,
+  siteContent = null,
+  products = [],
 }) {
   const [autoSyncRoute, setAutoSyncRoute] = useState(true);
 
@@ -28,7 +30,13 @@ export default function ItemModal({
     }
   }, [isOpen, config.type, config.isEdit]);
 
-  if (!isOpen) return null;
+  // Helper to generate slug from label
+  const getSlugFromLabel = (label = '') =>
+    label
+      .toLowerCase()
+      .replace(/⚡|⚡️/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
   const currentMainCategory = formData.mainCategory || 'VEYN-SELECTS';
   const dropsPath =
@@ -39,13 +47,94 @@ export default function ItemModal({
     currentMainCategory === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
   const newDropsPath = `${dropsPath}?badge=new`;
 
-  // Helper to generate slug from label
-  const getSlugFromLabel = (label = '') =>
-    label
-      .toLowerCase()
-      .replace(/⚡|⚡️/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+  // Hero Section Dynamic Route Helpers
+  const currentHeroSection = formData.targetSection || 'VEYN-SELECTS';
+  const heroDropsPath =
+    currentHeroSection === 'VEYN-OBJECTS'
+      ? '/collections/objects-drops'
+      : '/collections/all-drops';
+  const heroHomePath =
+    currentHeroSection === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
+  const heroNewDropsPath = `${heroDropsPath}?badge=new`;
+  const heroHashPath =
+    currentHeroSection === 'VEYN-OBJECTS' ? '#object-drops' : '#flash-sale';
+
+  // Dynamic Categories available for the current Hero Section
+  const availableHeroCategories = useMemo(() => {
+    const list = [];
+    const seen = new Set();
+
+    // 1. From siteContent.subcategories
+    if (siteContent?.subcategories && Array.isArray(siteContent.subcategories)) {
+      siteContent.subcategories
+        .filter(
+          (s) =>
+            (s.mainCategory || 'VEYN-SELECTS') === currentHeroSection &&
+            s.active !== false
+        )
+        .forEach((s) => {
+          const raw = (s.label || '').replace(/⚡|⚡️/g, '').trim();
+          const slug = getSlugFromLabel(raw);
+          if (
+            slug &&
+            !seen.has(slug) &&
+            !['home', 'flash-sale', 'new-drops', 'all-drops', 'all-objects'].includes(slug)
+          ) {
+            seen.add(slug);
+            list.push({
+              label: raw.toUpperCase(),
+              href: `${heroDropsPath}?category=${slug}`,
+            });
+          }
+        });
+    }
+
+    // 2. From products
+    if (products && Array.isArray(products)) {
+      products
+        .filter((p) => (p.category || 'VEYN-SELECTS') === currentHeroSection)
+        .forEach((p) => {
+          const cat = (p.subCategory || p.fit || '').trim();
+          const slug = getSlugFromLabel(cat);
+          if (slug && !seen.has(slug)) {
+            seen.add(slug);
+            list.push({
+              label: cat.toUpperCase(),
+              href: `${heroDropsPath}?category=${slug}`,
+            });
+          }
+        });
+    }
+
+    // Standard default categories if list is empty
+    if (list.length === 0) {
+      if (currentHeroSection === 'VEYN-OBJECTS') {
+        list.push(
+          { label: 'BAGS', href: '/collections/objects-drops?category=bags' },
+          { label: 'CHAINS', href: '/collections/objects-drops?category=chains' },
+          { label: 'CAPS', href: '/collections/objects-drops?category=caps' }
+        );
+      } else {
+        list.push(
+          { label: 'WIDE LEG', href: '/collections/all-drops?category=wide-fit' },
+          { label: 'BAGGY', href: '/collections/all-drops?category=baggy' },
+          { label: 'BOOTCUT', href: '/collections/all-drops?category=bootcut' }
+        );
+      }
+    }
+
+    return list;
+  }, [siteContent, products, currentHeroSection, heroDropsPath]);
+
+  // Products available for direct linking in current Hero Section
+  const availableHeroProducts = useMemo(() => {
+    if (!products || !Array.isArray(products)) return [];
+    return products
+      .filter((p) => (p.category || 'VEYN-SELECTS') === currentHeroSection && p.handle)
+      .slice(0, 30);
+  }, [products, currentHeroSection]);
+
+  if (!isOpen) return null;
 
   const currentSlug = getSlugFromLabel(formData.label);
   const expectedDynamicRoute = currentSlug
@@ -104,7 +193,39 @@ export default function ItemModal({
     });
   };
 
-  // Preset click handler
+  // Handle Hero Section Change
+  const handleHeroSectionChange = (newSection) => {
+    const newDrops =
+      newSection === 'VEYN-OBJECTS'
+        ? '/collections/objects-drops'
+        : '/collections/all-drops';
+    const newHome = newSection === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
+
+    setFormData((prev) => {
+      let updatedHref = prev.href;
+      if (
+        prev.href === '/collections/all-drops' ||
+        prev.href === '/collections/objects-drops'
+      ) {
+        updatedHref = newDrops;
+      } else if (prev.href === '/' || prev.href === '/veyn-objects') {
+        updatedHref = newHome;
+      } else if (prev.href && prev.href.includes('?category=')) {
+        const cat = prev.href.split('?category=')[1];
+        updatedHref = `${newDrops}?category=${cat}`;
+      } else if (prev.href === '#flash-sale' || prev.href === '#object-drops') {
+        updatedHref = newSection === 'VEYN-OBJECTS' ? '#object-drops' : '#flash-sale';
+      }
+
+      return {
+        ...prev,
+        targetSection: newSection,
+        href: updatedHref || newDrops,
+      };
+    });
+  };
+
+  // Preset click handler for Subcategories
   const handlePresetSelect = (presetKey) => {
     const slug = currentSlug;
 
@@ -295,9 +416,7 @@ export default function ItemModal({
                 <select
                   className="admin-form-select"
                   value={formData.targetSection || 'VEYN-SELECTS'}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, targetSection: e.target.value }))
-                  }
+                  onChange={(e) => handleHeroSectionChange(e.target.value)}
                 >
                   <option value="VEYN-SELECTS">VEYN-SELECTS</option>
                   <option value="VEYN-OBJECTS">VEYN-OBJECTS</option>
@@ -311,13 +430,124 @@ export default function ItemModal({
                   setFormData((prev) => ({ ...prev, image: newUrl }))
                 }
                 aspectRatio="16/9"
-                placeholder="/images/hero/heroimg01.jpg"
+                placeholder={
+                  formData.targetSection === 'VEYN-OBJECTS'
+                    ? '/images/hero/ObjectHero01.png'
+                    : '/images/hero/heroimg01.jpg'
+                }
                 required
                 helpText="Choose an image file from your device or paste a web/local image URL."
               />
 
+              {/* Dynamic Target Link / Route Section */}
               <div className="admin-form-group">
-                <label className="admin-form-label">TARGET LINK *</label>
+                <div className="admin-route-header-row">
+                  <label className="admin-form-label" style={{ marginBottom: 0 }}>
+                    TARGET LINK *
+                  </label>
+                  <span className="admin-route-helper-tag">
+                    ⚡ Dynamic Route Selector
+                  </span>
+                </div>
+
+                {/* Quick Presets Strip */}
+                <div className="admin-route-presets" role="group" aria-label="Quick route presets for hero slide">
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === heroDropsPath ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => setFormData((prev) => ({ ...prev, href: heroDropsPath }))}
+                    title="Navigate to full collection"
+                  >
+                    All Drops
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === heroNewDropsPath ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => setFormData((prev) => ({ ...prev, href: heroNewDropsPath }))}
+                    title="Filter by New Drops badge"
+                  >
+                    New Drops
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === heroHashPath ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => setFormData((prev) => ({ ...prev, href: heroHashPath }))}
+                    title="Scroll to section"
+                  >
+                    {currentHeroSection === 'VEYN-OBJECTS' ? 'Object Drops' : '⚡ Flash Sale'}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`admin-route-pill ${
+                      formData.href === heroHomePath ? 'admin-route-pill--active' : ''
+                    }`}
+                    onClick={() => setFormData((prev) => ({ ...prev, href: heroHomePath }))}
+                    title="Navigate to storefront home"
+                  >
+                    Home
+                  </button>
+
+                  {/* Dynamic Category Pills */}
+                  {availableHeroCategories.slice(0, 4).map((cat) => (
+                    <button
+                      key={cat.href}
+                      type="button"
+                      className={`admin-route-pill ${
+                        formData.href === cat.href ? 'admin-route-pill--active' : ''
+                      }`}
+                      onClick={() => setFormData((prev) => ({ ...prev, href: cat.href }))}
+                      title={`Filter by category ${cat.label}`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Dynamic Category & Product Dropdown Picker */}
+                <select
+                  className="admin-form-select"
+                  style={{ marginBottom: '8px' }}
+                  value={
+                    availableHeroCategories.some((c) => c.href === formData.href) ||
+                    availableHeroProducts.some((p) => `/products/${p.handle}` === formData.href)
+                      ? formData.href
+                      : ''
+                  }
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setFormData((prev) => ({ ...prev, href: e.target.value }));
+                    }
+                  }}
+                >
+                  <option value="">⚡ Select Dynamic Category or Product Link...</option>
+                  <optgroup label="📂 Dynamic Categories & Fits">
+                    {availableHeroCategories.map((cat) => (
+                      <option key={cat.href} value={cat.href}>
+                        {cat.label} ({cat.href})
+                      </option>
+                    ))}
+                  </optgroup>
+                  {availableHeroProducts.length > 0 && (
+                    <optgroup label="🏷️ Direct Products">
+                      {availableHeroProducts.map((p) => (
+                        <option key={p.handle} value={`/products/${p.handle}`}>
+                          {p.title} (/products/{p.handle})
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
+
+                {/* Direct Custom Route Input */}
                 <input
                   type="text"
                   className="admin-form-input"
@@ -325,12 +555,15 @@ export default function ItemModal({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, href: e.target.value }))
                   }
-                  placeholder="/collections/all-drops"
+                  placeholder={heroDropsPath}
                   required
                 />
-                <span style={{ fontSize: '11px', color: '#64748b' }}>
-                  Destination URL when slide is clicked
-                </span>
+
+                <div className="admin-route-hint">
+                  <span>
+                    Destination URL when slide is clicked. Choose a quick preset pill, select from dynamic categories/products, or enter any custom URL.
+                  </span>
+                </div>
               </div>
             </>
           )}
@@ -343,9 +576,19 @@ export default function ItemModal({
                 <select
                   className="admin-form-select"
                   value={formData.targetSection || 'VEYN-SELECTS'}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, targetSection: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    const newSection = e.target.value;
+                    const slug = getSlugFromLabel(formData.label || '');
+                    const baseDrops =
+                      newSection === 'VEYN-OBJECTS'
+                        ? '/collections/objects-drops'
+                        : '/collections/all-drops';
+                    setFormData((prev) => ({
+                      ...prev,
+                      targetSection: newSection,
+                      collectionPath: slug ? `${baseDrops}?category=${slug}` : baseDrops,
+                    }));
+                  }}
                 >
                   <option value="VEYN-SELECTS">VEYN-SELECTS</option>
                   <option value="VEYN-OBJECTS">VEYN-OBJECTS</option>
@@ -357,10 +600,28 @@ export default function ItemModal({
                 <input
                   type="text"
                   className="admin-form-input"
+                  style={{ textTransform: 'uppercase' }}
                   value={formData.label || ''}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, label: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    const upperVal = e.target.value.toUpperCase();
+                    const slug = getSlugFromLabel(upperVal);
+                    const isObj =
+                      (formData.targetSection || 'VEYN-SELECTS') === 'VEYN-OBJECTS';
+                    const baseDrops = isObj
+                      ? '/collections/objects-drops'
+                      : '/collections/all-drops';
+                    setFormData((prev) => ({
+                      ...prev,
+                      label: upperVal,
+                      key: prev.key && config.isEdit ? prev.key : slug,
+                      collectionPath:
+                        prev.collectionPath && config.isEdit
+                          ? prev.collectionPath
+                          : slug
+                          ? `${baseDrops}?category=${slug}`
+                          : baseDrops,
+                    }));
+                  }}
                   placeholder="e.g. YOUR CATEGORY NAME"
                   required
                 />

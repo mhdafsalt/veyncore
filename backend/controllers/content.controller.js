@@ -18,69 +18,10 @@ const DEFAULT_CONTENT = {
     { id: 'all-drops', mainCategory: 'VEYN-SELECTS', label: 'ALL DROPS', href: '/collections/all-drops', isGlow: false, sortOrder: 3, active: true },
 
     // VEYN-OBJECTS
-    { id: 'obj-all', mainCategory: 'VEYN-OBJECTS', label: 'ALL OBJECTS', href: '/collections/objects-drops', isGlow: false, sortOrder: 0, active: true },
-    { id: 'obj-drops', mainCategory: 'VEYN-OBJECTS', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true, sortOrder: 1, active: true },
+    { id: 'obj-drops', mainCategory: 'VEYN-OBJECTS', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true, sortOrder: 0, active: true },
+    { id: 'all-drops-obj', mainCategory: 'VEYN-OBJECTS', label: 'ALL DROPS', href: '/collections/objects-drops', isGlow: false, sortOrder: 1, active: true },
   ],
-  heroSlides: [
-    // VEYN-SELECTS
-    {
-      id: 'slide-1',
-      targetSection: 'VEYN-SELECTS',
-      title: 'Wide Leg Fit',
-      subtitle: 'Best Choice',
-      tag: 'DROP 01',
-      image: '/images/hero/heroimg01.jpg',
-      href: '/collections/wide-leg',
-      sortOrder: 0,
-      active: true,
-    },
-    {
-      id: 'slide-2',
-      targetSection: 'VEYN-SELECTS',
-      title: 'Veyn Selects',
-      subtitle: 'Curated Denims',
-      tag: 'EXCLUSIVE',
-      image: '/images/hero/heroimg02.jpg',
-      href: '/collections/veyn-selects',
-      sortOrder: 1,
-      active: true,
-    },
-    {
-      id: 'slide-3',
-      targetSection: 'VEYN-SELECTS',
-      title: 'Baggy Fit',
-      subtitle: 'Most Selling',
-      tag: 'BESTSELLER',
-      image: '/images/hero/heroimg03.jpg',
-      href: '/collections/baggy',
-      sortOrder: 2,
-      active: true,
-    },
-
-    // VEYN-OBJECTS
-    {
-      id: 'obj-slide-1',
-      targetSection: 'VEYN-OBJECTS',
-      title: 'Tactical Utility Bags',
-      subtitle: 'FUNCTION OVER ADORNMENT',
-      tag: 'NEW RELEASE',
-      image: '/images/hero/ObjectHero01.png',
-      href: '/collections/objects-drops?category=bags',
-      sortOrder: 0,
-      active: true,
-    },
-    {
-      id: 'obj-slide-2',
-      targetSection: 'VEYN-OBJECTS',
-      title: 'Solid Hardware Archive',
-      subtitle: 'ENGINEERED ARTIFACTS',
-      tag: 'DROP 01 // OBJECTS',
-      image: '/images/hero/ObjectHero02.png',
-      href: '/collections/objects-drops',
-      sortOrder: 1,
-      active: true,
-    },
-  ],
+  heroSlides: [],
   swipeCategories: [],
   bottomBanner: {
     imageDesktop: '/images/ImageBanner.png',
@@ -113,13 +54,26 @@ export const getContent = async (req, res) => {
     const contentObj = content.toObject ? content.toObject() : { ...content };
     const legacyStaticIds = new Set([
       'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
-      'bags', 'chains', 'headwear', 'hardware'
+      'bags', 'chains', 'headwear', 'hardware', 'obj-all'
     ]);
     if (Array.isArray(contentObj.subcategories)) {
       contentObj.subcategories = contentObj.subcategories.filter(item => {
+        if (item.id === 'obj-all' || item.label?.toUpperCase() === 'ALL OBJECTS') return false;
         if (legacyStaticIds.has(item.id) && (item.href === `#${item.id}` || !item.href)) return false;
         return true;
       });
+    }
+
+    if (content && Array.isArray(content.subcategories)) {
+      const hadObjAll = content.subcategories.some(
+        s => s.id === 'obj-all' || s.label?.toUpperCase() === 'ALL OBJECTS'
+      );
+      if (hadObjAll) {
+        content.subcategories = content.subcategories.filter(
+          s => s.id !== 'obj-all' && s.label?.toUpperCase() !== 'ALL OBJECTS'
+        );
+        await content.save();
+      }
     }
     const legacySwipeKeys = new Set(['baggy', 'bootcut', 'wide', 'straight', 'bags', 'chains', 'caps']);
     if (Array.isArray(contentObj.swipeCategories)) {
@@ -127,6 +81,16 @@ export const getContent = async (req, res) => {
         const key = (item.key || item.id || '').replace(/^swp-/, '').toLowerCase();
         return !legacySwipeKeys.has(key);
       });
+    }
+
+    const legacyHeroSlideIds = new Set([
+      'slide-1', 'slide-2', 'slide-3',
+      'obj-slide-1', 'obj-slide-2', 'obj-slide-3'
+    ]);
+    if (Array.isArray(contentObj.heroSlides)) {
+      contentObj.heroSlides = contentObj.heroSlides.filter(
+        item => !legacyHeroSlideIds.has(item.id)
+      );
     }
 
     return res.status(200).json({
@@ -167,9 +131,10 @@ export const getSectionContent = async (req, res) => {
     if (section === 'subcategories' && Array.isArray(sectionData)) {
       const legacyStaticIds = new Set([
         'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
-        'bags', 'chains', 'headwear', 'hardware'
+        'bags', 'chains', 'headwear', 'hardware', 'obj-all'
       ]);
       sectionData = sectionData.filter(item => {
+        if (item.id === 'obj-all' || item.label?.toUpperCase() === 'ALL OBJECTS') return false;
         if (legacyStaticIds.has(item.id) && (item.href === `#${item.id}` || !item.href)) {
           return false;
         }
@@ -183,6 +148,16 @@ export const getSectionContent = async (req, res) => {
         const key = (item.key || item.id || '').replace(/^swp-/, '').toLowerCase();
         return !legacySwipeKeys.has(key);
       });
+    }
+
+    if (section === 'heroSlides' && Array.isArray(sectionData)) {
+      const legacyHeroSlideIds = new Set([
+        'slide-1', 'slide-2', 'slide-3',
+        'obj-slide-1', 'obj-slide-2', 'obj-slide-3'
+      ]);
+      sectionData = sectionData.filter(
+        item => !legacyHeroSlideIds.has(item.id)
+      );
     }
 
     return res.status(200).json({

@@ -5,29 +5,7 @@ import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
 import './HeroSection.css';
 
-const BASE_SLIDES = [
-  {
-    id: 'wide-leg',
-    title: 'Wide Leg Fit',
-    subtitle: 'Best Choice',
-    image: '/images/hero/heroimg01.jpg',
-    href: '/collections/wide-leg',
-  },
-  {
-    id: 'veyn-selects',
-    title: 'Veyn Selects',
-    subtitle: 'Curated Denims',
-    image: '/images/hero/heroimg02.jpg',
-    href: '/collections/veyn-selects',
-  },
-  {
-    id: 'baggy-fit',
-    title: 'Baggy Fit',
-    subtitle: 'Most Selling',
-    image: '/images/hero/heroimg03.jpg',
-    href: '/collections/baggy',
-  },
-];
+const BASE_SLIDES = [];
 
 export default function HeroSection({
   slides: propSlides = null,
@@ -67,6 +45,10 @@ export default function HeroSection({
 
   // Triplicate the slides [copy1, copy2, copy3] for an infinite continuous loop
   const extendedSlides = useMemo(() => {
+    if (!slides || slides.length === 0) return [];
+    if (slides.length < 3) {
+      return [...slides, ...slides, ...slides, ...slides, ...slides, ...slides];
+    }
     return [...slides, ...slides, ...slides];
   }, [slides]);
 
@@ -122,17 +104,18 @@ export default function HeroSection({
 
   // Auto-play timer (advances forward only)
   useEffect(() => {
-    if (isHovered) return;
+    if (isHovered || baseCount === 0) return;
     const interval = setInterval(() => {
       handleNext();
     }, autoPlayInterval);
 
     return () => clearInterval(interval);
-  }, [isHovered, autoPlayInterval, handleNext]);
+  }, [isHovered, autoPlayInterval, handleNext, baseCount]);
 
   // Infinite Teleport Reset (seamless jump with transition disabled)
   const handleTransitionEnd = () => {
     isTransitioningRef.current = false;
+    if (baseCount === 0) return;
 
     // Scrolled past the end of the middle set into the right copy
     if (currentIndex >= baseCount * 2) {
@@ -167,6 +150,10 @@ export default function HeroSection({
     touchStartXRef.current = 0;
     touchEndXRef.current = 0;
   };
+
+  if (!slides || slides.length === 0) {
+    return null;
+  }
 
   return (
     <section

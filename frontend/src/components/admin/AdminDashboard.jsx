@@ -427,7 +427,12 @@ export default function AdminDashboard() {
       title: isEdit ? `EDIT ${type.toUpperCase()}` : `ADD TO ${type.toUpperCase()}`,
     });
 
-    setItemFormData(isEdit ? { ...item } : { active: true });
+    const defaultData =
+      type === 'heroSlides'
+        ? { targetSection: 'VEYN-SELECTS', href: '/collections/all-drops', active: true }
+        : { active: true };
+
+    setItemFormData(isEdit ? { ...item } : defaultData);
     setIsItemModalOpen(true);
   };
 
@@ -884,6 +889,8 @@ export default function AdminDashboard() {
         setFormData={setItemFormData}
         onSubmit={handleSaveContentItem}
         isSaving={isSaving}
+        siteContent={siteContent}
+        products={products}
       />
 
       <DeleteConfirmModal
