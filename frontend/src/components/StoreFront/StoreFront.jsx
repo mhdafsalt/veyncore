@@ -42,10 +42,10 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
 
   return (
     <>
-      {/* Veyncore Full-Screen Intro Loader - Only plays once on initial site entry */}
+      {/* Veyncore Full-Screen Intro Loader - Snappy 1s luxury entrance on initial site entry */}
       {isLoading && (
         <VeyncoreLoader
-          duration={1800}
+          duration={1000}
           onComplete={handleLoaderComplete}
         />
       )}

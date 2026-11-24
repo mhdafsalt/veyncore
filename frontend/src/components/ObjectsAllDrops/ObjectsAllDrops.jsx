@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { API_BASE_URL } from '@/lib/constants';
 import { matchProductCategory, DEFAULT_OBJECTS_CATEGORIES } from '@/lib/categoryFilterUtils';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsAllDrops.css';
 
 /**
@@ -81,7 +82,7 @@ function ObjectCardItem({ product }) {
         >
           <div className="obj-all-card__image-wrapper">
             <img
-              src={images[displayImageIndex]}
+              src={optimizeImageUrl(images[displayImageIndex], 700)}
               alt={product.title}
               className="obj-all-card__image"
               loading="lazy"

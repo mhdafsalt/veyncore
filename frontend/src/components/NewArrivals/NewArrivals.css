@@ -49,6 +49,45 @@
   min-width: 0;
 }
 
+/* Skeleton Loading Placeholder */
+@keyframes new-arrivals-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.new-arrivals__grid-item--skeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-arrivals__skeleton-image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(90deg, #f6f6f6 25%, #eeeeee 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation: new-arrivals-shimmer 1.6s infinite ease-in-out;
+}
+
+.new-arrivals__skeleton-title {
+  width: 70%;
+  height: 14px;
+  margin-top: 10px;
+  background: #f3f3f3;
+  border-radius: 2px;
+}
+
+.new-arrivals__skeleton-price {
+  width: 40%;
+  height: 12px;
+  margin-top: 6px;
+  background: #f3f3f3;
+  border-radius: 2px;
+}
+
 /* --------------------------------------------------------------------------
    Product Card
    -------------------------------------------------------------------------- */

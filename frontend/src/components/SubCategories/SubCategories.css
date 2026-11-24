@@ -23,7 +23,7 @@
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 12px;
+  padding: 0;
   box-sizing: border-box;
   position: relative;
 }
@@ -195,14 +195,14 @@
 }
 
 /* =========================================================
-   Desktop & Tablet Layout (>= 768px): Full Width Even Flex Distribution
-   Matches Image 2: HOME on far left, TOPS on far right,
+   Desktop & Tablet Layout (>= 768px): 100% Edge-to-Edge Even Distribution
+   Matches Image 2: HOME on far left edge, TOPS on far right edge,
    with 100% container width evenly divided across tabs
    ========================================================= */
 
 @media (min-width: 768px) {
   .subcategories__wrap {
-    padding: 0 12px;
+    padding: 0;
   }
 
   .subcategories__list {
@@ -219,7 +219,7 @@
 
   .subcategories__link {
     width: 100%;
-    padding: 11px 4px;
+    padding: 12px 2px;
     font-size: 12px;
     letter-spacing: 0.04em;
   }
@@ -237,12 +237,12 @@
 /* Large Desktop Screens (>= 1280px) */
 @media (min-width: 1280px) {
   .subcategories__wrap {
-    padding: 0 16px;
+    padding: 0;
   }
 
   .subcategories__link {
-    padding: 11px 6px;
-    font-size: 12px;
+    padding: 12px 4px;
+    font-size: 12.5px;
     letter-spacing: 0.05em;
   }
 
@@ -251,7 +251,7 @@
   }
 
   .subcategories__link--active::after {
-    width: calc(100% - 16px);
+    width: calc(100% - 14px);
     max-width: 52px;
   }
 }

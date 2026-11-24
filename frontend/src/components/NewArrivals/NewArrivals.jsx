@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './NewArrivals.css';
+
+// In-memory module cache for instant Frame-0 painting
+let cachedNewArrivals = null;
 
 /**
  * Format price to ensure Rs. and amount stay joined by non-breaking space
@@ -15,7 +19,7 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
 /**
  * Individual Product Card displaying main thumbnail, size selection, and quick-add
  */
-function ProductCard({ product }) {
+function ProductCard({ product, priority = false }) {
   const { addItem, openCart } = useCart();
   const [showSizes, setShowSizes] = useState(false);
   const [isMobileQuickBuyOpen, setIsMobileQuickBuyOpen] = useState(false);
@@ -68,10 +72,11 @@ function ProductCard({ product }) {
         >
           <div className="product-card__image-container">
             <img
-              src={mainImage}
+              src={optimizeImageUrl(mainImage, 700)}
               alt={product.title}
               className={`product-card__image ${imageLoaded ? 'product-card__image--loaded' : ''}`}
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'auto'}
               onLoad={() => setImageLoaded(true)}
               onError={(e) => {
                 e.target.onerror = null;
@@ -209,7 +214,8 @@ function ProductCard({ product }) {
  * Main Shop New Arrivals Section
  */
 export default function NewArrivals() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(() => cachedNewArrivals || []);
+  const [isLoading, setIsLoading] = useState(() => !cachedNewArrivals);
 
   useEffect(() => {
     let isMounted = true;
@@ -248,10 +254,12 @@ export default function NewArrivals() {
           availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['28', '30', '32', '34', '36'],
         }));
         if (isMounted) {
+          cachedNewArrivals = mapped;
           setProducts(mapped);
+          setIsLoading(false);
         }
       } catch (err) {
-        // Silently catch network errors
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -262,7 +270,7 @@ export default function NewArrivals() {
     };
   }, []);
 
-  if (!products || products.length === 0) {
+  if (!isLoading && (!products || products.length === 0)) {
     return null;
   }
 
@@ -278,11 +286,19 @@ export default function NewArrivals() {
 
         {/* 4-Column (Desktop) / 2-Column (Mobile) Product Grid */}
         <div className="new-arrivals__grid">
-          {products.map((product) => (
-            <div key={product.id || product.handle} className="new-arrivals__grid-item">
-              <ProductCard product={product} />
-            </div>
-          ))}
+          {products.length > 0
+            ? products.map((product, idx) => (
+                <div key={product.id || product.handle} className="new-arrivals__grid-item">
+                  <ProductCard product={product} priority={idx < 4} />
+                </div>
+              ))
+            : [...Array(4)].map((_, i) => (
+                <div key={i} className="new-arrivals__grid-item new-arrivals__grid-item--skeleton">
+                  <div className="new-arrivals__skeleton-image" />
+                  <div className="new-arrivals__skeleton-title" />
+                  <div className="new-arrivals__skeleton-price" />
+                </div>
+              ))}
         </div>
 
         {/* Centered Minimalist "View all" Action */}

@@ -6,7 +6,12 @@ import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { OBJECTS_DROP_CATEGORIES, OBJECTS_CATEGORY_DATA } from '@/data/objectsData';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsCategoryDrops.css';
+
+// In-memory module cache for instant Frame-0 painting
+let cachedObjectsCategories = null;
+let cachedObjectsCategoryData = null;
 
 /**
  * Format price to ensure Rs. and amount stay joined by non-breaking space
@@ -64,7 +69,7 @@ function ObjectProductCard({ product }) {
         <Link href={`/products/${product.handle || product.id}`} className="obj-drop-card__link">
           <div className="obj-drop-card__image-container">
             <img
-              src={images[0]}
+              src={optimizeImageUrl(images[0], 700)}
               alt={product.title}
               className="obj-drop-card__image"
               loading="lazy"
@@ -403,8 +408,8 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
  * 3. CAPS & HEADWEAR (#headwear)
  */
 export default function ObjectsCategoryDrops() {
-  const [categories, setCategories] = useState([]);
-  const [categoryData, setCategoryData] = useState({});
+  const [categories, setCategories] = useState(() => cachedObjectsCategories || []);
+  const [categoryData, setCategoryData] = useState(() => cachedObjectsCategoryData || {});
 
   // Fetch dynamic categories and products for VEYN-OBJECTS
   useEffect(() => {
@@ -484,10 +489,12 @@ export default function ObjectsCategoryDrops() {
               }));
             }
 
+            cachedObjectsCategoryData = grouped;
             setCategoryData(grouped);
           }
 
           if (activeCats && activeCats.length > 0) {
+            cachedObjectsCategories = activeCats;
             setCategories(activeCats);
           }
         }

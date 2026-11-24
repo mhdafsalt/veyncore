@@ -8,6 +8,7 @@ import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
 import { API_BASE_URL } from '@/lib/constants';
 import { matchProductCategory, DEFAULT_SELECTS_CATEGORIES } from '@/lib/categoryFilterUtils';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './AllDrops.css';
 
 /**
@@ -96,7 +97,7 @@ function DropsProductCard({ product }) {
         >
           <div className="all-drops-card__image-wrapper">
             <img
-              src={images[displayImageIndex]}
+              src={optimizeImageUrl(images[displayImageIndex], 700)}
               alt={product.title}
               className="all-drops-card__image"
               loading="lazy"

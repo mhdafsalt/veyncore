@@ -6,7 +6,12 @@ import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { FIT_CATEGORIES, CATEGORY_FITS_DATA } from '@/data/categoryFitsData';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './CategoryFits.css';
+
+// In-memory module cache for instant Frame-0 painting
+let cachedSelectsCategories = null;
+let cachedSelectsCategoryData = null;
 
 /**
  * Format price to ensure Rs. and amount stay joined by non-breaking space
@@ -70,7 +75,7 @@ function FitProductCard({ product }) {
         >
           <div className="fit-card__image-container">
             <img
-              src={mainImage}
+              src={optimizeImageUrl(mainImage, 700)}
               alt={product.title}
               className={`fit-card__image ${imageLoaded ? 'fit-card__image--loaded' : ''}`}
               loading="lazy"
@@ -419,8 +424,8 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
  * and a centered bottom "View all" button.
  */
 export default function CategoryFits() {
-  const [categories, setCategories] = useState([]);
-  const [categoryData, setCategoryData] = useState({});
+  const [categories, setCategories] = useState(() => cachedSelectsCategories || []);
+  const [categoryData, setCategoryData] = useState(() => cachedSelectsCategoryData || {});
 
   // Fetch dynamic categories and products from backend
   useEffect(() => {
@@ -490,10 +495,12 @@ export default function CategoryFits() {
               }));
             }
 
+            cachedSelectsCategoryData = grouped;
             setCategoryData(grouped);
           }
 
           if (activeCats && activeCats.length > 0) {
+            cachedSelectsCategories = activeCats;
             setCategories(activeCats);
           }
         }
