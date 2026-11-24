@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { API_BASE_URL } from '@/lib/constants';
+import { matchProductCategory, toCategorySlug } from '@/lib/categoryFilterUtils';
 import './SubCategories.css';
 
 const DEFAULT_SELECTS_SUBCATEGORIES = [
@@ -10,11 +11,22 @@ const DEFAULT_SELECTS_SUBCATEGORIES = [
   { id: 'flash-sale', label: 'FLASH SALE', href: '#flash-sale', isGlow: true },
   { id: 'new-drops', label: 'NEW DROPS', href: '/collections/all-drops', isGlow: true },
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops' },
+  { id: 'baggy', label: 'BAGGY', href: '/collections/all-drops?category=baggy' },
+  { id: 'bootcut', label: 'BOOTCUT', href: '/collections/all-drops?category=bootcut' },
+  { id: 'wide', label: 'WIDE', href: '/collections/all-drops?category=wide' },
+  { id: 'straight', label: 'STRAIGHT', href: '/collections/all-drops?category=straight' },
+  { id: 'cargo', label: 'CARGO', href: '/collections/all-drops?category=cargo' },
+  { id: 'denims', label: 'DENIMS', href: '/collections/all-drops?category=denims' },
+  { id: 'tops', label: 'TOPS', href: '/collections/all-drops?category=tops' },
 ];
 
 const DEFAULT_OBJECTS_SUBCATEGORIES = [
   { id: 'obj-drops', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true },
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/objects-drops' },
+  { id: 'bags', label: 'BAGS', href: '/collections/objects-drops?category=bags' },
+  { id: 'chains', label: 'CHAINS', href: '/collections/objects-drops?category=chains' },
+  { id: 'caps', label: 'CAPS', href: '/collections/objects-drops?category=caps' },
+  { id: 'shades', label: 'SHADES', href: '/collections/objects-drops?category=shades' },
 ];
 
 const LEGACY_STATIC_CATEGORIES = new Set([
@@ -128,22 +140,14 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       (sub) => sub.mainCategory === activeMainCategory && sub.active !== false
     );
 
-    // If HOME is not in adminItems for VEYN-SELECTS, ensure HOME is added first
-    if (!isObjects) {
-      const hasHome = adminItems.some((s) => norm(s.label) === 'HOME' || s.id === 'home');
-      if (!hasHome && adminItems.length === 0) {
-        addUnique(baseDefaults[0]); // HOME
-      }
-    }
+    // 2. Add base navigation defaults (core streetwear fits & object categories)
+    baseDefaults.forEach((base) => {
+      addUnique(base);
+    });
 
-    // 2. Add admin-managed items (they take priority and define custom routes/labels)
-    if (adminItems.length > 0) {
+    // 3. Add / merge admin-managed custom items
+    if (adminItems && adminItems.length > 0) {
       adminItems.forEach((item) => addUnique(item));
-    } else {
-      // 3. Fallback to base navigation tabs only if no admin items exist
-      baseDefaults.forEach((base) => {
-        addUnique(base);
-      });
     }
 
     // 4. Dynamically append any categories from real products if not already present
@@ -196,7 +200,8 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
             (s.id && s.id.toLowerCase() === categoryParam) ||
             (s.id && s.id.toLowerCase().replace(/^obj-/, '') === categoryParam) ||
             (s.label && s.label.toLowerCase().trim() === categoryParam) ||
-            (s.href && s.href.toLowerCase().includes(`category=${categoryParam}`))
+            (s.href && s.href.toLowerCase().includes(`category=${categoryParam}`)) ||
+            matchProductCategory({ subCategory: s.label, fit: s.id }, categoryParam)
         );
         if (match) return match.id;
       } else if (badgeParam === 'new') {
@@ -243,7 +248,8 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
             (s.id && s.id.toLowerCase() === categoryParam) ||
             (s.id && s.id.toLowerCase().replace(/^obj-/, '') === categoryParam) ||
             (s.label && s.label.toLowerCase().trim() === categoryParam) ||
-            (s.href && s.href.toLowerCase().includes(`category=${categoryParam}`))
+            (s.href && s.href.toLowerCase().includes(`category=${categoryParam}`)) ||
+            matchProductCategory({ subCategory: s.label, fit: s.id }, categoryParam)
         );
         if (match) {
           setActiveSubId(match.id);

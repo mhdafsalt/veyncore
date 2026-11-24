@@ -36,11 +36,33 @@ export const getProducts = async (req, res) => {
     }
 
     if (subCategory) {
-      filter.subCategory = new RegExp(`^${subCategory}$`, 'i');
+      const cleanSub = String(subCategory).trim().replace(/[-_]/g, ' ');
+      filter.$or = [
+        { subCategory: new RegExp(cleanSub, 'i') },
+        { fit: new RegExp(cleanSub, 'i') },
+        { swipeCategory: new RegExp(cleanSub, 'i') },
+      ];
     }
 
     if (fit) {
-      filter.fit = new RegExp(`^${fit}$`, 'i');
+      const cleanFit = String(fit).trim().replace(/[-_]/g, ' ');
+      if (filter.$or) {
+        filter.$and = [
+          { $or: filter.$or },
+          {
+            $or: [
+              { fit: new RegExp(cleanFit, 'i') },
+              { subCategory: new RegExp(cleanFit, 'i') },
+            ],
+          },
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = [
+          { fit: new RegExp(cleanFit, 'i') },
+          { subCategory: new RegExp(cleanFit, 'i') },
+        ];
+      }
     }
 
     if (swipeCategory) {

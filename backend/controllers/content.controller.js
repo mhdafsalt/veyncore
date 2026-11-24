@@ -1,47 +1,32 @@
 import SiteContent from '../models/content.model.js';
+import Subcategory from '../models/subcategory.model.js';
 
-// Default initial content structure
+// Initial empty content structure (no hardcoded static default content)
 const DEFAULT_CONTENT = {
   key: 'main_site_content',
-  announcements: [
-    { id: 'ann-1', text: 'LEAD WITH CONFIDENCE', active: true, sortOrder: 0 },
-    { id: 'ann-2', text: 'FREE SHIPPING ON ALL ORDERS', active: true, sortOrder: 1 },
-    { id: 'ann-3', text: 'NEW DENIM DROPS LIVE NOW', active: true, sortOrder: 2 },
-    { id: 'ann-4', text: 'CASH ON DELIVERY AVAILABLE', active: true, sortOrder: 3 },
-    { id: 'ann-5', text: 'EASY 7-DAY EXCHANGES', active: true, sortOrder: 4 },
-  ],
-  subcategories: [
-    // VEYN-SELECTS
-    { id: 'home', mainCategory: 'VEYN-SELECTS', label: 'HOME', href: '#home', isGlow: false, sortOrder: 0, active: true },
-    { id: 'flash-sale', mainCategory: 'VEYN-SELECTS', label: 'FLASH SALE', href: '#flash-sale', isGlow: true, sortOrder: 1, active: true },
-    { id: 'new-drops', mainCategory: 'VEYN-SELECTS', label: 'NEW DROPS', href: '/collections/all-drops', isGlow: true, sortOrder: 2, active: true },
-    { id: 'all-drops', mainCategory: 'VEYN-SELECTS', label: 'ALL DROPS', href: '/collections/all-drops', isGlow: false, sortOrder: 3, active: true },
-
-    // VEYN-OBJECTS
-    { id: 'obj-drops', mainCategory: 'VEYN-OBJECTS', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true, sortOrder: 0, active: true },
-    { id: 'all-drops-obj', mainCategory: 'VEYN-OBJECTS', label: 'ALL DROPS', href: '/collections/objects-drops', isGlow: false, sortOrder: 1, active: true },
-  ],
+  announcements: [],
+  subcategories: [],
   heroSlides: [],
   swipeCategories: [],
   bottomBanner: {
-    imageDesktop: '/images/ImageBanner.png',
-    imageMobile: '/images/ImageBanner-Mob.png',
-    altText: 'VEYNCORE Denim Campaign',
-    buttonLink: '/collections/all-drops',
-    active: true,
+    imageDesktop: '',
+    imageMobile: '',
+    altText: '',
+    buttonLink: '',
+    active: false,
   },
   bottomBannerObjects: {
-    imageDesktop: '/images/hero/ObjectHero03.jpg',
-    imageMobile: '/images/hero/ObjectHero03.jpg',
-    altText: 'VEYN-OBJECTS Artifacts Campaign',
-    buttonLink: '/collections/objects-drops',
-    active: true,
+    imageDesktop: '',
+    imageMobile: '',
+    altText: '',
+    buttonLink: '',
+    active: false,
   },
 };
 
 /**
  * GET /api/content
- * Retrieve current dynamic site content (auto-creates defaults if none exists)
+ * Retrieve current dynamic site content (auto-creates empty structure if none exists)
  */
 export const getContent = async (req, res) => {
   try {
@@ -52,45 +37,15 @@ export const getContent = async (req, res) => {
     }
 
     const contentObj = content.toObject ? content.toObject() : { ...content };
-    const legacyStaticIds = new Set([
-      'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
-      'bags', 'chains', 'headwear', 'hardware', 'obj-all'
-    ]);
-    if (Array.isArray(contentObj.subcategories)) {
-      contentObj.subcategories = contentObj.subcategories.filter(item => {
-        if (item.id === 'obj-all' || item.label?.toUpperCase() === 'ALL OBJECTS') return false;
-        if (legacyStaticIds.has(item.id) && (item.href === `#${item.id}` || !item.href)) return false;
-        return true;
-      });
-    }
 
-    if (content && Array.isArray(content.subcategories)) {
-      const hadObjAll = content.subcategories.some(
-        s => s.id === 'obj-all' || s.label?.toUpperCase() === 'ALL OBJECTS'
-      );
-      if (hadObjAll) {
-        content.subcategories = content.subcategories.filter(
-          s => s.id !== 'obj-all' && s.label?.toUpperCase() !== 'ALL OBJECTS'
-        );
-        await content.save();
+    // Reflect active subcategories from MongoDB Atlas subcategories collection
+    try {
+      const atlasSubs = await Subcategory.find({ active: true }).sort({ sortOrder: 1 }).lean();
+      if (atlasSubs && atlasSubs.length > 0) {
+        contentObj.subcategories = atlasSubs;
       }
-    }
-    const legacySwipeKeys = new Set(['baggy', 'bootcut', 'wide', 'straight', 'bags', 'chains', 'caps']);
-    if (Array.isArray(contentObj.swipeCategories)) {
-      contentObj.swipeCategories = contentObj.swipeCategories.filter(item => {
-        const key = (item.key || item.id || '').replace(/^swp-/, '').toLowerCase();
-        return !legacySwipeKeys.has(key);
-      });
-    }
-
-    const legacyHeroSlideIds = new Set([
-      'slide-1', 'slide-2', 'slide-3',
-      'obj-slide-1', 'obj-slide-2', 'obj-slide-3'
-    ]);
-    if (Array.isArray(contentObj.heroSlides)) {
-      contentObj.heroSlides = contentObj.heroSlides.filter(
-        item => !legacyHeroSlideIds.has(item.id)
-      );
+    } catch (e) {
+      // Fallback to embedded array if query fails
     }
 
     return res.status(200).json({
@@ -120,7 +75,7 @@ export const getSectionContent = async (req, res) => {
       content = await SiteContent.create(DEFAULT_CONTENT);
     }
 
-    let sectionData = content[section] || DEFAULT_CONTENT[section];
+    let sectionData = content[section] !== undefined ? content[section] : DEFAULT_CONTENT[section];
     if (sectionData === undefined) {
       return res.status(404).json({
         success: false,
@@ -128,36 +83,15 @@ export const getSectionContent = async (req, res) => {
       });
     }
 
-    if (section === 'subcategories' && Array.isArray(sectionData)) {
-      const legacyStaticIds = new Set([
-        'denims', 'cargo', 'baggy', 'bootcut', 'wide', 'straight', 'tops', 'accessories',
-        'bags', 'chains', 'headwear', 'hardware', 'obj-all'
-      ]);
-      sectionData = sectionData.filter(item => {
-        if (item.id === 'obj-all' || item.label?.toUpperCase() === 'ALL OBJECTS') return false;
-        if (legacyStaticIds.has(item.id) && (item.href === `#${item.id}` || !item.href)) {
-          return false;
+    if (section === 'subcategories') {
+      try {
+        const atlasSubcategories = await Subcategory.find({ active: true }).sort({ sortOrder: 1 }).lean();
+        if (atlasSubcategories && atlasSubcategories.length > 0) {
+          sectionData = atlasSubcategories;
         }
-        return true;
-      });
-    }
-
-    if (section === 'swipeCategories' && Array.isArray(sectionData)) {
-      const legacySwipeKeys = new Set(['baggy', 'bootcut', 'wide', 'straight', 'bags', 'chains', 'caps']);
-      sectionData = sectionData.filter(item => {
-        const key = (item.key || item.id || '').replace(/^swp-/, '').toLowerCase();
-        return !legacySwipeKeys.has(key);
-      });
-    }
-
-    if (section === 'heroSlides' && Array.isArray(sectionData)) {
-      const legacyHeroSlideIds = new Set([
-        'slide-1', 'slide-2', 'slide-3',
-        'obj-slide-1', 'obj-slide-2', 'obj-slide-3'
-      ]);
-      sectionData = sectionData.filter(
-        item => !legacyHeroSlideIds.has(item.id)
-      );
+      } catch (e) {
+        // Fallback to embedded array if query fails
+      }
     }
 
     return res.status(200).json({
@@ -259,6 +193,29 @@ export const updateSectionContent = async (req, res) => {
     content[section] = sectionData;
     content.markModified(section);
     await content.save();
+
+    // Keep dedicated subcategories collection in MongoDB Atlas in 100% sync
+    if (section === 'subcategories' && Array.isArray(sectionData)) {
+      try {
+        await Subcategory.deleteMany({});
+        await Subcategory.insertMany(
+          sectionData.map((item, idx) => ({
+            id: String(item.id || `sub-${Date.now()}-${idx}`),
+            slug: String(item.id || `sub-${Date.now()}-${idx}`),
+            parentCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+            mainCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+            label: String(item.label || '').trim().toUpperCase(),
+            href: String(item.href || '#').trim(),
+            image: String(item.image || '').trim(),
+            isGlow: Boolean(item.isGlow),
+            sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
+            active: item.active !== false,
+          }))
+        );
+      } catch (syncErr) {
+        console.error('[Content Controller] Error syncing subcategories to MongoDB Atlas:', syncErr);
+      }
+    }
 
     return res.status(200).json({
       success: true,

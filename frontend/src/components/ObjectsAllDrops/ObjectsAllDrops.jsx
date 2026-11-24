@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { API_BASE_URL } from '@/lib/constants';
+import { matchProductCategory, DEFAULT_OBJECTS_CATEGORIES } from '@/lib/categoryFilterUtils';
 import './ObjectsAllDrops.css';
 
 /**
@@ -377,12 +378,9 @@ function ObjectsAllDropsContent() {
   const filteredProducts = useMemo(() => {
     let result = [...productsList];
 
-    // Filter by category tab
-    if (activeCategoryTab !== 'all') {
-      const targetSub = activeCategoryTab.toUpperCase();
-      result = result.filter(
-        (p) => p.subCategory === targetSub || p.subCategory?.startsWith(targetSub)
-      );
+    // Filter by category tab using unified matching utility
+    if (activeCategoryTab && activeCategoryTab !== 'all') {
+      result = result.filter((p) => matchProductCategory(p, activeCategoryTab));
     }
 
     // Filter by availability
@@ -425,16 +423,25 @@ function ObjectsAllDropsContent() {
     }
 
     return result;
-  }, [activeCategoryTab, selectedAvailability, minPrice, maxPrice, sortBy]);
+  }, [productsList, activeCategoryTab, selectedAvailability, minPrice, maxPrice, sortBy]);
 
   const currentSortLabel =
     SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || 'Featured';
 
-  // Fully Dynamic Category Extraction from products for Objects
+  // Dynamic Category Extraction from defaults and real products for Objects
   const dynamicObjectCategories = useMemo(() => {
     const map = new Map();
-    map.set('all', { id: 'all', label: 'ALL', count: productsList.length });
 
+    // 1. Seed with standard object categories
+    DEFAULT_OBJECTS_CATEGORIES.forEach((def) => {
+      map.set(def.id, {
+        id: def.id,
+        label: def.label,
+        count: def.id === 'all' ? productsList.length : 0,
+      });
+    });
+
+    // 2. Add any additional dynamic subcategories from products
     productsList.forEach((p) => {
       const sub = (p.subCategory || '').trim();
       if (sub) {
@@ -449,25 +456,37 @@ function ObjectsAllDropsContent() {
       }
     });
 
+    // 3. Exact matching counts using robust matching utility
     const entries = Array.from(map.values());
     entries.forEach((cat) => {
-      if (cat.id === 'all') return;
-      const target = cat.id;
-      cat.count = productsList.filter((p) => {
-        const sub = (p.subCategory || '').toLowerCase().trim();
-        return sub === target || sub.startsWith(target);
-      }).length;
+      if (cat.id === 'all') {
+        cat.count = productsList.length;
+        return;
+      }
+      cat.count = productsList.filter((p) => matchProductCategory(p, cat.id)).length;
     });
 
     return entries;
   }, [productsList]);
+
+  const activeCategoryLabel = useMemo(() => {
+    if (!activeCategoryTab || activeCategoryTab === 'all') return '';
+    const match = dynamicObjectCategories.find(
+      (c) =>
+        c.id === activeCategoryTab ||
+        matchProductCategory({ subCategory: c.label, fit: c.id }, activeCategoryTab)
+    );
+    return match ? match.label : activeCategoryTab.toUpperCase();
+  }, [activeCategoryTab, dynamicObjectCategories]);
 
   return (
     <section className="obj-all">
       <div className="obj-all__container">
         {/* Collection Header */}
         <header className="obj-all__header">
-          <h1 className="obj-all__title">OBJECT DROPS</h1>
+          <h1 className="obj-all__title">
+            {activeCategoryLabel ? `OBJECT DROPS • ${activeCategoryLabel}` : 'OBJECT DROPS'}
+          </h1>
           <span className="obj-all__count-badge">
             {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
           </span>
@@ -477,6 +496,85 @@ function ObjectsAllDropsContent() {
         <div className="obj-all__controls" ref={dropdownRef}>
           {/* Desktop Filter Dropdowns */}
           <div className="obj-all__desktop-filters">
+            {/* Category Filter Dropdown */}
+            <div className="obj-all__filter-dropdown">
+              <button
+                type="button"
+                className={`obj-all__filter-trigger ${
+                  activeCategoryTab && activeCategoryTab !== 'all'
+                    ? 'obj-all__filter-trigger--active'
+                    : ''
+                }`}
+                onClick={() => toggleDropdown('category')}
+                aria-expanded={activeDropdown === 'category'}
+              >
+                <span>Category</span>
+                {activeCategoryTab && activeCategoryTab !== 'all' && (
+                  <span className="obj-all__filter-count">
+                    ({activeCategoryLabel})
+                  </span>
+                )}
+                <svg
+                  className={`obj-all__chevron ${
+                    activeDropdown === 'category' ? 'obj-all__chevron--open' : ''
+                  }`}
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                >
+                  <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+
+              {activeDropdown === 'category' && (
+                <div className="obj-all__popover">
+                  <div className="obj-all__popover-header">
+                    <span>Category</span>
+                    {activeCategoryTab && activeCategoryTab !== 'all' && (
+                      <button
+                        type="button"
+                        className="obj-all__popover-reset"
+                        onClick={() => {
+                          handleTabChange('all');
+                          setActiveDropdown(null);
+                        }}
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="obj-all__popover-body">
+                    {dynamicObjectCategories.map((cat) => {
+                      const isCatActive =
+                        cat.id === 'all'
+                          ? !activeCategoryTab || activeCategoryTab === 'all'
+                          : activeCategoryTab === cat.id;
+
+                      return (
+                        <label key={cat.id} className="obj-all__checkbox-label">
+                          <input
+                            type="radio"
+                            name="desktop-obj-category"
+                            checked={isCatActive}
+                            onChange={() => {
+                              handleTabChange(cat.id);
+                              setActiveDropdown(null);
+                            }}
+                            className="obj-all__checkbox-input"
+                          />
+                          <span className="obj-all__checkbox-custom" />
+                          <span>
+                            {cat.label} ({cat.count})
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Availability Filter */}
             <div className="obj-all__filter-dropdown">
               <button

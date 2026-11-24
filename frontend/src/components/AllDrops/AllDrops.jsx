@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
 import { API_BASE_URL } from '@/lib/constants';
+import { matchProductCategory, DEFAULT_SELECTS_CATEGORIES } from '@/lib/categoryFilterUtils';
 import './AllDrops.css';
 
 /**
@@ -366,15 +367,17 @@ function AllDropsContent() {
     };
   }, []);
 
-  // Fully Dynamic Category Extraction from products & backend subcategories (NO hardcoded category names)
+  // Dynamic Category Extraction from defaults, products & backend subcategories
   const dynamicCategories = useMemo(() => {
     const map = new Map();
 
-    // 1. "ALL DROPS" option
-    map.set('all', {
-      id: 'all',
-      label: 'ALL DROPS',
-      count: productsList.length,
+    // 1. Seed with standard categories
+    DEFAULT_SELECTS_CATEGORIES.forEach((def) => {
+      map.set(def.id, {
+        id: def.id,
+        label: def.label,
+        count: def.id === 'all' ? productsList.length : 0,
+      });
     });
 
     const priorityOrder = ['baggy', 'bootcut', 'wide', 'straight', 'cargo', 'denims', 'tops', 'accessories'];
@@ -410,25 +413,14 @@ function AllDropsContent() {
         });
     }
 
-    // 4. Calculate exact matching counts for each category
+    // 4. Calculate exact matching counts for each category using robust helper
     const entries = Array.from(map.values());
     entries.forEach((cat) => {
-      if (cat.id === 'all') return;
-      const target = cat.id;
-      const matches = productsList.filter((p) => {
-        const pFit = (p.fit || '').toLowerCase().trim();
-        const pSub = (p.subCategory || '').toLowerCase().trim();
-        const pSwipe = (p.swipeCategory || '').toLowerCase().trim();
-        const pTitle = (p.title || '').toLowerCase();
-
-        if (pFit === target || pSub === target || pSwipe === target) return true;
-        if (target.endsWith('s') && (pFit === target.slice(0, -1) || pSub === target.slice(0, -1))) return true;
-        if (!target.endsWith('s') && (pFit === target + 's' || pSub === target + 's')) return true;
-        if (target === 'denims') return p.category === 'VEYN-SELECTS';
-        if (pTitle.includes(target)) return true;
-        return false;
-      });
-      cat.count = matches.length;
+      if (cat.id === 'all') {
+        cat.count = productsList.length;
+        return;
+      }
+      cat.count = productsList.filter((p) => matchProductCategory(p, cat.id)).length;
     });
 
     // 5. Sort: "all" first, then priority order, then alphabetically
@@ -515,22 +507,9 @@ function AllDropsContent() {
   const filteredProducts = useMemo(() => {
     let result = [...productsList];
 
-    // Filter by Category
+    // Filter by Category using unified matching utility
     if (selectedCategory && selectedCategory !== 'all') {
-      const target = selectedCategory.toLowerCase().trim();
-      result = result.filter((p) => {
-        const pFit = (p.fit || '').toLowerCase().trim();
-        const pSub = (p.subCategory || '').toLowerCase().trim();
-        const pSwipe = (p.swipeCategory || '').toLowerCase().trim();
-        const pTitle = (p.title || '').toLowerCase();
-
-        if (pFit === target || pSub === target || pSwipe === target) return true;
-        if (target.endsWith('s') && (pFit === target.slice(0, -1) || pSub === target.slice(0, -1))) return true;
-        if (!target.endsWith('s') && (pFit === target + 's' || pSub === target + 's')) return true;
-        if (target === 'denims') return p.category === 'VEYN-SELECTS';
-        if (pTitle.includes(target)) return true;
-        return false;
-      });
+      result = result.filter((p) => matchProductCategory(p, selectedCategory));
     }
 
     // Filter by badge if specified (e.g. ?badge=new)
