@@ -86,6 +86,11 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    stock: {
+      type: Number,
+      default: 50,
+      min: 0,
+    },
     inStock: {
       type: Boolean,
       default: true,
@@ -97,6 +102,14 @@ const productSchema = new mongoose.Schema(
     newArrival: {
       type: Boolean,
       default: false,
+    },
+    measurements: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    sizeChartImage: {
+      type: String,
+      default: '',
     },
     swipeCategory: {
       type: String,
@@ -126,6 +139,9 @@ productSchema.pre('save', function (next) {
   }
   if (this.category === 'VEYN-OBJECTS') {
     this.isObject = true;
+  }
+  if (this.stock !== undefined) {
+    this.inStock = Number(this.stock) > 0;
   }
   next();
 });

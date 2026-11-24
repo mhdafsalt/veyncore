@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { getProductByHandle } from '@/data/productsData';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
 import { parseNumericPrice } from '@/lib/priceUtils';
+import { generateDynamicMeasurements, isTopCategory } from '@/lib/sizeChartUtils';
 import './ProductDetail.css';
 
 /**
@@ -48,8 +49,25 @@ export default function ProductDetail({ product }) {
     ? product.images
     : ['/images/products/artic-blue-wide.jpg'];
 
-  const sizes = product?.availableSizes || ['28', '30', '32', '34'];
-  const measurements = product?.measurements?.[sizeUnit] || [];
+  const sizes = product?.availableSizes && product.availableSizes.length > 0
+    ? product.availableSizes
+    : ['28', '30', '32', '34'];
+  const isTop = Boolean(isTopCategory(product?.subCategory));
+  const measurements = useMemo(() => {
+    if (
+      product?.measurements?.[sizeUnit] &&
+      Array.isArray(product.measurements[sizeUnit]) &&
+      product.measurements[sizeUnit].length > 0
+    ) {
+      return product.measurements[sizeUnit];
+    }
+    return generateDynamicMeasurements(
+      sizes,
+      sizeUnit,
+      product?.subCategory,
+      product?.category
+    );
+  }, [product?.measurements, sizeUnit, sizes, product?.subCategory, product?.category]);
 
   // Get Related Products
   const relatedProducts = (product?.relatedHandles || [])
@@ -933,19 +951,45 @@ export default function ProductDetail({ product }) {
                   </div>
                 </div>
               ) : (
-                /* Denim Pants Size Chart */
+                /* Dynamic Apparel / Denim Pants Size Chart */
                 <>
+                  {product?.sizeChartImage && (
+                    <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+                      <img
+                        src={product.sizeChartImage}
+                        alt="Size Chart Guide"
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '300px',
+                          borderRadius: '8px',
+                          border: '1px solid #e2e8f0',
+                          objectFit: 'contain',
+                        }}
+                      />
+                    </div>
+                  )}
+
                   <div className="size-modal__table-wrap">
                     <table className="size-modal__table">
                       <thead>
-                        <tr>
-                          <th>Size</th>
-                          <th>Waist ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                          <th>Rise ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                          <th>Thighs ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                          <th>Length ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                          <th>Leg Opening ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
-                        </tr>
+                        {isTop ? (
+                          <tr>
+                            <th>Size</th>
+                            <th>Chest ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Length ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Shoulder ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Sleeve ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                          </tr>
+                        ) : (
+                          <tr>
+                            <th>Size</th>
+                            <th>Waist ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Rise ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Thighs ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Length ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                            <th>Leg Opening ({sizeUnit === 'inches' ? 'in' : 'cm'})</th>
+                          </tr>
+                        )}
                       </thead>
                       <tbody>
                         {measurements.map((row) => (
@@ -954,11 +998,22 @@ export default function ProductDetail({ product }) {
                             className={row.size === selectedSize ? 'size-modal__row--selected' : ''}
                           >
                             <td className="size-modal__cell-size">{row.size}</td>
-                            <td>{row.waist}</td>
-                            <td>{row.rise}</td>
-                            <td>{row.thighs}</td>
-                            <td>{row.length}</td>
-                            <td>{row.legOpening}</td>
+                            {isTop ? (
+                              <>
+                                <td>{row.chest || row.waist}</td>
+                                <td>{row.length}</td>
+                                <td>{row.shoulder || row.rise}</td>
+                                <td>{row.sleeve || row.thighs}</td>
+                              </>
+                            ) : (
+                              <>
+                                <td>{row.waist}</td>
+                                <td>{row.rise}</td>
+                                <td>{row.thighs}</td>
+                                <td>{row.length}</td>
+                                <td>{row.legOpening}</td>
+                              </>
+                            )}
                           </tr>
                         ))}
                       </tbody>
@@ -983,27 +1038,50 @@ export default function ProductDetail({ product }) {
                     </div>
 
                     <div className="size-modal__guide-text">
-                      <h4 className="size-modal__guide-title">How to Measure Pants &amp; Jeans</h4>
+                      <h4 className="size-modal__guide-title">
+                        {isTop ? 'How to Measure Tops & T-Shirts' : 'How to Measure Pants & Jeans'}
+                      </h4>
                       <ul className="size-modal__guide-list">
-                        <li>
-                          <strong>Waist:</strong> Measure straight across the top of the waistband and double the measurement.
-                        </li>
-                        <li>
-                          <strong>Rise:</strong> Measure vertically from the bottom of the crotch seam up to the top waistband.
-                        </li>
-                        <li>
-                          <strong>Thighs:</strong> Measure straight across the leg 1 inch below the crotch seam.
-                        </li>
-                        <li>
-                          <strong>Length:</strong> Measure from the top waistband along the outer seam down to the bottom hem.
-                        </li>
-                        <li>
-                          <strong>Leg Opening:</strong> Measure straight across the bottom hem of one leg.
-                        </li>
+                        {isTop ? (
+                          <>
+                            <li>
+                              <strong>Chest:</strong> Measure horizontally across the fullest part of the chest under arms.
+                            </li>
+                            <li>
+                              <strong>Length:</strong> Measure from the highest point of the shoulder seam to the bottom hem.
+                            </li>
+                            <li>
+                              <strong>Shoulder:</strong> Measure straight across the back from shoulder seam to shoulder seam.
+                            </li>
+                            <li>
+                              <strong>Sleeve:</strong> Measure from the shoulder seam down to the sleeve cuff opening.
+                            </li>
+                          </>
+                        ) : (
+                          <>
+                            <li>
+                              <strong>Waist:</strong> Measure straight across the top of the waistband and double the measurement.
+                            </li>
+                            <li>
+                              <strong>Rise:</strong> Measure vertically from the bottom of the crotch seam up to the top waistband.
+                            </li>
+                            <li>
+                              <strong>Thighs:</strong> Measure straight across the leg 1 inch below the crotch seam.
+                            </li>
+                            <li>
+                              <strong>Length:</strong> Measure from the top waistband along the outer seam down to the bottom hem.
+                            </li>
+                            <li>
+                              <strong>Leg Opening:</strong> Measure straight across the bottom hem of one leg.
+                            </li>
+                          </>
+                        )}
                       </ul>
 
                       <div className="size-modal__tip">
-                        <span>💡 <strong>Streetwear Fit Tip:</strong> For our signature relaxed baggy silhouette, select your standard waist size. For an extreme oversized drop, choose one size up.</span>
+                        <span>
+                          💡 <strong>Streetwear Fit Tip:</strong> For our signature relaxed {product.subCategory || 'silhouette'}, select your standard size. For an extreme oversized drop, choose one size up.
+                        </span>
                       </div>
                     </div>
                   </div>

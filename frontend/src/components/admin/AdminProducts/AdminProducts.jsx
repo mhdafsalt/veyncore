@@ -178,11 +178,13 @@ export default function AdminProducts({
                         type="button"
                         onClick={() => onToggleStock(p)}
                         className={`admin-badge admin-badge--${
-                          p.inStock !== false ? 'in-stock' : 'out-stock'
+                          p.inStock !== false && (p.stock === undefined || p.stock > 0) ? 'in-stock' : 'out-stock'
                         } admin-products__stock-btn`}
                         title="Click to toggle stock status"
                       >
-                        {p.inStock !== false ? '✓ IN STOCK' : '✕ SOLD OUT'}
+                        {p.inStock !== false && (p.stock === undefined || p.stock > 0)
+                          ? `✓ IN STOCK${p.stock !== undefined ? ` (${p.stock})` : ''}`
+                          : '✕ SOLD OUT'}
                       </button>
                     </td>
                     <td style={{ textAlign: 'right' }}>

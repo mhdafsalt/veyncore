@@ -79,7 +79,10 @@ export default function AdminDashboard() {
     swipeCategory: '',
     featured: false,
     newArrival: false,
+    stock: 50,
     inStock: true,
+    measurements: null,
+    sizeChartImage: '',
   });
 
   // Item Modal State (for Subcategories, Hero Slides, Announcements, Swipe Categories)
@@ -288,7 +291,10 @@ export default function AdminDashboard() {
       swipeCategory: '',
       featured: false,
       newArrival: false,
+      stock: 50,
       inStock: true,
+      measurements: null,
+      sizeChartImage: '',
     });
     setIsProductModalOpen(true);
   };
@@ -312,7 +318,10 @@ export default function AdminDashboard() {
       swipeCategory: product.swipeCategory || '',
       featured: Boolean(product.featured),
       newArrival: Boolean(product.newArrival),
-      inStock: product.inStock !== false,
+      stock: product.stock !== undefined ? product.stock : (product.inStock !== false ? 50 : 0),
+      inStock: product.inStock !== false && (product.stock === undefined || product.stock > 0),
+      measurements: product.measurements || null,
+      sizeChartImage: product.sizeChartImage || '',
     });
     setIsProductModalOpen(true);
   };
@@ -328,6 +337,11 @@ export default function AdminDashboard() {
       const cleanedImages = (productFormData.images || [])
         .map((img) => img.trim())
         .filter(Boolean);
+
+      const stockNum =
+        productFormData.stock !== '' && productFormData.stock !== undefined
+          ? Math.max(0, parseInt(productFormData.stock, 10) || 0)
+          : (productFormData.inStock !== false ? 50 : 0);
 
       const payload = {
         title: productFormData.title,
@@ -349,7 +363,10 @@ export default function AdminDashboard() {
           productFormData.swipeCategory || productFormData.subCategory.toLowerCase(),
         featured: productFormData.featured,
         newArrival: productFormData.newArrival,
-        inStock: productFormData.inStock,
+        stock: stockNum,
+        inStock: stockNum > 0,
+        measurements: productFormData.measurements || null,
+        sizeChartImage: productFormData.sizeChartImage || '',
       };
 
       const isEdit = Boolean(editingProduct && (editingProduct._id || editingProduct.handle));
@@ -385,16 +402,18 @@ export default function AdminDashboard() {
 
   const handleToggleStock = async (product) => {
     try {
-      const updatedStock = product.inStock === false;
+      const isCurrentlyInStock = product.inStock !== false && (product.stock === undefined || product.stock > 0);
+      const nextInStock = !isCurrentlyInStock;
+      const nextStock = nextInStock ? (product.stock && product.stock > 0 ? product.stock : 50) : 0;
       const res = await fetch(`${API_BASE_URL}/api/products/${product.handle || product._id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ inStock: updatedStock }),
+        body: JSON.stringify({ inStock: nextInStock, stock: nextStock }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
         showToast(
-          `Product marked as ${updatedStock ? 'IN STOCK' : 'SOLD OUT'}.`,
+          `Product marked as ${nextInStock ? `IN STOCK (${nextStock})` : 'SOLD OUT'}.`,
           'success'
         );
         fetchProducts();
@@ -879,6 +898,8 @@ export default function AdminDashboard() {
         setFormData={setProductFormData}
         onSubmit={handleSaveProduct}
         isSaving={isSaving}
+        siteContent={siteContent}
+        products={products}
       />
 
       <ItemModal

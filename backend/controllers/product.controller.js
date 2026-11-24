@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/product.model.js';
 
 /**
@@ -168,6 +169,17 @@ export const createProduct = async (req, res) => {
       data.isObject = true;
     }
 
+    if (data.stock !== undefined) {
+      data.stock = Math.max(0, Number(data.stock) || 0);
+      data.inStock = data.stock > 0;
+    } else if (data.inStock !== undefined) {
+      data.stock = data.inStock ? 50 : 0;
+    }
+
+    if (data.sizeChartImage) {
+      data.sizeChartImage = String(data.sizeChartImage).trim();
+    }
+
     const product = await Product.create(data);
 
     return res.status(201).json({
@@ -217,10 +229,29 @@ export const updateProduct = async (req, res) => {
       updates.isObject = false;
     }
 
-    const product = await Product.findByIdAndUpdate(id, updates, {
-      new: true,
-      runValidators: true,
-    });
+    if (updates.stock !== undefined) {
+      updates.stock = Math.max(0, Number(updates.stock) || 0);
+      updates.inStock = updates.stock > 0;
+    } else if (updates.inStock !== undefined && updates.stock === undefined) {
+      updates.stock = updates.inStock ? 50 : 0;
+    }
+
+    if (updates.sizeChartImage !== undefined) {
+      updates.sizeChartImage = String(updates.sizeChartImage).trim();
+    }
+
+    let product;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      product = await Product.findByIdAndUpdate(id, updates, {
+        new: true,
+        runValidators: true,
+      });
+    } else {
+      product = await Product.findOneAndUpdate({ handle: id.toLowerCase() }, updates, {
+        new: true,
+        runValidators: true,
+      });
+    }
 
     if (!product) {
       return res.status(404).json({
