@@ -10,6 +10,7 @@
   overflow: hidden;
   background-color: #000000;
   box-sizing: border-box;
+  margin: 20px 0 28px;
 }
 
 .image-banner__link {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ImageBanner.css';
 
 export default function ImageBanner({
@@ -102,9 +103,9 @@ export default function ImageBanner({
         aria-label={banner.altText || 'View campaign collection'}
       >
         <picture className="image-banner__picture">
-          <source media="(max-width: 768px)" srcSet={banner.imageMobile} />
+          <source media="(max-width: 768px)" srcSet={optimizeImageUrl(banner.imageMobile, 800)} />
           <img
-            src={banner.imageDesktop}
+            src={optimizeImageUrl(banner.imageDesktop, 1600)}
             alt={banner.altText}
             className="image-banner__img"
             loading="lazy"

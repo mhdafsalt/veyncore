@@ -7,6 +7,7 @@ import MainCategories from '@/components/MainCategories/MainCategories';
 import SubCategories from '@/components/SubCategories/SubCategories';
 import HeroSection from '@/components/HeroSection/HeroSection';
 import NewArrivals from '@/components/NewArrivals/NewArrivals';
+import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import CategoryFits from '@/components/CategoryFits/CategoryFits';
 import VeynObjects from '@/components/VeynObjects/VeynObjects';
 import Footer from '@/components/Footer/Footer';
@@ -81,14 +82,17 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
               {/* Shop New Arrivals (Responsive 4-col/2-col grid with veyncult styling) */}
               <NewArrivals />
 
+              {/* Editorial Campaign Image Banner positioned right below SHOP NEW ARRIVALS View all button */}
+              <ImageBanner targetSection="VEYN-SELECTS" />
+
               {/* Fit Categories Showcase (BAGGY, BOOTCUT, WIDE, STRAIGHT swipeable rows with 6 cards & View all) */}
               <CategoryFits />
             </>
           )}
         </div>
 
-        {/* 6. Modern VEYNCORE Footer with Editorial Image Banner on Homepage */}
-        <Footer showBanner={true} activeMainCategory={activeCategory} />
+        {/* 6. Modern VEYNCORE Footer */}
+        <Footer showBanner={false} activeMainCategory={activeCategory} />
       </main>
     </>
   );

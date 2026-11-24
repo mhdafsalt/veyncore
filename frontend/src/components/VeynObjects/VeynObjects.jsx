@@ -3,6 +3,7 @@
 import React from 'react';
 import ObjectsHero from '@/components/ObjectsHero/ObjectsHero';
 import ObjectsNewArrivals from '@/components/ObjectsNewArrivals/ObjectsNewArrivals';
+import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import ObjectsCategoryDrops from '@/components/ObjectsCategoryDrops/ObjectsCategoryDrops';
 import './VeynObjects.css';
 
@@ -14,6 +15,9 @@ export default function VeynObjects() {
 
       {/* 2. Curated Object Drops Showcase Grid */}
       <ObjectsNewArrivals />
+
+      {/* Editorial Campaign Image Banner positioned right below Objects Drops grid */}
+      <ImageBanner targetSection="VEYN-OBJECTS" />
 
       {/* 3. Category-Based Swipeable Drops (BAGS, CHAINS, CAPS) */}
       <ObjectsCategoryDrops />
