@@ -10,7 +10,7 @@ const contentSchema = new mongoose.Schema(
     },
     announcements: [
       {
-        id: { type: String, required: true },
+        id: { type: String, default: () => `ann-${Date.now()}-${Math.random().toString(36).substr(2, 4)}` },
         text: { type: String, required: true },
         active: { type: Boolean, default: true },
         sortOrder: { type: Number, default: 0 },
@@ -18,7 +18,7 @@ const contentSchema = new mongoose.Schema(
     ],
     subcategories: [
       {
-        id: { type: String, required: true },
+        id: { type: String, default: () => `sub-${Date.now()}-${Math.random().toString(36).substr(2, 4)}` },
         mainCategory: {
           type: String,
           enum: ['VEYN-SELECTS', 'VEYN-OBJECTS'],
@@ -34,7 +34,7 @@ const contentSchema = new mongoose.Schema(
     ],
     heroSlides: [
       {
-        id: { type: String, required: true },
+        id: { type: String, default: () => `slide-${Date.now()}-${Math.random().toString(36).substr(2, 4)}` },
         targetSection: {
           type: String,
           enum: ['VEYN-SELECTS', 'VEYN-OBJECTS'],
@@ -52,7 +52,7 @@ const contentSchema = new mongoose.Schema(
     ],
     swipeCategories: [
       {
-        id: { type: String, required: true },
+        id: { type: String, default: () => `swp-${Date.now()}-${Math.random().toString(36).substr(2, 4)}` },
         targetSection: {
           type: String,
           enum: ['VEYN-SELECTS', 'VEYN-OBJECTS'],

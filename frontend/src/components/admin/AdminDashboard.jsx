@@ -439,7 +439,12 @@ export default function AdminDashboard() {
       const currentList = [...(siteContent?.[type] || [])];
 
       if (isEdit && index >= 0) {
-        currentList[index] = { ...currentList[index], ...itemFormData };
+        const existing = currentList[index] || {};
+        currentList[index] = {
+          ...existing,
+          ...itemFormData,
+          id: itemFormData.id || existing.id || existing._id || `item-${Date.now()}-${index}`,
+        };
       } else {
         const newItem = {
           ...itemFormData,
@@ -481,6 +486,7 @@ export default function AdminDashboard() {
       currentList[index] = {
         ...currentList[index],
         [field]: !currentList[index][field],
+        id: currentList[index].id || currentList[index]._id || `item-${Date.now()}-${index}`,
       };
 
       const res = await fetch(`${API_BASE_URL}/api/content/${type}`, {
@@ -493,6 +499,8 @@ export default function AdminDashboard() {
       if (res.ok && data.success) {
         showToast('Status toggled.', 'success');
         fetchContent();
+      } else {
+        showToast(data.message || 'Toggle failed', 'error');
       }
     } catch (err) {
       showToast('Error updating status', 'error');

@@ -195,7 +195,75 @@ export const updateSectionContent = async (req, res) => {
       content = await SiteContent.create(DEFAULT_CONTENT);
     }
 
-    content[section] = bodyData;
+    // Determine payload format: array items can arrive as { items: [...] }, [ ... ], or { [section]: [...] }
+    let sectionData = bodyData;
+    if (bodyData && typeof bodyData === 'object') {
+      if (Array.isArray(bodyData.items)) {
+        sectionData = bodyData.items;
+      } else if (Array.isArray(bodyData[section])) {
+        sectionData = bodyData[section];
+      }
+    }
+
+    // Validate and sanitize if array section
+    if (section === 'announcements') {
+      const list = Array.isArray(sectionData) ? sectionData : [];
+      sectionData = list
+        .filter((item) => item && (item.text || item.id))
+        .map((item, idx) => ({
+          id: String(item.id || item._id || `ann-${Date.now()}-${idx}`),
+          text: String(item.text || '').trim(),
+          active: item.active !== false,
+          sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
+        }));
+    } else if (section === 'subcategories') {
+      const list = Array.isArray(sectionData) ? sectionData : [];
+      sectionData = list
+        .filter((item) => item && (item.label || item.id))
+        .map((item, idx) => ({
+          id: String(item.id || item._id || `sub-${Date.now()}-${idx}`),
+          mainCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+          label: String(item.label || '').trim(),
+          href: String(item.href || '#').trim(),
+          image: String(item.image || '').trim(),
+          isGlow: Boolean(item.isGlow),
+          sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
+          active: item.active !== false,
+        }));
+    } else if (section === 'heroSlides') {
+      const list = Array.isArray(sectionData) ? sectionData : [];
+      sectionData = list
+        .filter((item) => item && (item.image || item.id))
+        .map((item, idx) => ({
+          id: String(item.id || item._id || `slide-${Date.now()}-${idx}`),
+          targetSection: item.targetSection === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+          title: String(item.title || '').trim(),
+          subtitle: String(item.subtitle || '').trim(),
+          tag: String(item.tag || '').trim(),
+          image: String(item.image || '').trim(),
+          href: String(item.href || '/collections/all-drops').trim(),
+          description: String(item.description || '').trim(),
+          sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
+          active: item.active !== false,
+        }));
+    } else if (section === 'swipeCategories') {
+      const list = Array.isArray(sectionData) ? sectionData : [];
+      sectionData = list
+        .filter((item) => item && (item.key || item.label || item.id))
+        .map((item, idx) => ({
+          id: String(item.id || item._id || `swp-${Date.now()}-${idx}`),
+          targetSection: item.targetSection === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+          key: String(item.key || '').trim().toLowerCase(),
+          label: String(item.label || '').trim(),
+          image: String(item.image || '').trim(),
+          collectionPath: String(item.collectionPath || '/collections/all-drops').trim(),
+          sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
+          active: item.active !== false,
+        }));
+    }
+
+    content[section] = sectionData;
+    content.markModified(section);
     await content.save();
 
     return res.status(200).json({
@@ -204,10 +272,10 @@ export const updateSectionContent = async (req, res) => {
       data: content[section],
     });
   } catch (error) {
-    console.error('[Content Controller] Error updating section:', error);
+    console.error(`[Content Controller] Error updating section "${req.params?.section}":`, error);
     return res.status(500).json({
       success: false,
-      message: `Failed to update section "${req.params.section}".`,
+      message: `Failed to update section "${req.params?.section}".`,
       error: error.message,
     });
   }

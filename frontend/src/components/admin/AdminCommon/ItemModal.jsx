@@ -76,17 +76,6 @@ export default function ItemModal({
                 />
               </div>
 
-              <AdminImageUploader
-                label="SUBCATEGORY ICON / IMAGE (OPTIONAL)"
-                value={formData.image || ''}
-                onChange={(newUrl) =>
-                  setFormData((prev) => ({ ...prev, image: newUrl }))
-                }
-                aspectRatio="1/1"
-                placeholder="/images/icons/..."
-                helpText="Optional icon or thumbnail preview for this subcategory item."
-              />
-
               <div className="admin-form-group">
                 <label className="admin-checkbox-label">
                   <input
@@ -131,39 +120,21 @@ export default function ItemModal({
                 helpText="Choose an image file from your device or paste a web/local image URL."
               />
 
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label className="admin-form-label">TARGET LINK *</label>
-                  <input
-                    type="text"
-                    className="admin-form-input"
-                    value={formData.href || ''}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, href: e.target.value }))
-                    }
-                    placeholder="/collections/all-drops"
-                    required
-                  />
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>
-                    Destination URL when slide is clicked
-                  </span>
-                </div>
-
-                <div className="admin-form-group">
-                  <label className="admin-form-label">CORNER TAG BADGE (OPTIONAL)</label>
-                  <input
-                    type="text"
-                    className="admin-form-input"
-                    value={formData.tag || ''}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, tag: e.target.value }))
-                    }
-                    placeholder="e.g. DROP 01"
-                  />
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>
-                    Optional promotional badge overlay
-                  </span>
-                </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">TARGET LINK *</label>
+                <input
+                  type="text"
+                  className="admin-form-input"
+                  value={formData.href || ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, href: e.target.value }))
+                  }
+                  placeholder="/collections/all-drops"
+                  required
+                />
+                <span style={{ fontSize: '11px', color: '#64748b' }}>
+                  Destination URL when slide is clicked
+                </span>
               </div>
             </>
           )}
