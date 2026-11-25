@@ -3,6 +3,7 @@
    ========================================================================== */
 
 .hero-carousel-section {
+  --hero-items-per-view: 3;
   position: relative;
   width: 100%;
   background-color: #ffffff;
@@ -10,6 +11,18 @@
   overflow: hidden;
   user-select: none;
   box-sizing: border-box;
+}
+
+@media (max-width: 1023px) {
+  .hero-carousel-section {
+    --hero-items-per-view: 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-carousel-section {
+    --hero-items-per-view: 1;
+  }
 }
 
 .hero-carousel__container {
@@ -53,6 +66,9 @@
   margin: 0;
   box-sizing: border-box;
   display: flex;
+  flex: 0 0 calc(100% / var(--hero-items-per-view, 3));
+  max-width: calc(100% / var(--hero-items-per-view, 3));
+  width: calc(100% / var(--hero-items-per-view, 3));
 }
 
 /* --------------------------------------------------------------------------

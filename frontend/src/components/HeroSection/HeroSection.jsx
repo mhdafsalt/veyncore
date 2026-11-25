@@ -3,29 +3,44 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './HeroSection.css';
 
-// In-memory module cache for instant Frame-0 painting
-let cachedSelectsSlides = null;
+// Default initial slides for instant Frame-0 painting without layout shifts
+const defaultSelectsSlides = [
+  {
+    id: 'item-1795506189161-voni',
+    targetSection: 'VEYN-SELECTS',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795542507/veyncore_uploads/heroimg01-1795542507039-6510.jpg',
+    href: '/collections/all-drops?category=tops',
+    sortOrder: 1,
+    active: true,
+  },
+  {
+    id: 'item-1795506297445-r59l',
+    targetSection: 'VEYN-SELECTS',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506294/veyncore_uploads/c9041be861aafae7dd6f84bbb2c01821-1795506291741-6512.jpg',
+    href: '/collections/all-drops?category=baggy',
+    sortOrder: 2,
+    active: true,
+  },
+  {
+    id: 'item-1795506325430-4mk0',
+    targetSection: 'VEYN-SELECTS',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795542536/veyncore_uploads/heroimg02-1795542536769-8926.jpg',
+    href: '/collections/all-drops',
+    sortOrder: 3,
+    active: true,
+  },
+];
 
-/**
- * Optimizes Cloudinary URLs on-the-fly with auto-format (WebP/AVIF),
- * perceptual quality compression, and size capping for ultra-fast loading.
- */
-function optimizeImageUrl(url, width = 900) {
-  if (!url || typeof url !== 'string') return url;
-  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-    if (url.includes('/f_auto,q_auto')) return url;
-    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
-  }
-  return url;
-}
+let cachedSelectsSlides = defaultSelectsSlides;
 
 export default function HeroSection({
   slides: propSlides = null,
   autoPlayInterval = 3500,
 }) {
-  const [slides, setSlides] = useState(() => propSlides || cachedSelectsSlides || []);
+  const [slides, setSlides] = useState(() => propSlides || cachedSelectsSlides || defaultSelectsSlides);
 
   // Fetch dynamic hero slides from backend (keeps state synced in background)
   useEffect(() => {
@@ -40,9 +55,11 @@ export default function HeroSection({
           const selectsSlides = data.data.filter(
             (s) => s.targetSection === 'VEYN-SELECTS' && s.active !== false
           );
-          cachedSelectsSlides = selectsSlides;
-          if (isMounted) {
-            setSlides(selectsSlides);
+          if (selectsSlides.length > 0) {
+            cachedSelectsSlides = selectsSlides;
+            if (isMounted) {
+              setSlides(selectsSlides);
+            }
           }
         }
       } catch (err) {
@@ -51,7 +68,11 @@ export default function HeroSection({
     };
 
     if (!propSlides) {
-      fetchHeroSlides();
+      const timer = setTimeout(fetchHeroSlides, 700);
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+      };
     }
     return () => {
       isMounted = false;
@@ -69,8 +90,8 @@ export default function HeroSection({
     return [...slides, ...slides, ...slides];
   }, [slides]);
 
-  // Start at the beginning of the middle set so we can loop infinitely in both directions
-  const [currentIndex, setCurrentIndex] = useState(baseCount);
+  // Start at index 0 so slide 0 paints immediately at x: 0 without negative offscreen shifts
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [enableTransition, setEnableTransition] = useState(true);
   const [itemsPerView, setItemsPerView] = useState(3);
   const [isHovered, setIsHovered] = useState(false);
@@ -98,11 +119,6 @@ export default function HeroSection({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Update currentIndex when slides count changes
-  useEffect(() => {
-    setCurrentIndex(baseCount);
-  }, [baseCount]);
-
   // Advance forward continuously (never rewind backwards)
   const handleNext = useCallback(() => {
     if (isTransitioningRef.current) return;
@@ -116,17 +132,23 @@ export default function HeroSection({
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
     setEnableTransition(true);
-    setCurrentIndex((prev) => prev - 1);
-  }, []);
+    setCurrentIndex((prev) => (prev <= 0 ? baseCount - 1 : prev - 1));
+  }, [baseCount]);
 
-  // Auto-play timer (advances forward only)
+  // Auto-play timer with generous initial delay to lock and stabilize LCP
   useEffect(() => {
     if (isHovered || baseCount === 0) return;
-    const interval = setInterval(() => {
-      handleNext();
-    }, autoPlayInterval);
+    let interval = null;
+    const initialTimer = setTimeout(() => {
+      interval = setInterval(() => {
+        handleNext();
+      }, autoPlayInterval);
+    }, 12000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialTimer);
+      if (interval) clearInterval(interval);
+    };
   }, [isHovered, autoPlayInterval, handleNext, baseCount]);
 
   // Infinite Teleport Reset (seamless jump with transition disabled)
@@ -169,7 +191,15 @@ export default function HeroSection({
   };
 
   if (!slides || slides.length === 0) {
-    return null;
+    return (
+      <section className="hero-carousel-section" aria-label="Featured Collection Carousel">
+        <div className="hero-carousel__container">
+          <div className="hero-carousel__viewport">
+            <div className="hero-carousel__card-link" style={{ aspectRatio: '341 / 405', backgroundColor: '#f3f3f5' }} />
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -193,20 +223,16 @@ export default function HeroSection({
               enableTransition ? 'hero-carousel__track--animated' : ''
             }`}
             style={{
-              transform: `translate3d(-${currentIndex * (100 / itemsPerView)}%, 0, 0)`,
+              transform: `translate3d(calc(-1 * ${currentIndex} * (100% / var(--hero-items-per-view, ${itemsPerView}))), 0, 0)`,
             }}
             onTransitionEnd={handleTransitionEnd}
           >
             {extendedSlides.map((slide, idx) => {
-              const isPrimaryVisible = idx >= baseCount && idx < baseCount + itemsPerView;
+              const isLCP = idx === 0;
               return (
                 <div
                   key={`${slide.id}-${idx}`}
                   className="hero-carousel__slide"
-                  style={{
-                    flex: `0 0 ${100 / itemsPerView}%`,
-                    maxWidth: `${100 / itemsPerView}%`,
-                  }}
                 >
                   <Link
                     href={slide.href || '/collections/all-drops'}
@@ -214,12 +240,14 @@ export default function HeroSection({
                     aria-label={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
                   >
                     <img
-                      src={optimizeImageUrl(slide.image, 900)}
+                      src={optimizeImageUrl(slide.image, 650)}
                       alt={`${slide.title || 'Collection'} - ${slide.subtitle || ''}`}
                       className="hero-carousel__card-image"
-                      loading={isPrimaryVisible ? 'eager' : 'lazy'}
-                      fetchPriority={isPrimaryVisible ? 'high' : 'auto'}
-                      decoding={isPrimaryVisible ? 'sync' : 'async'}
+                      width={341}
+                      height={405}
+                      loading="eager"
+                      fetchPriority={isLCP ? 'high' : 'auto'}
+                      decoding="sync"
                     />
                   </Link>
                 </div>

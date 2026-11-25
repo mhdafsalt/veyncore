@@ -75,10 +75,13 @@ function ObjectCardItem({ product }) {
         >
           <div className="obj-all-card__image-wrapper">
             <img
-              src={optimizeImageUrl(images[displayImageIndex], 700)}
+              src={optimizeImageUrl(images[displayImageIndex], 500)}
               alt={product.title}
+              width={300}
+              height={400}
               className="obj-all-card__image"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </Link>
@@ -158,6 +161,7 @@ function ObjectCardItem({ product }) {
                   setShowSizes(true);
                 }
               }}
+              aria-label={`Choose options for ${product.title}`}
             >
               {addedStatus ? (
                 <>

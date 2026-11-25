@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import AnnouncementBar from '@/components/AnnouncementBar/AnnouncementBar';
 import Navbar from '@/components/Navbar/Navbar';
 import MainCategories from '@/components/MainCategories/MainCategories';
@@ -23,11 +23,22 @@ let hasIntroPlayed = false;
  */
 export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [isLoading, setIsLoading] = useState(() => !hasIntroPlayed);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Instant Frame-0 painting with zero blocking overlay
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('veyn_intro_seen', '1');
+      hasIntroPlayed = true;
+    }
+  }, []);
 
   const handleLoaderComplete = useCallback(() => {
     hasIntroPlayed = true;
     setIsLoading(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('veyn_intro_seen', '1');
+    }
   }, []);
 
   // Seamless zero-refresh in-place tab switch
@@ -43,10 +54,10 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
 
   return (
     <>
-      {/* Veyncore Full-Screen Intro Loader - Snappy 1s luxury entrance on initial site entry */}
+      {/* Veyncore Full-Screen Intro Loader - Snappy luxury entrance on initial site entry */}
       {isLoading && (
         <VeyncoreLoader
-          duration={1000}
+          duration={550}
           onComplete={handleLoaderComplete}
         />
       )}

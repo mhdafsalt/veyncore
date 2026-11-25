@@ -97,10 +97,13 @@ function DropsProductCard({ product }) {
         >
           <div className="all-drops-card__image-wrapper">
             <img
-              src={optimizeImageUrl(images[displayImageIndex], 700)}
+              src={optimizeImageUrl(images[displayImageIndex], 500)}
               alt={product.title}
+              width={300}
+              height={400}
               className="all-drops-card__image"
               loading="lazy"
+              decoding="async"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = '/images/products/artic-blue-wide.jpg';
@@ -195,6 +198,7 @@ function DropsProductCard({ product }) {
                   setShowSizes(true);
                 }
               }}
+              aria-label={`Choose options for ${product.title}`}
             >
               {addedStatus ? (
                 <>

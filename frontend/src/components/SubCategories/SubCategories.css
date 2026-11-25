@@ -11,11 +11,14 @@
   border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
   overflow: hidden;
+  min-height: 40px;
+  contain: layout;
 }
 
 @media (max-width: 768px) {
   .subcategories {
     top: var(--navbar-height-mobile, 50px);
+    min-height: 35px;
   }
 }
 
@@ -151,11 +154,11 @@
 @keyframes subcategories-lightning-pulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.7));
+    opacity: 0.9;
   }
   50% {
     transform: scale(1.18);
-    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.95));
+    opacity: 1;
   }
 }
 
@@ -178,7 +181,7 @@
   animation: subcategories-lightning-pulse 1.8s ease-in-out infinite;
   transform-origin: center;
   user-select: none;
-  will-change: transform, filter;
+  will-change: transform, opacity;
 }
 
 .subcategories__link--glow:hover {

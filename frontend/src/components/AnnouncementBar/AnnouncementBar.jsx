@@ -4,10 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/lib/constants';
 import './AnnouncementBar.css';
 
-let cachedAnnouncements = null;
+const initialAnnouncements = [
+  'IDENTITY RUNS DEEP',
+  'CASH ON DELIVERY AVAILABLE',
+  '7 DAY EASY RETURNS & EXCHANGES',
+];
+
+let cachedAnnouncements = initialAnnouncements;
 
 export default function AnnouncementBar() {
-  const [announcements, setAnnouncements] = useState(() => cachedAnnouncements || []);
+  const [announcements, setAnnouncements] = useState(() => cachedAnnouncements || initialAnnouncements);
 
   // Fetch dynamic announcements from backend (purely dynamic from database)
   useEffect(() => {
@@ -23,9 +29,11 @@ export default function AnnouncementBar() {
             .filter((a) => a.active !== false)
             .map((a) => a.text)
             .filter(Boolean);
-          cachedAnnouncements = activeList;
-          if (isMounted) {
-            setAnnouncements(activeList);
+          if (activeList.length > 0) {
+            cachedAnnouncements = activeList;
+            if (isMounted) {
+              setAnnouncements(activeList);
+            }
           }
         }
       } catch (err) {
@@ -39,9 +47,9 @@ export default function AnnouncementBar() {
     };
   }, []);
 
-  // If no dynamic announcements exist in database, do not render any mock announcement
+  // If no dynamic announcements exist in database, reserve layout space to prevent CLS
   if (!announcements || announcements.length === 0) {
-    return null;
+    return <aside className="announcement-bar" role="region" aria-label="Announcement Ticker" />;
   }
 
   // Duplicate array so each group is wide enough to seamlessly loop on all screens
@@ -62,7 +70,7 @@ export default function AnnouncementBar() {
           ))}
         </div>
 
-        {/* Track Group 2 (Seamless loop copy) */}
+        {/* Track Group 2 (Exact duplicate for seamless looping) */}
         <div className="announcement-bar__group" aria-hidden="true">
           {marqueeItems.map((text, idx) => (
             <span key={`group2-${idx}`} className="announcement-bar__item">

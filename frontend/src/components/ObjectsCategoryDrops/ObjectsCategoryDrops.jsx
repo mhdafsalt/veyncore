@@ -68,10 +68,13 @@ function ObjectProductCard({ product }) {
         <Link href={`/products/${product.handle || product.id}`} className="obj-drop-card__link">
           <div className="obj-drop-card__image-container">
             <img
-              src={optimizeImageUrl(images[0], 700)}
+              src={optimizeImageUrl(images[0], 500)}
               alt={product.title}
+              width={300}
+              height={400}
               className="obj-drop-card__image"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </Link>
@@ -202,10 +205,13 @@ function ViewAllEndCard({ categoryLabel, collectionPath, image }) {
         <div className={`obj-drop-card__view-all-box ${image ? 'obj-drop-card__view-all-box--has-image' : ''}`}>
           {image && (
             <img
-              src={optimizeImageUrl(image, 700)}
+              src={optimizeImageUrl(image, 500)}
               alt={`View all ${categoryLabel}`}
               className="obj-drop-card__view-all-image"
+              width={300}
+              height={400}
               loading="lazy"
+              decoding="async"
             />
           )}
           <div className="obj-drop-card__view-all-content">
@@ -450,7 +456,7 @@ export default function ObjectsCategoryDrops() {
         }
 
         // 2. Fetch dynamic products
-        const prodRes = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
+        const prodRes = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=36`);
         const prodJson = await prodRes.json();
 
         if (isMounted) {

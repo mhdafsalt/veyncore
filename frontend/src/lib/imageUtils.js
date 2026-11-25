@@ -9,7 +9,10 @@ export function optimizeImageUrl(url, width = 800) {
 
   // Cloudinary URL transformation
   if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-    if (url.includes('/f_auto,q_auto')) return url;
+    // If URL already has f_auto,q_auto, replace or update width
+    if (url.includes('/f_auto,q_auto')) {
+      return url.replace(/\/upload\/f_auto,q_auto(?:,w_\d+)?(?:,c_limit)?\//, `/upload/f_auto,q_auto,w_${width},c_limit/`);
+    }
     return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
   }
 

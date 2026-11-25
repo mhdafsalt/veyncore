@@ -3,30 +3,47 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsHero.css';
 
-let cachedObjectsSlides = null;
+const defaultObjectsSlides = [
+  {
+    id: 'obj-slide-3',
+    targetSection: 'VEYN-OBJECTS',
+    title: 'Tactical Artifacts & Caps',
+    subtitle: 'DISTRESSED UTILITY',
+    tag: 'ESSENTIALS',
+    image: '/images/hero/ObjectHero03.png',
+    href: '/collections/objects-drops',
+    description: '',
+    sortOrder: 2,
+    active: true,
+  },
+  {
+    id: 'item-1795506485735-7nf5',
+    targetSection: 'VEYN-OBJECTS',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506476/veyncore_uploads/24bc592b40ca58fc89ae4dc630b3b10f-1795506472410-1309.jpg',
+    href: '/collections/objects-drops?category=shades',
+    sortOrder: 4,
+    active: true,
+  },
+  {
+    id: 'item-1795506542135-1l3n',
+    targetSection: 'VEYN-OBJECTS',
+    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506537/veyncore_uploads/unnamed__1_-1795506535210-5755.jpg',
+    href: '/collections/objects-drops?category=baggy',
+    sortOrder: 5,
+    active: true,
+  },
+];
 
-/**
- * Optimizes image URLs with next-gen formats and compression
- */
-function optimizeImageUrl(url, width = 900) {
-  if (!url || typeof url !== 'string') return url;
-  if (url === '/images/hero/ObjectHero03.png') {
-    return '/images/hero/ObjectHero03.jpg';
-  }
-  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-    if (url.includes('/f_auto,q_auto')) return url;
-    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
-  }
-  return url;
-}
+let cachedObjectsSlides = defaultObjectsSlides;
 
 export default function ObjectsHero({
   images: propImages = null,
   autoPlayInterval = 3500,
 }) {
-  const [images, setImages] = useState(() => propImages || cachedObjectsSlides || []);
+  const [images, setImages] = useState(() => propImages || cachedObjectsSlides || defaultObjectsSlides);
 
   // Fetch dynamic hero slides from backend (keeps state synced in background)
   useEffect(() => {
@@ -41,9 +58,11 @@ export default function ObjectsHero({
           const objectsSlides = data.data.filter(
             (s) => s.targetSection === 'VEYN-OBJECTS' && s.active !== false
           );
-          cachedObjectsSlides = objectsSlides;
-          if (isMounted) {
-            setImages(objectsSlides);
+          if (objectsSlides.length > 0) {
+            cachedObjectsSlides = objectsSlides;
+            if (isMounted) {
+              setImages(objectsSlides);
+            }
           }
         }
       } catch (err) {
@@ -52,7 +71,11 @@ export default function ObjectsHero({
     };
 
     if (!propImages) {
-      fetchHeroSlides();
+      const timer = setTimeout(fetchHeroSlides, 700);
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+      };
     }
     return () => {
       isMounted = false;
@@ -70,7 +93,8 @@ export default function ObjectsHero({
     return [...images, ...images, ...images];
   }, [images]);
 
-  const [currentIndex, setCurrentIndex] = useState(baseCount);
+  // Start at index 0 so slide 0 paints immediately at x: 0 without negative offscreen shifts
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [enableTransition, setEnableTransition] = useState(true);
   const [itemsPerView, setItemsPerView] = useState(3);
   const [isHovered, setIsHovered] = useState(false);
@@ -79,16 +103,16 @@ export default function ObjectsHero({
   const touchStartXRef = useRef(0);
   const touchEndXRef = useRef(0);
 
-  // Responsive items-per-view matching VEYN-SELECTS (3 on desktop, 2 on tablet, 1 on mobile)
+  // Responsive items-per-view
   useEffect(() => {
     const handleResize = () => {
       if (typeof window !== 'undefined') {
         if (window.innerWidth < 768) {
-          setItemsPerView(1); // Mobile: 1 image per view
+          setItemsPerView(1); // Mobile: 1 box
         } else if (window.innerWidth < 1024) {
-          setItemsPerView(2); // Tablet: 2 images side-by-side
+          setItemsPerView(2); // Tablet: 2 boxes
         } else {
-          setItemsPerView(3); // Desktop/Laptop: 3 images side-by-side like VEYN-SELECTS
+          setItemsPerView(3); // Desktop/Laptop: 3 boxes
         }
       }
     };
@@ -98,20 +122,7 @@ export default function ObjectsHero({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Safety unlock: ensure isTransitioningRef never hangs
-  useEffect(() => {
-    if (!enableTransition) return;
-    const safetyTimer = setTimeout(() => {
-      isTransitioningRef.current = false;
-    }, 600);
-    return () => clearTimeout(safetyTimer);
-  }, [currentIndex, enableTransition]);
-
-  useEffect(() => {
-    setCurrentIndex(baseCount);
-  }, [baseCount]);
-
-  // Advance forward continuously (never rewind backwards)
+  // Advance forward continuously
   const handleNext = useCallback(() => {
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
@@ -124,10 +135,26 @@ export default function ObjectsHero({
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
     setEnableTransition(true);
-    setCurrentIndex((prev) => prev - 1);
-  }, []);
+    setCurrentIndex((prev) => (prev <= 0 ? baseCount - 1 : prev - 1));
+  }, [baseCount]);
 
-  // Seamless invisible teleport on transition end
+  // Auto-play timer with generous initial delay to lock and stabilize LCP
+  useEffect(() => {
+    if (isHovered || baseCount === 0) return;
+    let interval = null;
+    const initialTimer = setTimeout(() => {
+      interval = setInterval(() => {
+        handleNext();
+      }, autoPlayInterval);
+    }, 12000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      if (interval) clearInterval(interval);
+    };
+  }, [isHovered, autoPlayInterval, handleNext, baseCount]);
+
+  // Infinite Teleport Reset
   const handleTransitionEnd = () => {
     isTransitioningRef.current = false;
     if (baseCount === 0) return;
@@ -140,17 +167,6 @@ export default function ObjectsHero({
       setCurrentIndex(currentIndex + baseCount);
     }
   };
-
-  // Auto-play timer: continuous forward sliding
-  useEffect(() => {
-    if (isHovered || baseCount === 0) return;
-
-    const interval = setInterval(() => {
-      handleNext();
-    }, autoPlayInterval);
-
-    return () => clearInterval(interval);
-  }, [isHovered, autoPlayInterval, handleNext, baseCount]);
 
   // Touch Swipe Handlers for Mobile
   const handleTouchStart = (e) => {
@@ -175,7 +191,15 @@ export default function ObjectsHero({
   };
 
   if (!images || images.length === 0) {
-    return null;
+    return (
+      <section className="objects-hero" aria-label="Loading VEYN-OBJECTS">
+        <div className="objects-hero__container">
+          <div className="objects-hero__viewport">
+            <div className="objects-hero__link" style={{ aspectRatio: '341 / 405', backgroundColor: '#f3f3f5' }} />
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -208,20 +232,16 @@ export default function ObjectsHero({
               enableTransition ? 'objects-hero__track--animated' : ''
             }`}
             style={{
-              transform: `translate3d(-${currentIndex * (100 / itemsPerView)}%, 0, 0)`,
+              transform: `translate3d(calc(-1 * ${currentIndex} * (100% / var(--objects-items-per-view, ${itemsPerView}))), 0, 0)`,
             }}
             onTransitionEnd={handleTransitionEnd}
           >
             {extendedSlides.map((item, idx) => {
-              const isPrimaryVisible = idx >= baseCount && idx < baseCount + itemsPerView;
+              const isLCP = idx === 0;
               return (
                 <div
                   key={`${item.id || 'slide'}-${idx}`}
                   className="objects-hero__item"
-                  style={{
-                    flex: `0 0 ${100 / itemsPerView}%`,
-                    maxWidth: `${100 / itemsPerView}%`,
-                  }}
                 >
                   <Link
                     href={item.href || '/collections/objects-drops'}
@@ -229,12 +249,14 @@ export default function ObjectsHero({
                     aria-label={item.alt || item.title || 'VEYN-OBJECTS'}
                   >
                     <img
-                      src={optimizeImageUrl(item.image, 900)}
+                      src={optimizeImageUrl(item.image, 650)}
                       alt={item.alt || item.title || 'VEYN-OBJECTS'}
                       className="objects-hero__image"
-                      loading={isPrimaryVisible ? 'eager' : 'lazy'}
-                      fetchPriority={isPrimaryVisible ? 'high' : 'auto'}
-                      decoding={isPrimaryVisible ? 'sync' : 'async'}
+                      width={341}
+                      height={405}
+                      loading="eager"
+                      fetchPriority={isLCP ? 'high' : 'auto'}
+                      decoding="sync"
                     />
                   </Link>
                 </div>

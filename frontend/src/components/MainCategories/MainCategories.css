@@ -6,6 +6,8 @@
   position: relative;
   z-index: 15;
   box-sizing: border-box;
+  min-height: 43px;
+  contain: layout;
 }
 
 .main-categories__list {

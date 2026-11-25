@@ -23,7 +23,7 @@ export default function VeyncoreLoader({ onComplete, duration = 1800 }) {
     setIsFadingOut(true);
     const completeTimer = setTimeout(() => {
       if (onComplete) onComplete();
-    }, 450);
+    }, 280);
     return () => clearTimeout(completeTimer);
   }, [onComplete]);
 

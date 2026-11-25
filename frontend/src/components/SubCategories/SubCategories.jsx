@@ -48,17 +48,20 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   const activeTabRef = useRef(null);
   const prevMainCategoryRef = useRef(activeMainCategory);
 
-  // Prefetch collection drop destinations for instant 0ms page transitions
+  // Prefetch collection drop destinations after initial paint is complete
   useEffect(() => {
     if (router && typeof router.prefetch === 'function') {
-      router.prefetch('/collections/all-drops');
-      router.prefetch('/collections/objects-drops');
-      router.prefetch('/');
-      router.prefetch('/veyn-objects');
+      const timer = setTimeout(() => {
+        router.prefetch('/collections/all-drops');
+        router.prefetch('/collections/objects-drops');
+        router.prefetch('/');
+        router.prefetch('/veyn-objects');
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [router]);
 
-  // Fetch dynamic subcategories from backend
+  // Fetch dynamic subcategories from backend (deferred to prioritize initial paint)
   useEffect(() => {
     let isMounted = true;
     const fetchSubcategories = async () => {
@@ -78,9 +81,10 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     };
 
-    fetchSubcategories();
+    const timer = setTimeout(fetchSubcategories, 500);
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, []);
 
@@ -102,9 +106,10 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     };
 
-    fetchCatalog();
+    const timer = setTimeout(fetchCatalog, 600);
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, []);
 

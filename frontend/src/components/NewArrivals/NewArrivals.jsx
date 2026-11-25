@@ -72,11 +72,14 @@ function ProductCard({ product, priority = false }) {
         >
           <div className="product-card__image-container">
             <img
-              src={optimizeImageUrl(mainImage, 700)}
+              src={optimizeImageUrl(mainImage, 500)}
               alt={product.title}
+              width={300}
+              height={400}
               className={`product-card__image ${imageLoaded ? 'product-card__image--loaded' : ''}`}
               loading={priority ? 'eager' : 'lazy'}
               fetchPriority={priority ? 'high' : 'auto'}
+              decoding={priority ? 'sync' : 'async'}
               onLoad={() => setImageLoaded(true)}
               onError={(e) => {
                 e.target.onerror = null;
@@ -136,6 +139,7 @@ function ProductCard({ product, priority = false }) {
               className={`product-card__choose-button ${addedStatus ? 'product-card__choose-button--added' : ''
                 }`}
               onClick={handleQuickAddClick}
+              aria-label={`Choose options for ${product.title}`}
             >
               {addedStatus ? (
                 <>
@@ -220,7 +224,7 @@ export default function NewArrivals() {
     let isMounted = true;
     const fetchNewArrivals = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=100`);
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=20`);
         const json = await res.json();
         const dbItems = res.ok && json.success && Array.isArray(json.data) ? json.data : [];
 
@@ -262,10 +266,11 @@ export default function NewArrivals() {
       }
     };
 
-    fetchNewArrivals();
+    const timer = setTimeout(fetchNewArrivals, 500);
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, []);
 
@@ -286,9 +291,9 @@ export default function NewArrivals() {
         {/* 4-Column (Desktop) / 2-Column (Mobile) Product Grid */}
         <div className="new-arrivals__grid">
           {products.length > 0
-            ? products.map((product, idx) => (
+            ? products.map((product) => (
               <div key={product.id || product.handle} className="new-arrivals__grid-item">
-                <ProductCard product={product} priority={idx < 4} />
+                <ProductCard product={product} priority={false} />
               </div>
             ))
             : [...Array(4)].map((_, i) => (

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { API_BASE_URL } from '@/lib/constants';
+import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsNewArrivals.css';
 
 /**
@@ -69,10 +70,13 @@ function ObjectCard({ product }) {
         >
           <div className="product-card__image-container">
             <img
-              src={mainImage}
+              src={optimizeImageUrl(mainImage, 500)}
               alt={product.title}
+              width={300}
+              height={400}
               className={`product-card__image ${imageLoaded ? 'product-card__image--loaded' : ''}`}
               loading="lazy"
+              decoding="async"
               onLoad={() => setImageLoaded(true)}
               onError={(e) => {
                 e.target.onerror = null;
@@ -208,7 +212,7 @@ export default function ObjectsNewArrivals() {
     let isMounted = true;
     const fetchObjects = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
+        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=20`);
         const json = await res.json();
         const dbItems = res.ok && json.success && Array.isArray(json.data) ? json.data : [];
 
@@ -248,10 +252,11 @@ export default function ObjectsNewArrivals() {
       }
     };
 
-    fetchObjects();
+    const timer = setTimeout(fetchObjects, 500);
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, []);
 

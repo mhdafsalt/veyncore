@@ -8,6 +8,8 @@
   position: relative;
   z-index: 10;
   height: 34px;
+  min-height: 34px;
+  contain: layout size;
   display: flex;
   align-items: center;
   box-sizing: border-box;

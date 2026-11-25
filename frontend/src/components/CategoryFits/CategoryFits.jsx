@@ -74,10 +74,13 @@ function FitProductCard({ product }) {
         >
           <div className="fit-card__image-container">
             <img
-              src={optimizeImageUrl(mainImage, 700)}
+              src={optimizeImageUrl(mainImage, 500)}
               alt={product.title}
+              width={300}
+              height={400}
               className={`fit-card__image ${imageLoaded ? 'fit-card__image--loaded' : ''}`}
               loading="lazy"
+              decoding="async"
               onLoad={() => setImageLoaded(true)}
               onError={(e) => {
                 e.target.onerror = null;
@@ -138,6 +141,7 @@ function FitProductCard({ product }) {
                 addedStatus ? 'fit-card__choose-button--added' : ''
               }`}
               onClick={handleQuickAddClick}
+              aria-label={`Choose options for ${product.title}`}
             >
               {addedStatus ? (
                 <>
@@ -221,10 +225,13 @@ function ViewAllEndCard({ fitLabel, collectionPath, image }) {
         <div className={`fit-card__view-all-box ${image ? 'fit-card__view-all-box--has-image' : ''}`}>
           {image && (
             <img
-              src={optimizeImageUrl(image, 700)}
+              src={optimizeImageUrl(image, 500)}
               alt={`View all ${fitLabel}`}
               className="fit-card__view-all-image"
+              width={300}
+              height={400}
               loading="lazy"
+              decoding="async"
             />
           )}
           <div className="fit-card__view-all-content">
@@ -463,7 +470,7 @@ export default function CategoryFits() {
         }
 
         // 2. Fetch products
-        const prodRes = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=100`);
+        const prodRes = await fetch(`${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=36`);
         const prodJson = await prodRes.json();
 
         if (isMounted) {
