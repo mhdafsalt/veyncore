@@ -36,11 +36,23 @@ export default function RootLayout({ children }) {
           href="https://res.cloudinary.com/sod0mks1/image/upload/f_auto,q_auto,w_650,c_limit/v1795542507/veyncore_uploads/heroimg01-1795542507039-6510.jpg"
           fetchPriority="high"
         />
-        {/* Google Fonts with preconnect and display=swap */}
+        {/* Asynchronous Non-Render-Blocking Google Fonts */}
         <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Dosis:wght@400;500;600;700;800&display=swap"
+          rel="preload"
+          as="style"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap';document.head.appendChild(l);})();`,
+          }}
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+          />
+        </noscript>
       </head>
       <body>
         <AuthProvider>
