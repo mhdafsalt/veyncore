@@ -323,7 +323,7 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage }
       {/* Row Header with Fit Name and Link */}
       <header className="category-fits__row-header">
         <h2 className="category-fits__row-heading">{fitLabel}</h2>
-        {products.length >= 8 && (
+        {products.length > 0 && (
           <Link href={collectionPath} className="category-fits__row-header-link" aria-label={`View all ${fitLabel}`}>
             <span>View all</span>
             <svg
@@ -386,8 +386,8 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage }
             </div>
           ))}
 
-          {/* "View all" End Card appears ONLY after latest added 8 cards */}
-          {products.length >= 8 && (
+          {/* "View all" End Card appears at the end of the swipe row */}
+          {products.length > 0 && (
             <div className="category-fits__slider-item category-fits__slider-item--view-all">
               <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} image={viewAllImage} />
             </div>
@@ -498,14 +498,45 @@ export default function CategoryFits() {
               });
             });
 
-            // If no custom swipeCategories configured, dynamically generate from real products
-            if (!activeCats || activeCats.length === 0) {
-              activeCats = Object.keys(grouped).map((k) => ({
-                id: k,
-                label: k.toUpperCase(),
-                collectionPath: `/collections/all-drops?category=${encodeURIComponent(k)}`,
-              }));
+            // Build dynamic categories list:
+            // 1. Configured custom swipe categories from Admin (in their custom sort order with custom lookbook images)
+            // 2. PLUS all other real product categories available in catalog
+            const allProductCatKeys = Object.keys(grouped);
+            const combinedCats = [];
+            const handledKeys = new Set();
+
+            if (dynamicCats && dynamicCats.length > 0) {
+              dynamicCats.forEach((dc) => {
+                const normKey = (dc.id || '').toLowerCase();
+                if (normKey && !handledKeys.has(normKey)) {
+                  handledKeys.add(normKey);
+                  combinedCats.push(dc);
+                }
+              });
             }
+
+            // Exclude any categories explicitly disabled in Admin
+            const disabledKeys = new Set();
+            if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
+              catJson.data
+                .filter((c) => c.targetSection === 'VEYN-SELECTS' && c.active === false)
+                .forEach((c) => disabledKeys.add((c.key || c.id || '').toLowerCase()));
+            }
+
+            // Append all remaining active product categories from catalog
+            allProductCatKeys.forEach((key) => {
+              if (!handledKeys.has(key) && !disabledKeys.has(key) && grouped[key]?.length > 0) {
+                handledKeys.add(key);
+                combinedCats.push({
+                  id: key,
+                  label: key.toUpperCase(),
+                  collectionPath: `/collections/all-drops?category=${encodeURIComponent(key)}`,
+                  image: null,
+                });
+              }
+            });
+
+            activeCats = combinedCats;
 
             cachedSelectsCategoryData = grouped;
             setCategoryData(grouped);

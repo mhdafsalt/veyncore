@@ -475,6 +475,17 @@ export default function AdminDashboard() {
       if (type === 'subcategories' && preparedData.label) {
         preparedData.label = String(preparedData.label).trim().toUpperCase();
       }
+      if (type === 'swipeCategories') {
+        preparedData.targetSection = preparedData.targetSection || 'VEYN-SELECTS';
+        if (preparedData.label) preparedData.label = String(preparedData.label).trim().toUpperCase();
+        if (preparedData.key) preparedData.key = String(preparedData.key).trim().toLowerCase();
+        if (!preparedData.collectionPath) {
+          const isObj = preparedData.targetSection === 'VEYN-OBJECTS';
+          preparedData.collectionPath = isObj
+            ? `/collections/objects-drops?category=${preparedData.key || 'all'}`
+            : `/collections/all-drops?category=${preparedData.key || 'all'}`;
+        }
+      }
 
       if (isEdit && index >= 0) {
         const existing = currentList[index] || {};
@@ -633,12 +644,12 @@ export default function AdminDashboard() {
         }
       } else if (type === 'contentItem') {
         let currentList = [...(siteContent?.[sectionKey] || [])];
-        if (id) {
-          currentList = currentList.filter(
-            (item, i) => (item.id || item._id || item.key) !== id && i !== index
-          );
-        } else if (typeof index === 'number' && index >= 0 && index < currentList.length) {
+        if (typeof index === 'number' && index >= 0 && index < currentList.length) {
           currentList.splice(index, 1);
+        } else if (id) {
+          currentList = currentList.filter(
+            (item) => (item.id || item._id || item.key) !== id
+          );
         }
 
         // Optimistically update React state immediately so the item vanishes with 0ms delay!

@@ -912,7 +912,7 @@ export default function ItemModal({
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      key: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''),
+                      key: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''),
                     }))
                   }
                   placeholder="e.g. category-key (matches product category)"

@@ -119,8 +119,8 @@ export default function AdminSwipeCategories({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-                    No swipe categories configured. Default 4 rows (BAGGY, BOOTCUT, WIDE, STRAIGHT) will be shown.
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                    No swipe categories configured. Default product categories will be shown.
                   </td>
                 </tr>
               )}

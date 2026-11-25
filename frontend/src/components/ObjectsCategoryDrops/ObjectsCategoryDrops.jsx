@@ -115,9 +115,8 @@ function ObjectProductCard({ product }) {
           ) : (
             <button
               type="button"
-              className={`obj-drop-card__choose-button ${
-                addedStatus ? 'obj-drop-card__choose-button--added' : ''
-              }`}
+              className={`obj-drop-card__choose-button ${addedStatus ? 'obj-drop-card__choose-button--added' : ''
+                }`}
               onClick={handleQuickAddClick}
               aria-label={`Choose options for ${product.title}`}
             >
@@ -311,7 +310,7 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
       {/* Row Header with Category Name and Link */}
       <header className="objects-cat-drops__row-header">
         <h2 className="objects-cat-drops__row-heading">{categoryLabel}</h2>
-        {products.length >= 8 && (
+        {products.length > 0 && (
           <Link href={collectionPath} className="objects-cat-drops__row-header-link" aria-label={`View all ${categoryLabel}`}>
             <span>View all</span>
             <svg
@@ -337,9 +336,8 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
         {/* Left Floating Nav Button */}
         <button
           type="button"
-          className={`objects-cat-drops__nav-button objects-cat-drops__nav-button--prev ${
-            !canScrollLeft ? 'objects-cat-drops__nav-button--disabled' : ''
-          }`}
+          className={`objects-cat-drops__nav-button objects-cat-drops__nav-button--prev ${!canScrollLeft ? 'objects-cat-drops__nav-button--disabled' : ''
+            }`}
           onClick={() => scrollByAmount('left')}
           aria-label={`Scroll ${categoryLabel} left`}
           disabled={!canScrollLeft}
@@ -373,8 +371,8 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
             </div>
           ))}
 
-          {/* "View" End Card - only after latest added 8 cards */}
-          {products.length >= 8 && (
+          {/* "View" End Card at the end of the swipe track */}
+          {products.length > 0 && (
             <div className="objects-cat-drops__slider-item objects-cat-drops__slider-item--view-all">
               <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} image={viewAllImage} />
             </div>
@@ -384,9 +382,8 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
         {/* Right Floating Nav Button */}
         <button
           type="button"
-          className={`objects-cat-drops__nav-button objects-cat-drops__nav-button--next ${
-            !canScrollRight ? 'objects-cat-drops__nav-button--disabled' : ''
-          }`}
+          className={`objects-cat-drops__nav-button objects-cat-drops__nav-button--next ${!canScrollRight ? 'objects-cat-drops__nav-button--disabled' : ''
+            }`}
           onClick={() => scrollByAmount('right')}
           aria-label={`Scroll ${categoryLabel} right`}
           disabled={!canScrollRight}
@@ -490,16 +487,47 @@ export default function ObjectsCategoryDrops() {
               });
             });
 
-            // If no custom swipeCategories configured, dynamically generate from real products
-            if (!activeCats || activeCats.length === 0) {
-              activeCats = Object.keys(grouped).map((k) => ({
-                id: k,
-                rawKey: k,
-                label: k.toUpperCase(),
-                anchorId: k,
-                collectionPath: `/collections/objects-drops?category=${encodeURIComponent(k)}`,
-              }));
+            // Build dynamic categories list for VEYN-OBJECTS:
+            // 1. Configured custom swipe categories from Admin
+            // 2. PLUS all other real product categories available in catalog
+            const allProductCatKeys = Object.keys(grouped);
+            const combinedCats = [];
+            const handledKeys = new Set();
+
+            if (dynamicCats && dynamicCats.length > 0) {
+              dynamicCats.forEach((dc) => {
+                const normKey = (dc.id || '').toLowerCase();
+                if (normKey && !handledKeys.has(normKey)) {
+                  handledKeys.add(normKey);
+                  combinedCats.push(dc);
+                }
+              });
             }
+
+            // Exclude any categories explicitly disabled in Admin
+            const disabledKeys = new Set();
+            if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
+              catJson.data
+                .filter((c) => c.targetSection === 'VEYN-OBJECTS' && c.active === false)
+                .forEach((c) => disabledKeys.add((c.key || c.id || '').toLowerCase()));
+            }
+
+            // Append all remaining active product categories from catalog
+            allProductCatKeys.forEach((key) => {
+              if (!handledKeys.has(key) && !disabledKeys.has(key) && grouped[key]?.length > 0) {
+                handledKeys.add(key);
+                combinedCats.push({
+                  id: key,
+                  rawKey: key,
+                  label: key.toUpperCase(),
+                  anchorId: key,
+                  collectionPath: `/collections/objects-drops?category=${encodeURIComponent(key)}`,
+                  image: null,
+                });
+              }
+            });
+
+            activeCats = combinedCats;
 
             cachedObjectsCategoryData = grouped;
             setCategoryData(grouped);
