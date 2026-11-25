@@ -14,6 +14,16 @@ export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSele
   const pathname = usePathname();
   const [selectedCat, setSelectedCat] = useState(activeCategory);
 
+  // Prefetch storefront and drops routes for 0ms latency transitions
+  useEffect(() => {
+    if (router && typeof router.prefetch === 'function') {
+      router.prefetch('/');
+      router.prefetch('/veyn-objects');
+      router.prefetch('/collections/all-drops');
+      router.prefetch('/collections/objects-drops');
+    }
+  }, [router]);
+
   // Keep selectedCat synchronized with incoming activeCategory prop
   useEffect(() => {
     if (activeCategory) {

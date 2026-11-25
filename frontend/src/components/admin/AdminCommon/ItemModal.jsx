@@ -134,6 +134,175 @@ export default function ItemModal({
       .slice(0, 30);
   }, [products, currentHeroSection]);
 
+  // Dynamic Categories available for SwipeCategories based on targetSection
+  const currentSwipeSection = formData.targetSection || 'VEYN-SELECTS';
+  const availableSwipeCategories = useMemo(() => {
+    const list = [];
+    const seen = new Set();
+    const isObjects = currentSwipeSection === 'VEYN-OBJECTS';
+
+    // 1. From real products catalog
+    if (products && Array.isArray(products)) {
+      products
+        .filter((p) => (p.category || 'VEYN-SELECTS') === currentSwipeSection)
+        .forEach((p) => {
+          const candidates = [p.subCategory, p.fit, p.swipeCategory].filter(Boolean);
+          candidates.forEach((cand) => {
+            const raw = String(cand).trim();
+            const slug = getSlugFromLabel(raw);
+            if (slug && !seen.has(slug)) {
+              seen.add(slug);
+              list.push({
+                label: raw.toUpperCase(),
+                slug: slug,
+                count: products.filter(
+                  (item) =>
+                    (item.category || 'VEYN-SELECTS') === currentSwipeSection &&
+                    [item.subCategory, item.fit, item.swipeCategory]
+                      .filter(Boolean)
+                      .some((c) => getSlugFromLabel(c) === slug)
+                ).length,
+              });
+            }
+          });
+        });
+    }
+
+    // 2. From siteContent.subcategories
+    if (siteContent?.subcategories && Array.isArray(siteContent.subcategories)) {
+      siteContent.subcategories
+        .filter(
+          (s) =>
+            (s.mainCategory || 'VEYN-SELECTS') === currentSwipeSection &&
+            s.active !== false
+        )
+        .forEach((s) => {
+          const raw = (s.label || '').replace(/⚡|⚡️/g, '').trim();
+          const slug = getSlugFromLabel(raw);
+          if (
+            slug &&
+            !seen.has(slug) &&
+            !['home', 'flash-sale', 'new-drops', 'all-drops', 'all-objects'].includes(slug)
+          ) {
+            seen.add(slug);
+            list.push({
+              label: raw.toUpperCase(),
+              slug: slug,
+              count: 0,
+            });
+          }
+        });
+    }
+
+    // 3. Fallback standard core fits / categories if not already present
+    const defaultList = isObjects
+      ? [
+          { label: 'BAGS', slug: 'bags' },
+          { label: 'CHAINS', slug: 'chains' },
+          { label: 'CAPS', slug: 'caps' },
+          { label: 'SHADES', slug: 'shades' },
+          { label: 'BRACELETS', slug: 'bracelets' },
+          { label: 'WATCHES', slug: 'watches' },
+          { label: 'BELTS', slug: 'belts' },
+        ]
+      : [
+          { label: 'BAGGY', slug: 'baggy' },
+          { label: 'BOOTCUT', slug: 'bootcut' },
+          { label: 'WIDE', slug: 'wide' },
+          { label: 'STRAIGHT', slug: 'straight' },
+          { label: 'CARGO', slug: 'cargo' },
+          { label: 'DENIMS', slug: 'denims' },
+          { label: 'TOPS', slug: 'tops' },
+        ];
+
+    defaultList.forEach((def) => {
+      if (!seen.has(def.slug)) {
+        seen.add(def.slug);
+        list.push({
+          label: def.label,
+          slug: def.slug,
+          count: 0,
+        });
+      }
+    });
+
+    return list;
+  }, [products, siteContent, currentSwipeSection]);
+
+  // Dynamic Categories available for Subcategories based on mainCategory
+  const availableSubcategoriesList = useMemo(() => {
+    const list = [];
+    const seen = new Set();
+    const isObjects = currentMainCategory === 'VEYN-OBJECTS';
+
+    // 1. From real products catalog
+    if (products && Array.isArray(products)) {
+      products
+        .filter((p) => (p.category || 'VEYN-SELECTS') === currentMainCategory)
+        .forEach((p) => {
+          const candidates = [p.subCategory, p.fit, p.swipeCategory].filter(Boolean);
+          candidates.forEach((cand) => {
+            const raw = String(cand).trim();
+            const slug = getSlugFromLabel(raw);
+            if (slug && !seen.has(slug)) {
+              seen.add(slug);
+              list.push({
+                label: raw.toUpperCase(),
+                slug: slug,
+                count: products.filter(
+                  (item) =>
+                    (item.category || 'VEYN-SELECTS') === currentMainCategory &&
+                    [item.subCategory, item.fit, item.swipeCategory]
+                      .filter(Boolean)
+                      .some((c) => getSlugFromLabel(c) === slug)
+                ).length,
+              });
+            }
+          });
+        });
+    }
+
+    // 2. Standard defaults
+    const defaultList = isObjects
+      ? [
+          { label: 'OBJECT DROPS', slug: 'obj-drops' },
+          { label: 'ALL DROPS', slug: 'all-drops' },
+          { label: 'BAGS', slug: 'bags' },
+          { label: 'CHAINS', slug: 'chains' },
+          { label: 'CAPS', slug: 'caps' },
+          { label: 'SHADES', slug: 'shades' },
+          { label: 'BRACELETS', slug: 'bracelets' },
+          { label: 'WATCHES', slug: 'watches' },
+          { label: 'BELTS', slug: 'belts' },
+        ]
+      : [
+          { label: 'HOME', slug: 'home' },
+          { label: 'FLASH SALE ⚡️', slug: 'flash-sale' },
+          { label: 'NEW DROPS ⚡️', slug: 'new-drops' },
+          { label: 'ALL DROPS', slug: 'all-drops' },
+          { label: 'BAGGY', slug: 'baggy' },
+          { label: 'BOOTCUT', slug: 'bootcut' },
+          { label: 'WIDE', slug: 'wide' },
+          { label: 'STRAIGHT', slug: 'straight' },
+          { label: 'CARGO', slug: 'cargo' },
+          { label: 'DENIMS', slug: 'denims' },
+          { label: 'TOPS', slug: 'tops' },
+        ];
+
+    defaultList.forEach((def) => {
+      if (!seen.has(def.slug)) {
+        seen.add(def.slug);
+        list.push({
+          label: def.label,
+          slug: def.slug,
+          count: 0,
+        });
+      }
+    });
+
+    return list;
+  }, [products, currentMainCategory]);
+
   if (!isOpen) return null;
 
   const currentSlug = getSlugFromLabel(formData.label);
@@ -144,6 +313,41 @@ export default function ItemModal({
   const isDynamicCategoryActive =
     autoSyncRoute ||
     (formData.href && formData.href.includes('?category='));
+
+  // Handle Category Select for Swipe Categories from dynamic dropdown
+  const handleSwipeCategorySelect = (selectedLabel) => {
+    if (!selectedLabel || selectedLabel === 'CUSTOM') return;
+    const matched = availableSwipeCategories.find((c) => c.label === selectedLabel);
+    const slug = matched ? matched.slug : getSlugFromLabel(selectedLabel);
+    const isObj = (formData.targetSection || 'VEYN-SELECTS') === 'VEYN-OBJECTS';
+    const baseDrops = isObj ? '/collections/objects-drops' : '/collections/all-drops';
+
+    setFormData((prev) => ({
+      ...prev,
+      label: selectedLabel,
+      key: slug,
+      collectionPath: `${baseDrops}?category=${slug}`,
+    }));
+  };
+
+  const handleSwipeLabelInputChange = (val) => {
+    const upperVal = (val || '').toUpperCase();
+    const slug = getSlugFromLabel(upperVal);
+    const isObj = (formData.targetSection || 'VEYN-SELECTS') === 'VEYN-OBJECTS';
+    const baseDrops = isObj ? '/collections/objects-drops' : '/collections/all-drops';
+
+    setFormData((prev) => ({
+      ...prev,
+      label: upperVal,
+      key: prev.key && config.isEdit ? prev.key : slug,
+      collectionPath:
+        prev.collectionPath && config.isEdit
+          ? prev.collectionPath
+          : slug
+          ? `${baseDrops}?category=${slug}`
+          : baseDrops,
+    }));
+  };
 
   // Handle Label Change with dynamic route auto-sync (Enforce UPPERCASE)
   const handleLabelChange = (val) => {
@@ -275,6 +479,34 @@ export default function ItemModal({
             <>
               <div className="admin-form-group">
                 <label className="admin-form-label">SUBCATEGORY LABEL *</label>
+                <select
+                  className="admin-form-select"
+                  style={{ marginBottom: '8px' }}
+                  value={
+                    availableSubcategoriesList.some((c) => c.label === (formData.label || '').replace(/⚡|⚡️/g, '').trim())
+                      ? (formData.label || '').replace(/⚡|⚡️/g, '').trim()
+                      : formData.label
+                      ? 'CUSTOM'
+                      : ''
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val && val !== 'CUSTOM') {
+                      handleLabelChange(val);
+                    }
+                  }}
+                >
+                  <option value="">⚡ Select Dynamic Subcategory / Fit...</option>
+                  <optgroup label={`📂 Available ${currentMainCategory} Categories`}>
+                    {availableSubcategoriesList.map((cat) => (
+                      <option key={cat.slug} value={cat.label}>
+                        {cat.label} {cat.count > 0 ? `(${cat.count} products)` : ''}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <option value="CUSTOM">✏️ + Custom Subcategory Name (Type Below)</option>
+                </select>
+
                 <input
                   type="text"
                   className="admin-form-input"
@@ -597,34 +829,48 @@ export default function ItemModal({
 
               <div className="admin-form-group">
                 <label className="admin-form-label">CATEGORY LABEL *</label>
+
+                {/* Dynamic Category Dropdown */}
+                <select
+                  className="admin-form-select"
+                  style={{ marginBottom: '8px' }}
+                  value={
+                    availableSwipeCategories.some((c) => c.label === (formData.label || '').trim())
+                      ? (formData.label || '').trim()
+                      : formData.label
+                      ? 'CUSTOM'
+                      : ''
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val && val !== 'CUSTOM') {
+                      handleSwipeCategorySelect(val);
+                    }
+                  }}
+                >
+                  <option value="">⚡ Select Dynamic Category / Fit...</option>
+                  <optgroup label={`📂 Available ${formData.targetSection || 'VEYN-SELECTS'} Categories`}>
+                    {availableSwipeCategories.map((cat) => (
+                      <option key={cat.slug} value={cat.label}>
+                        {cat.label} {cat.count > 0 ? `(${cat.count} products)` : ''}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <option value="CUSTOM">✏️ + Custom Category Name (Type Below)</option>
+                </select>
+
                 <input
                   type="text"
                   className="admin-form-input"
                   style={{ textTransform: 'uppercase' }}
                   value={formData.label || ''}
-                  onChange={(e) => {
-                    const upperVal = e.target.value.toUpperCase();
-                    const slug = getSlugFromLabel(upperVal);
-                    const isObj =
-                      (formData.targetSection || 'VEYN-SELECTS') === 'VEYN-OBJECTS';
-                    const baseDrops = isObj
-                      ? '/collections/objects-drops'
-                      : '/collections/all-drops';
-                    setFormData((prev) => ({
-                      ...prev,
-                      label: upperVal,
-                      key: prev.key && config.isEdit ? prev.key : slug,
-                      collectionPath:
-                        prev.collectionPath && config.isEdit
-                          ? prev.collectionPath
-                          : slug
-                          ? `${baseDrops}?category=${slug}`
-                          : baseDrops,
-                    }));
-                  }}
-                  placeholder="e.g. YOUR CATEGORY NAME"
+                  onChange={(e) => handleSwipeLabelInputChange(e.target.value)}
+                  placeholder="E.G. YOUR CATEGORY NAME"
                   required
                 />
+                <span className="admin-route-hint" style={{ marginTop: '4px', display: 'block' }}>
+                  Select from dynamic categories above to auto-populate Key Identifier and Collection Route, or type a custom category name.
+                </span>
               </div>
 
               <div className="admin-form-group">

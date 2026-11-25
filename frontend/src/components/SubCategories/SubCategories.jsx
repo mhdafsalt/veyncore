@@ -50,15 +50,30 @@ const toSlug = (str = '') =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-');
 
+// In-memory module cache for instant Frame-0 painting
+let cachedDynamicSubcategories = null;
+let cachedSubcategoriesCatalog = null;
+
 function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [dynamicSubcategories, setDynamicSubcategories] = useState(null);
+  const [dynamicSubcategories, setDynamicSubcategories] = useState(() => cachedDynamicSubcategories);
+  const [productCatalog, setProductCatalog] = useState(() => cachedSubcategoriesCatalog || []);
 
   const containerRef = useRef(null);
   const activeTabRef = useRef(null);
   const prevMainCategoryRef = useRef(activeMainCategory);
+
+  // Prefetch collection drop destinations for instant 0ms page transitions
+  useEffect(() => {
+    if (router && typeof router.prefetch === 'function') {
+      router.prefetch('/collections/all-drops');
+      router.prefetch('/collections/objects-drops');
+      router.prefetch('/');
+      router.prefetch('/veyn-objects');
+    }
+  }, [router]);
 
   // Fetch dynamic subcategories from backend
   useEffect(() => {
@@ -68,6 +83,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         const res = await fetch(`${API_BASE_URL}/api/content/subcategories`);
         const data = await res.json();
         if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedDynamicSubcategories = data.data;
           if (isMounted) {
             setDynamicSubcategories(data.data);
           }
@@ -84,8 +100,6 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   }, []);
 
   // Fetch real product catalog to extract dynamic categories
-  const [productCatalog, setProductCatalog] = useState([]);
-
   useEffect(() => {
     let isMounted = true;
     const fetchCatalog = async () => {
@@ -93,6 +107,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         const res = await fetch(`${API_BASE_URL}/api/products?limit=100`);
         const data = await res.json();
         if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedSubcategoriesCatalog = data.data;
           if (isMounted) {
             setProductCatalog(data.data);
           }
@@ -315,22 +330,27 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   // Function to smoothly center the active tab inside the scrollable container
   const centerActiveTab = useCallback((tabEl) => {
     if (!tabEl || !containerRef.current) return;
-    const container = containerRef.current;
-    const containerRect = container.getBoundingClientRect();
-    const tabRect = tabEl.getBoundingClientRect();
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        const containerRect = container.getBoundingClientRect();
+        const tabRect = tabEl.getBoundingClientRect();
 
-    const relativeLeft = tabRect.left - containerRect.left + container.scrollLeft;
-    const targetScroll = relativeLeft - container.clientWidth / 2 + tabRect.width / 2;
-    const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
-    const clampedScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+        const relativeLeft = tabRect.left - containerRect.left + container.scrollLeft;
+        const targetScroll = relativeLeft - container.clientWidth / 2 + tabRect.width / 2;
+        const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
+        const clampedScroll = Math.max(0, Math.min(targetScroll, maxScroll));
 
-    if (typeof container.scrollTo === 'function') {
-      container.scrollTo({
-        left: clampedScroll,
-        behavior: 'smooth'
+        if (typeof container.scrollTo === 'function') {
+          container.scrollTo({
+            left: clampedScroll,
+            behavior: 'smooth'
+          });
+        } else {
+          container.scrollLeft = clampedScroll;
+        }
       });
-    } else {
-      container.scrollLeft = clampedScroll;
     }
   }, []);
 
@@ -404,20 +424,33 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       subLabel === 'ALL DROPS'
     ) {
       const dropsUrl = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
-      router.push(dropsUrl);
+      if (pathname === dropsUrl) {
+        router.replace(dropsUrl, { scroll: false });
+      } else {
+        router.push(dropsUrl);
+      }
       return;
     }
 
     // 5. NEW DROPS tab -> Navigate to All Drops with new drops filter
     if (subId === 'new-drops' || subLabel === 'NEW DROPS') {
       const dropsUrl = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
-      router.push(`${dropsUrl}?badge=new`);
+      const targetUrl = `${dropsUrl}?badge=new`;
+      if (pathname === dropsUrl) {
+        router.replace(targetUrl, { scroll: false });
+      } else {
+        router.push(targetUrl);
+      }
       return;
     }
 
     // 6. Configured direct route with query parameter (e.g. /collections/all-drops?category=xyz)
     if (subHref && (subHref.startsWith('/collections/') || subHref.startsWith('/products/'))) {
-      router.push(subHref);
+      if (pathname && subHref.startsWith(pathname)) {
+        router.replace(subHref, { scroll: false });
+      } else {
+        router.push(subHref);
+      }
       return;
     }
 
@@ -434,7 +467,12 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     }
     const targetDropsPage = activeMainCategory === 'VEYN-OBJECTS' ? '/collections/objects-drops' : '/collections/all-drops';
-    router.push(`${targetDropsPage}?category=${encodeURIComponent(categoryKey)}`);
+    const targetUrl = `${targetDropsPage}?category=${encodeURIComponent(categoryKey)}`;
+    if (pathname === targetDropsPage) {
+      router.replace(targetUrl, { scroll: false });
+    } else {
+      router.push(targetUrl);
+    }
   };
 
   return (

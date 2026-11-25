@@ -240,6 +240,9 @@ function ObjectCardItem({ product }) {
   );
 }
 
+// In-memory module cache for instant Frame-0 painting
+let cachedObjectsAllDropsProducts = null;
+
 /**
  * Inner Collection Component that consumes URL Search Params
  */
@@ -247,7 +250,7 @@ function ObjectsAllDropsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [productsList, setProductsList] = useState([]);
+  const [productsList, setProductsList] = useState(() => cachedObjectsAllDropsProducts || []);
 
   // Read initial category filter from URL search params (e.g. ?category=bags)
   const initialCategoryParam = searchParams.get('category')?.toLowerCase().trim() || 'all';
@@ -292,6 +295,7 @@ function ObjectsAllDropsContent() {
             inStock: p.inStock !== false,
             createdAt: p.createdAt || new Date().toISOString(),
           }));
+          cachedObjectsAllDropsProducts = mapped;
           if (isMounted) {
             setProductsList(mapped);
           }
@@ -342,9 +346,9 @@ function ObjectsAllDropsContent() {
   const handleTabChange = (catId) => {
     setActiveCategoryTab(catId);
     if (catId === 'all') {
-      router.push('/collections/objects-drops', { scroll: false });
+      router.replace('/collections/objects-drops', { scroll: false });
     } else {
-      router.push(`/collections/objects-drops?category=${catId}`, { scroll: false });
+      router.replace(`/collections/objects-drops?category=${catId}`, { scroll: false });
     }
   };
 
@@ -401,6 +405,12 @@ function ObjectsAllDropsContent() {
         const subCatMatch = (p.subCategory || '').toLowerCase().includes(searchParam);
         return titleMatch || subCatMatch;
       });
+    }
+
+    // Filter by badge if specified (e.g. ?badge=new)
+    const badgeParam = searchParams ? searchParams.get('badge')?.toLowerCase() : null;
+    if (badgeParam === 'new') {
+      result = result.filter((p) => p.badge === 'NEW' || p.newArrival);
     }
 
     // Filter by price
@@ -480,15 +490,21 @@ function ObjectsAllDropsContent() {
     return entries;
   }, [productsList]);
 
+  const badgeParam = searchParams ? searchParams.get('badge')?.toLowerCase() : null;
+  const isNewDrops = badgeParam === 'new';
+
   const activeCategoryLabel = useMemo(() => {
-    if (!activeCategoryTab || activeCategoryTab === 'all') return '';
-    const match = dynamicObjectCategories.find(
-      (c) =>
-        c.id === activeCategoryTab ||
-        matchProductCategory({ subCategory: c.label, fit: c.id }, activeCategoryTab)
-    );
-    return match ? match.label : activeCategoryTab.toUpperCase();
-  }, [activeCategoryTab, dynamicObjectCategories]);
+    if (activeCategoryTab && activeCategoryTab !== 'all') {
+      const match = dynamicObjectCategories.find(
+        (c) =>
+          c.id === activeCategoryTab ||
+          matchProductCategory({ subCategory: c.label, fit: c.id }, activeCategoryTab)
+      );
+      return match ? match.label : activeCategoryTab.toUpperCase();
+    }
+    if (isNewDrops) return 'NEW DROPS';
+    return '';
+  }, [activeCategoryTab, dynamicObjectCategories, isNewDrops]);
 
   return (
     <section className="obj-all">
@@ -496,7 +512,7 @@ function ObjectsAllDropsContent() {
         {/* Collection Header */}
         <header className="obj-all__header">
           <h1 className="obj-all__title">
-            {activeCategoryLabel ? `OBJECT DROPS • ${activeCategoryLabel}` : 'OBJECT DROPS'}
+            {activeCategoryLabel || 'OBJECT DROPS'}
           </h1>
           <span className="obj-all__count-badge">
             {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}

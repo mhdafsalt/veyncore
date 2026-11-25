@@ -271,6 +271,10 @@ function DropsProductCard({ product }) {
   );
 }
 
+// In-memory module cache for instant Frame-0 painting
+let cachedAllDropsProducts = null;
+let cachedAllDropsSubcategories = null;
+
 /**
  * Main ALL DROPS Collection View
  */
@@ -278,8 +282,8 @@ function AllDropsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [productsList, setProductsList] = useState([]);
-  const [dynamicSubcategories, setDynamicSubcategories] = useState(null);
+  const [productsList, setProductsList] = useState(() => cachedAllDropsProducts || []);
+  const [dynamicSubcategories, setDynamicSubcategories] = useState(() => cachedAllDropsSubcategories);
 
   // Category filter state synced with URL ?category=...
   const categoryParam = searchParams ? searchParams.get('category')?.toLowerCase().trim() || '' : '';
@@ -332,6 +336,7 @@ function AllDropsContent() {
             newArrival: Boolean(p.newArrival),
             createdAt: p.createdAt || new Date().toISOString(),
           }));
+          cachedAllDropsProducts = mapped;
           if (isMounted) {
             setProductsList(mapped);
           }
@@ -354,6 +359,7 @@ function AllDropsContent() {
         const res = await fetch(`${API_BASE_URL}/api/content/subcategories`);
         const json = await res.json();
         if (res.ok && json.success && Array.isArray(json.data)) {
+          cachedAllDropsSubcategories = json.data;
           if (isMounted) {
             setDynamicSubcategories(json.data);
           }
@@ -442,10 +448,10 @@ function AllDropsContent() {
     const cleanId = (catId || '').toLowerCase().trim();
     if (!cleanId || cleanId === 'all') {
       setSelectedCategory('all');
-      router.push('/collections/all-drops', { scroll: false });
+      router.replace('/collections/all-drops', { scroll: false });
     } else {
       setSelectedCategory(cleanId);
-      router.push(`/collections/all-drops?category=${encodeURIComponent(cleanId)}`, { scroll: false });
+      router.replace(`/collections/all-drops?category=${encodeURIComponent(cleanId)}`, { scroll: false });
     }
   };
 
@@ -584,10 +590,15 @@ function AllDropsContent() {
     setDisplayCount(16);
   }, [selectedCategory, selectedAvailability, minPrice, maxPrice, sortBy]);
 
+  const badgeParam = searchParams ? searchParams.get('badge')?.toLowerCase() : null;
+  const isNewDrops = badgeParam === 'new';
+
   const activeCategoryLabel =
     selectedCategory && selectedCategory !== 'all'
       ? dynamicCategories.find((c) => c.id === selectedCategory)?.label ||
         selectedCategory.toUpperCase()
+      : isNewDrops
+      ? 'NEW DROPS'
       : null;
 
   // Automated Infinite Scroll / Lazy Loading via IntersectionObserver
@@ -634,7 +645,7 @@ function AllDropsContent() {
         <header className="all-drops__header">
           <div className="all-drops__header-title-row">
             <h1 className="all-drops__title">
-              {activeCategoryLabel ? `ALL DROPS • ${activeCategoryLabel}` : 'ALL DROPS'}
+              {activeCategoryLabel || 'ALL DROPS'}
             </h1>
             <span className="all-drops__count-badge">
               {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
