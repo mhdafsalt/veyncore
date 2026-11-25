@@ -49,7 +49,9 @@ export const getContent = async (req, res) => {
       // Fallback to embedded array if query fails
     }
 
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     return res.status(200).json({
       success: true,
       data: contentObj,
@@ -97,7 +99,9 @@ export const getSectionContent = async (req, res) => {
       }
     }
 
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     return res.status(200).json({
       success: true,
       section,

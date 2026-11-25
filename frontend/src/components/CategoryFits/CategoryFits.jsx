@@ -215,27 +215,37 @@ function FitProductCard({ product }) {
 /**
  * End-of-row "View" card that sits directly after the 6th card in the swipe row
  */
-function ViewAllEndCard({ fitLabel, collectionPath }) {
+function ViewAllEndCard({ fitLabel, collectionPath, image }) {
   return (
     <article className="fit-card fit-card--view-all">
       <Link href={collectionPath} className="fit-card__view-all-link" aria-label={`View all ${fitLabel}`}>
-        <div className="fit-card__view-all-box">
-          <span className="fit-card__view-all-text">View</span>
-          <svg
-            className="fit-card__view-all-arrow"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <polyline points="13 5 20 12 13 19" />
-          </svg>
+        <div className={`fit-card__view-all-box ${image ? 'fit-card__view-all-box--has-image' : ''}`}>
+          {image && (
+            <img
+              src={optimizeImageUrl(image, 700)}
+              alt={`View all ${fitLabel}`}
+              className="fit-card__view-all-image"
+              loading="lazy"
+            />
+          )}
+          <div className="fit-card__view-all-content">
+            <span className="fit-card__view-all-text">View all</span>
+            <svg
+              className="fit-card__view-all-arrow"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <polyline points="13 5 20 12 13 19" />
+            </svg>
+          </div>
         </div>
       </Link>
     </article>
@@ -248,7 +258,7 @@ function ViewAllEndCard({ fitLabel, collectionPath }) {
  * 2. Swipeable track with 6 cards + 1 "View all" end card
  * 3. Centered bottom "View all" action button
  */
-function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
+function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage }) {
   if (!products || products.length === 0) return null;
 
   const trackRef = useRef(null);
@@ -380,7 +390,7 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath }) {
           {/* "View all" End Card appears ONLY after latest added 8 cards */}
           {products.length >= 8 && (
             <div className="category-fits__slider-item category-fits__slider-item--view-all">
-              <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} />
+              <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} image={viewAllImage} />
             </div>
           )}
         </div>
@@ -433,8 +443,10 @@ export default function CategoryFits() {
 
     const loadDynamicData = async () => {
       try {
-        // 1. Fetch swipe categories
-        const catRes = await fetch(`${API_BASE_URL}/api/content/swipeCategories`);
+        // 1. Fetch swipe categories (fresh from backend with no stale cache)
+        const catRes = await fetch(`${API_BASE_URL}/api/content/swipeCategories?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const catJson = await catRes.json();
         let dynamicCats = null;
         if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
@@ -446,6 +458,7 @@ export default function CategoryFits() {
               id: (c.key || c.id).toLowerCase(),
               label: c.label,
               collectionPath: c.collectionPath || `/collections/${(c.key || c.id).toLowerCase()}`,
+              image: c.image || null,
             }));
           }
         }
@@ -534,6 +547,7 @@ export default function CategoryFits() {
               fitId={cat.id}
               fitLabel={cat.label}
               collectionPath={cat.collectionPath}
+              viewAllImage={cat.image}
             />
           );
         })}

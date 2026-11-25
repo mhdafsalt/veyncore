@@ -197,27 +197,37 @@ function ObjectProductCard({ product }) {
 /**
  * End-of-row "View" card that sits directly after the 6th card in the swipe row
  */
-function ViewAllEndCard({ categoryLabel, collectionPath }) {
+function ViewAllEndCard({ categoryLabel, collectionPath, image }) {
   return (
     <article className="obj-drop-card obj-drop-card--view-all">
       <Link href={collectionPath} className="obj-drop-card__view-all-link" aria-label={`View all ${categoryLabel}`}>
-        <div className="obj-drop-card__view-all-box">
-          <span className="obj-drop-card__view-all-text">View all</span>
-          <svg
-            className="obj-drop-card__view-all-arrow"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <polyline points="13 5 20 12 13 19" />
-          </svg>
+        <div className={`obj-drop-card__view-all-box ${image ? 'obj-drop-card__view-all-box--has-image' : ''}`}>
+          {image && (
+            <img
+              src={optimizeImageUrl(image, 700)}
+              alt={`View all ${categoryLabel}`}
+              className="obj-drop-card__view-all-image"
+              loading="lazy"
+            />
+          )}
+          <div className="obj-drop-card__view-all-content">
+            <span className="obj-drop-card__view-all-text">View all</span>
+            <svg
+              className="obj-drop-card__view-all-arrow"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <polyline points="13 5 20 12 13 19" />
+            </svg>
+          </div>
         </div>
       </Link>
     </article>
@@ -230,7 +240,7 @@ function ViewAllEndCard({ categoryLabel, collectionPath }) {
  * 2. Swipeable track with 6 cards + 1 "View" end card
  * 3. Left/Right floating navigation buttons
  */
-function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, collectionPath }) {
+function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, collectionPath, viewAllImage }) {
   if (!products || products.length === 0) return null;
 
   const trackRef = useRef(null);
@@ -367,7 +377,7 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
           {/* "View" End Card - only after latest added 8 cards */}
           {products.length >= 8 && (
             <div className="objects-cat-drops__slider-item objects-cat-drops__slider-item--view-all">
-              <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} />
+              <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} image={viewAllImage} />
             </div>
           )}
         </div>
@@ -417,8 +427,10 @@ export default function ObjectsCategoryDrops() {
 
     const loadDynamicData = async () => {
       try {
-        // 1. Fetch dynamic swipe categories
-        const catRes = await fetch(`${API_BASE_URL}/api/content/swipeCategories`);
+        // 1. Fetch dynamic swipe categories (fresh from backend with no stale cache)
+        const catRes = await fetch(`${API_BASE_URL}/api/content/swipeCategories?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const catJson = await catRes.json();
         let dynamicCats = null;
         if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
@@ -435,6 +447,7 @@ export default function ObjectsCategoryDrops() {
                 label: c.label || (normId === 'caps' ? 'CAPS & HEADWEAR' : c.label),
                 anchorId: rawKey || normId,
                 collectionPath: c.collectionPath || `/collections/objects-drops?category=${normId}`,
+                image: c.image || null,
               };
             });
           }
@@ -531,6 +544,7 @@ export default function ObjectsCategoryDrops() {
               anchorId={cat.anchorId}
               products={products}
               collectionPath={cat.collectionPath}
+              viewAllImage={cat.image}
             />
           );
         })}

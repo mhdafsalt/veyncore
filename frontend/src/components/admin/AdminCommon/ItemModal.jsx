@@ -16,10 +16,14 @@ export default function ItemModal({
   products = [],
 }) {
   const [autoSyncRoute, setAutoSyncRoute] = useState(true);
+  const [isCustomSwipeCategory, setIsCustomSwipeCategory] = useState(false);
+  const [isCustomSubcategory, setIsCustomSubcategory] = useState(false);
 
   // Initialize autoSyncRoute based on whether item is being edited or new
   useEffect(() => {
     if (isOpen) {
+      setIsCustomSwipeCategory(false);
+      setIsCustomSubcategory(false);
       if (config.type === 'subcategories') {
         const isDynamic =
           !formData.href ||
@@ -316,7 +320,13 @@ export default function ItemModal({
 
   // Handle Category Select for Swipe Categories from dynamic dropdown
   const handleSwipeCategorySelect = (selectedLabel) => {
-    if (!selectedLabel || selectedLabel === 'CUSTOM') return;
+    if (selectedLabel === '__custom__') {
+      setIsCustomSwipeCategory(true);
+      setFormData((prev) => ({ ...prev, label: '' }));
+      return;
+    }
+    setIsCustomSwipeCategory(false);
+    if (!selectedLabel) return;
     const matched = availableSwipeCategories.find((c) => c.label === selectedLabel);
     const slug = matched ? matched.slug : getSlugFromLabel(selectedLabel);
     const isObj = (formData.targetSection || 'VEYN-SELECTS') === 'VEYN-OBJECTS';
@@ -481,20 +491,26 @@ export default function ItemModal({
                 <label className="admin-form-label">SUBCATEGORY LABEL *</label>
                 <select
                   className="admin-form-select"
-                  style={{ marginBottom: '8px' }}
                   value={
-                    availableSubcategoriesList.some((c) => c.label === (formData.label || '').replace(/⚡|⚡️/g, '').trim())
+                    isCustomSubcategory
+                      ? '__custom__'
+                      : availableSubcategoriesList.some(
+                          (c) => c.label === (formData.label || '').replace(/⚡|⚡️/g, '').trim()
+                        )
                       ? (formData.label || '').replace(/⚡|⚡️/g, '').trim()
-                      : formData.label
-                      ? 'CUSTOM'
-                      : ''
+                      : formData.label || ''
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val && val !== 'CUSTOM') {
+                    if (val === '__custom__') {
+                      setIsCustomSubcategory(true);
+                      setFormData((prev) => ({ ...prev, label: '' }));
+                    } else {
+                      setIsCustomSubcategory(false);
                       handleLabelChange(val);
                     }
                   }}
+                  required
                 >
                   <option value="">⚡ Select Dynamic Subcategory / Fit...</option>
                   <optgroup label={`📂 Available ${currentMainCategory} Categories`}>
@@ -504,18 +520,28 @@ export default function ItemModal({
                       </option>
                     ))}
                   </optgroup>
-                  <option value="CUSTOM">✏️ + Custom Subcategory Name (Type Below)</option>
+                  {formData.label &&
+                    !availableSubcategoriesList.some(
+                      (c) => c.label === (formData.label || '').replace(/⚡|⚡️/g, '').trim()
+                    ) &&
+                    !isCustomSubcategory && (
+                      <option value={formData.label}>{formData.label}</option>
+                    )}
+                  <option value="__custom__">✏️ + Custom Subcategory Name...</option>
                 </select>
 
-                <input
-                  type="text"
-                  className="admin-form-input"
-                  style={{ textTransform: 'uppercase' }}
-                  value={formData.label || ''}
-                  onChange={(e) => handleLabelChange(e.target.value)}
-                  placeholder="e.g. BOOTCUT, CARGO, FLASH SALE⚡️"
-                  required
-                />
+                {isCustomSubcategory && (
+                  <input
+                    type="text"
+                    className="admin-form-input"
+                    style={{ textTransform: 'uppercase', marginTop: '8px' }}
+                    value={formData.label || ''}
+                    onChange={(e) => handleLabelChange(e.target.value)}
+                    placeholder="e.g. BOOTCUT, CARGO, FLASH SALE⚡️"
+                    required
+                    autoFocus
+                  />
+                )}
               </div>
 
               <div className="admin-form-group">
@@ -833,20 +859,17 @@ export default function ItemModal({
                 {/* Dynamic Category Dropdown */}
                 <select
                   className="admin-form-select"
-                  style={{ marginBottom: '8px' }}
                   value={
-                    availableSwipeCategories.some((c) => c.label === (formData.label || '').trim())
+                    isCustomSwipeCategory
+                      ? '__custom__'
+                      : availableSwipeCategories.some(
+                          (c) => c.label === (formData.label || '').trim()
+                        )
                       ? (formData.label || '').trim()
-                      : formData.label
-                      ? 'CUSTOM'
-                      : ''
+                      : formData.label || ''
                   }
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val && val !== 'CUSTOM') {
-                      handleSwipeCategorySelect(val);
-                    }
-                  }}
+                  onChange={(e) => handleSwipeCategorySelect(e.target.value)}
+                  required
                 >
                   <option value="">⚡ Select Dynamic Category / Fit...</option>
                   <optgroup label={`📂 Available ${formData.targetSection || 'VEYN-SELECTS'} Categories`}>
@@ -856,21 +879,28 @@ export default function ItemModal({
                       </option>
                     ))}
                   </optgroup>
-                  <option value="CUSTOM">✏️ + Custom Category Name (Type Below)</option>
+                  {formData.label &&
+                    !availableSwipeCategories.some(
+                      (c) => c.label === (formData.label || '').trim()
+                    ) &&
+                    !isCustomSwipeCategory && (
+                      <option value={formData.label}>{formData.label}</option>
+                    )}
+                  <option value="__custom__">✏️ + Custom Category Name...</option>
                 </select>
 
-                <input
-                  type="text"
-                  className="admin-form-input"
-                  style={{ textTransform: 'uppercase' }}
-                  value={formData.label || ''}
-                  onChange={(e) => handleSwipeLabelInputChange(e.target.value)}
-                  placeholder="E.G. YOUR CATEGORY NAME"
-                  required
-                />
-                <span className="admin-route-hint" style={{ marginTop: '4px', display: 'block' }}>
-                  Select from dynamic categories above to auto-populate Key Identifier and Collection Route, or type a custom category name.
-                </span>
+                {isCustomSwipeCategory && (
+                  <input
+                    type="text"
+                    className="admin-form-input"
+                    style={{ textTransform: 'uppercase', marginTop: '8px' }}
+                    value={formData.label || ''}
+                    onChange={(e) => handleSwipeLabelInputChange(e.target.value)}
+                    placeholder="E.G. YOUR CATEGORY NAME"
+                    required
+                    autoFocus
+                  />
+                )}
               </div>
 
               <div className="admin-form-group">
@@ -902,6 +932,19 @@ export default function ItemModal({
                   placeholder="e.g. /collections/all-drops?category=your-category"
                 />
               </div>
+
+              {/* View All Card Lookbook Image Option */}
+              <AdminImageUploader
+                label="VIEW ALL CARD IMAGE (OPTIONAL)"
+                value={formData.image || ''}
+                onChange={(newUrl) =>
+                  setFormData((prev) => ({ ...prev, image: newUrl }))
+                }
+                aspectRatio="3/4"
+                placeholder="https://... or /images/..."
+                helpText="Optional lookbook image displayed on the 'View All' card at the end of this swipe row."
+                onRemove={() => setFormData((prev) => ({ ...prev, image: '' }))}
+              />
             </>
           )}
 

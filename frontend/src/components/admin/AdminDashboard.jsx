@@ -161,7 +161,13 @@ export default function AdminDashboard() {
   const fetchContent = useCallback(async () => {
     try {
       setLoadingContent(true);
-      const res = await fetch(`${API_BASE_URL}/api/content`);
+      const res = await fetch(`${API_BASE_URL}/api/content?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store',
+          Pragma: 'no-cache',
+        },
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         setSiteContent(data.data);
@@ -521,6 +527,12 @@ export default function AdminDashboard() {
         id: currentList[index].id || currentList[index]._id || `item-${Date.now()}-${index}`,
       };
 
+      // Optimistically update React state immediately for instant response
+      setSiteContent((prev) => ({
+        ...prev,
+        [type]: currentList,
+      }));
+
       const res = await fetch(`${API_BASE_URL}/api/content/${type}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
@@ -530,9 +542,16 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (res.ok && data.success) {
         showToast('Status toggled.', 'success');
+        if (Array.isArray(data.data)) {
+          setSiteContent((prev) => ({
+            ...prev,
+            [type]: data.data,
+          }));
+        }
         fetchContent();
       } else {
         showToast(data.message || 'Toggle failed', 'error');
+        fetchContent();
       }
     } catch (err) {
       showToast('Error updating status', 'error');
@@ -546,6 +565,7 @@ export default function AdminDashboard() {
       type: 'contentItem',
       sectionKey: type,
       index,
+      id: item?.id || item?._id || item?.key,
       title: item?.title || item?.label || item?.text || 'Item',
     });
   };
@@ -612,8 +632,20 @@ export default function AdminDashboard() {
           showToast(data.message || 'Delete failed', 'error');
         }
       } else if (type === 'contentItem') {
-        const currentList = [...(siteContent?.[sectionKey] || [])];
-        currentList.splice(index, 1);
+        let currentList = [...(siteContent?.[sectionKey] || [])];
+        if (id) {
+          currentList = currentList.filter(
+            (item, i) => (item.id || item._id || item.key) !== id && i !== index
+          );
+        } else if (typeof index === 'number' && index >= 0 && index < currentList.length) {
+          currentList.splice(index, 1);
+        }
+
+        // Optimistically update React state immediately so the item vanishes with 0ms delay!
+        setSiteContent((prev) => ({
+          ...prev,
+          [sectionKey]: currentList,
+        }));
 
         const res = await fetch(`${API_BASE_URL}/api/content/${sectionKey}`, {
           method: 'PUT',
@@ -623,9 +655,16 @@ export default function AdminDashboard() {
         const data = await res.json();
         if (res.ok && data.success) {
           showToast('Item deleted from section.', 'success');
+          if (Array.isArray(data.data)) {
+            setSiteContent((prev) => ({
+              ...prev,
+              [sectionKey]: data.data,
+            }));
+          }
           fetchContent();
         } else {
           showToast(data.message || 'Delete failed', 'error');
+          fetchContent();
         }
       } else if (type === 'media') {
         const res = await fetch(`${API_BASE_URL}/api/upload/${encodeURIComponent(id)}`, {

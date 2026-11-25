@@ -35,6 +35,7 @@ export default function AdminSwipeCategories({
           <table className="admin-table">
             <thead>
               <tr>
+                <th>IMAGE</th>
                 <th>CATEGORY LABEL</th>
                 <th>KEY IDENTIFIER</th>
                 <th>TARGET SECTION</th>
@@ -47,6 +48,24 @@ export default function AdminSwipeCategories({
               {swipeCategories && swipeCategories.length > 0 ? (
                 swipeCategories.map((item, idx) => (
                   <tr key={item.id || idx}>
+                    <td>
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.label}
+                          style={{
+                            width: '38px',
+                            height: '48px',
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            border: '1px solid #e2e8f0',
+                            display: 'block',
+                          }}
+                        />
+                      ) : (
+                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>—</span>
+                      )}
+                    </td>
                     <td style={{ fontWeight: 700, color: '#0f172a' }}>{item.label}</td>
                     <td>
                       <span className="admin-swipe-categories__code-key">
