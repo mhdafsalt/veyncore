@@ -5,76 +5,11 @@ import { API_BASE_URL } from '@/lib/constants';
 
 const AuthContext = createContext(null);
 
-const INITIAL_ORDERS = [
-  {
-    id: 'VC-90248',
-    date: '20 Nov 2026',
-    status: 'IN TRANSIT',
-    statusClass: 'status--in-transit',
-    trackingNumber: 'IP982341902IN',
-    courier: 'India Post Speed Post',
-    total: 3098,
-    itemsCount: 2,
-    items: [
-      {
-        title: 'Raw Selvedge Baggy Denim',
-        fit: 'Baggy Cut',
-        size: '32',
-        qty: 1,
-        price: 2499,
-        image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=300&q=80',
-      },
-      {
-        title: 'Veyncore Heavy Rib Beanie',
-        fit: 'One Size',
-        size: 'OS',
-        qty: 1,
-        price: 599,
-        image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=300&q=80',
-      },
-    ],
-  },
-  {
-    id: 'VC-87109',
-    date: '12 Nov 2026',
-    status: 'DELIVERED',
-    statusClass: 'status--delivered',
-    trackingNumber: 'IP871092831IN',
-    courier: 'Bluedart Air Express',
-    total: 2799,
-    itemsCount: 1,
-    items: [
-      {
-        title: 'Washed Black Bootcut Jeans',
-        fit: 'Bootcut Denim',
-        size: '30',
-        qty: 1,
-        price: 2799,
-        image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=300&q=80',
-      },
-    ],
-  },
-];
-
-const INITIAL_ADDRESSES = [
-  {
-    id: 'addr_1',
-    isDefault: true,
-    name: 'Alex Veyn',
-    street: 'Plot 42, Bandra West, Off Carter Road',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-    postalCode: '400050',
-    country: 'India',
-    phone: '+91 98765 43210',
-  },
-];
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
-  const [addresses, setAddresses] = useState(INITIAL_ADDRESSES);
+  const [orders, setOrders] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Auth Modal State

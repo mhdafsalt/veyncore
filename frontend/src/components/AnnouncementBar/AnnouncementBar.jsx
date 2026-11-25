@@ -4,35 +4,32 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/lib/constants';
 import './AnnouncementBar.css';
 
-const DEFAULT_ANNOUNCEMENTS = [
-  'LEAD WITH CONFIDENCE',
-  'FREE SHIPPING ON ALL ORDERS',
-  'NEW DENIM DROPS LIVE NOW',
-  'CASH ON DELIVERY AVAILABLE',
-  'EASY 7-DAY EXCHANGES'
-];
+let cachedAnnouncements = null;
 
 export default function AnnouncementBar() {
-  const [announcements, setAnnouncements] = useState(DEFAULT_ANNOUNCEMENTS);
+  const [announcements, setAnnouncements] = useState(() => cachedAnnouncements || []);
 
-  // Fetch dynamic announcements from backend
+  // Fetch dynamic announcements from backend (purely dynamic from database)
   useEffect(() => {
     let isMounted = true;
     const fetchAnnouncements = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/content/announcements`);
+        const res = await fetch(`${API_BASE_URL}/api/content/announcements?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const data = await res.json();
-        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (res.ok && data.success && Array.isArray(data.data)) {
           const activeList = data.data
             .filter((a) => a.active !== false)
             .map((a) => a.text)
             .filter(Boolean);
-          if (isMounted && activeList.length > 0) {
+          cachedAnnouncements = activeList;
+          if (isMounted) {
             setAnnouncements(activeList);
           }
         }
       } catch (err) {
-        // Fallback to defaults
+        // Silently continue
       }
     };
 
@@ -41,6 +38,11 @@ export default function AnnouncementBar() {
       isMounted = false;
     };
   }, []);
+
+  // If no dynamic announcements exist in database, do not render any mock announcement
+  if (!announcements || announcements.length === 0) {
+    return null;
+  }
 
   // Duplicate array so each group is wide enough to seamlessly loop on all screens
   const marqueeItems = [...announcements, ...announcements];

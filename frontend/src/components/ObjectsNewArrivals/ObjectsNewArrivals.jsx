@@ -124,9 +124,8 @@ function ObjectCard({ product }) {
           ) : (
             <button
               type="button"
-              className={`product-card__choose-button ${
-                addedStatus ? 'product-card__choose-button--added' : ''
-              }`}
+              className={`product-card__choose-button ${addedStatus ? 'product-card__choose-button--added' : ''
+                }`}
               onClick={handleQuickAddClick}
               aria-label={`Choose options for ${product.title}`}
             >
@@ -277,10 +276,25 @@ export default function ObjectsNewArrivals() {
           ))}
         </div>
 
-        {/* Centered Minimalist "View all" Action */}
+        {/* Centered Minimalist "View All" Action matching reference design */}
         <div className="new-arrivals__footer">
-          <Link href="/collections/objects-drops" className="new-arrivals__view-all-button">
-            View all
+          <Link href="/collections/objects-drops" className="new-arrivals__view-all-button" aria-label="View all">
+            <span className="new-arrivals__view-all-text">VIEW ALL</span>
+            <svg
+              className="new-arrivals__view-all-arrow"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <polyline points="14 5 21 12 14 19" />
+            </svg>
           </Link>
         </div>
       </div>

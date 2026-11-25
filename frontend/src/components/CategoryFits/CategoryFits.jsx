@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
-import { FIT_CATEGORIES, CATEGORY_FITS_DATA } from '@/data/categoryFitsData';
 import { API_BASE_URL } from '@/lib/constants';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './CategoryFits.css';
@@ -325,8 +324,8 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage }
       <header className="category-fits__row-header">
         <h2 className="category-fits__row-heading">{fitLabel}</h2>
         {products.length >= 8 && (
-          <Link href={collectionPath} className="category-fits__row-header-link" aria-label={`View ${fitLabel}`}>
-            <span>View</span>
+          <Link href={collectionPath} className="category-fits__row-header-link" aria-label={`View all ${fitLabel}`}>
+            <span>View all</span>
             <svg
               width="16"
               height="16"

@@ -10,27 +10,6 @@ import { parseNumericPrice } from '@/lib/priceUtils';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './CartDrawer.css';
 
-const DEFAULT_COLLECTIONS = [
-  {
-    id: 'denims',
-    title: 'DENIMS',
-    image: '/images/hero/hero-card-1.jpg',
-    href: '/collections/all-drops?category=denims',
-  },
-  {
-    id: 'tops',
-    title: 'TOPS',
-    image: '/images/hero/hero-card-2.jpg',
-    href: '/collections/all-drops?category=tops',
-  },
-  {
-    id: 'cargo',
-    title: 'CARGO',
-    image: '/images/hero/hero-card-3.jpg',
-    href: '/collections/all-drops?category=cargo',
-  },
-];
-
 export default function CartDrawer() {
   const {
     cartItems,
@@ -49,9 +28,9 @@ export default function CartDrawer() {
     openCheckout,
   } = useCart();
 
-  // Dynamic recommendations and collections state
-  const [recommendations, setRecommendations] = useState(UPSELL_PRODUCTS);
-  const [trendingCollections, setTrendingCollections] = useState(DEFAULT_COLLECTIONS);
+  // Dynamic recommendations and collections state (purely loaded from database)
+  const [recommendations, setRecommendations] = useState([]);
+  const [trendingCollections, setTrendingCollections] = useState([]);
   const [featuredDrops, setFeaturedDrops] = useState([]);
   const [upsellIndex, setUpsellIndex] = useState(0);
 
@@ -124,7 +103,7 @@ export default function CartDrawer() {
 
   // Filter recommendations to exclude products already in the cart
   const availableUpsells = useMemo(() => {
-    if (!recommendations || recommendations.length === 0) return UPSELL_PRODUCTS;
+    if (!recommendations || recommendations.length === 0) return [];
     const cartIdentifiers = new Set(
       cartItems.map((item) => String(item.handle || item.productId || item.id).toLowerCase())
     );
@@ -134,13 +113,15 @@ export default function CartDrawer() {
     return filtered.length > 0 ? filtered : recommendations;
   }, [recommendations, cartItems]);
 
-  const currentUpsell = availableUpsells[upsellIndex % availableUpsells.length] || UPSELL_PRODUCTS[0];
+  const currentUpsell = availableUpsells.length > 0 ? availableUpsells[upsellIndex % availableUpsells.length] : null;
 
   const handleNextUpsell = () => {
+    if (availableUpsells.length === 0) return;
     setUpsellIndex((prev) => (prev + 1) % availableUpsells.length);
   };
 
   const handlePrevUpsell = () => {
+    if (availableUpsells.length === 0) return;
     setUpsellIndex((prev) => (prev - 1 + availableUpsells.length) % availableUpsells.length);
   };
 

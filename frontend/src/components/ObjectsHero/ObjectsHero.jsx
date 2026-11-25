@@ -7,37 +7,6 @@ import './ObjectsHero.css';
 
 let cachedObjectsSlides = null;
 
-// Initial fallback slides so VEYN-OBJECTS hero renders instantly on frame 0
-const INITIAL_OBJECTS_SLIDES = [
-  {
-    id: 'obj-slide-3',
-    targetSection: 'VEYN-OBJECTS',
-    title: 'Tactical Artifacts & Caps',
-    image: '/images/hero/ObjectHero03.jpg', // 110 KB optimized JPG instead of 2.06 MB PNG
-    href: '/collections/objects-drops',
-    active: true,
-    sortOrder: 2,
-  },
-  {
-    id: 'item-1795506485735-7nf5',
-    targetSection: 'VEYN-OBJECTS',
-    title: 'Shades',
-    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506476/veyncore_uploads/24bc592b40ca58fc89ae4dc630b3b10f-1795506472410-1309.jpg',
-    href: '/collections/objects-drops?category=shades',
-    active: true,
-    sortOrder: 4,
-  },
-  {
-    id: 'item-1795506542135-1l3n',
-    targetSection: 'VEYN-OBJECTS',
-    title: 'Objects',
-    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506537/veyncore_uploads/unnamed__1_-1795506535210-5755.jpg',
-    href: '/collections/objects-drops?category=baggy',
-    active: true,
-    sortOrder: 5,
-  },
-];
-
 /**
  * Optimizes image URLs with next-gen formats and compression
  */
@@ -57,24 +26,24 @@ export default function ObjectsHero({
   images: propImages = null,
   autoPlayInterval = 3500,
 }) {
-  const [images, setImages] = useState(() => propImages || cachedObjectsSlides || INITIAL_OBJECTS_SLIDES);
+  const [images, setImages] = useState(() => propImages || cachedObjectsSlides || []);
 
   // Fetch dynamic hero slides from backend (keeps state synced in background)
   useEffect(() => {
     let isMounted = true;
     const fetchHeroSlides = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/content/heroSlides`);
+        const res = await fetch(`${API_BASE_URL}/api/content/heroSlides?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const data = await res.json();
-        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (res.ok && data.success && Array.isArray(data.data)) {
           const objectsSlides = data.data.filter(
             (s) => s.targetSection === 'VEYN-OBJECTS' && s.active !== false
           );
-          if (objectsSlides.length > 0) {
-            cachedObjectsSlides = objectsSlides;
-            if (isMounted) {
-              setImages(objectsSlides);
-            }
+          cachedObjectsSlides = objectsSlides;
+          if (isMounted) {
+            setImages(objectsSlides);
           }
         }
       } catch (err) {

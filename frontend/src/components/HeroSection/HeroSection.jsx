@@ -5,38 +5,8 @@ import Link from 'next/link';
 import { API_BASE_URL } from '@/lib/constants';
 import './HeroSection.css';
 
+// In-memory module cache for instant Frame-0 painting
 let cachedSelectsSlides = null;
-
-// Initial fallback slides so the hero renders instantly on frame 0 without waiting for API
-const INITIAL_SELECTS_SLIDES = [
-  {
-    id: 'item-1795506189161-voni',
-    targetSection: 'VEYN-SELECTS',
-    title: 'Tops Collection',
-    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506172/veyncore_uploads/020d89e8dfd1ce0111c4cc93654e487a-1795506170197-8087.jpg',
-    href: '/collections/all-drops?category=tops',
-    active: true,
-    sortOrder: 1,
-  },
-  {
-    id: 'item-1795506297445-r59l',
-    targetSection: 'VEYN-SELECTS',
-    title: 'Baggy Fit',
-    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506294/veyncore_uploads/c9041be861aafae7dd6f84bbb2c01821-1795506291741-6512.jpg',
-    href: '/collections/all-drops?category=baggy',
-    active: true,
-    sortOrder: 2,
-  },
-  {
-    id: 'item-1795506325430-4mk0',
-    targetSection: 'VEYN-SELECTS',
-    title: 'All Drops',
-    image: 'https://res.cloudinary.com/sod0mks1/image/upload/v1795506323/veyncore_uploads/8b6841c5-91c7-446c-9bd5-a90cc5b1-1795506320244-3695.webp',
-    href: '/collections/all-drops',
-    active: true,
-    sortOrder: 3,
-  },
-];
 
 /**
  * Optimizes Cloudinary URLs on-the-fly with auto-format (WebP/AVIF),
@@ -55,24 +25,24 @@ export default function HeroSection({
   slides: propSlides = null,
   autoPlayInterval = 3500,
 }) {
-  const [slides, setSlides] = useState(() => propSlides || cachedSelectsSlides || INITIAL_SELECTS_SLIDES);
+  const [slides, setSlides] = useState(() => propSlides || cachedSelectsSlides || []);
 
   // Fetch dynamic hero slides from backend (keeps state synced in background)
   useEffect(() => {
     let isMounted = true;
     const fetchHeroSlides = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/content/heroSlides`);
+        const res = await fetch(`${API_BASE_URL}/api/content/heroSlides?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const data = await res.json();
-        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (res.ok && data.success && Array.isArray(data.data)) {
           const selectsSlides = data.data.filter(
             (s) => s.targetSection === 'VEYN-SELECTS' && s.active !== false
           );
-          if (selectsSlides.length > 0) {
-            cachedSelectsSlides = selectsSlides;
-            if (isMounted) {
-              setSlides(selectsSlides);
-            }
+          cachedSelectsSlides = selectsSlides;
+          if (isMounted) {
+            setSlides(selectsSlides);
           }
         }
       } catch (err) {

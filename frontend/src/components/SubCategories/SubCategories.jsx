@@ -6,30 +6,13 @@ import { API_BASE_URL } from '@/lib/constants';
 import { matchProductCategory, toCategorySlug } from '@/lib/categoryFilterUtils';
 import './SubCategories.css';
 
-const DEFAULT_SELECTS_SUBCATEGORIES = [
+const BASE_SELECTS_NAV = [
   { id: 'home', label: 'HOME', href: '/' },
-  { id: 'flash-sale', label: 'FLASH SALE', href: '#flash-sale', isGlow: true },
-  { id: 'new-drops', label: 'NEW DROPS', href: '/collections/all-drops?badge=new', isGlow: true },
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops' },
-  { id: 'baggy', label: 'BAGGY', href: '/collections/all-drops?category=baggy' },
-  { id: 'bootcut', label: 'BOOTCUT', href: '/collections/all-drops?category=bootcut' },
-  { id: 'wide', label: 'WIDE', href: '/collections/all-drops?category=wide' },
-  { id: 'straight', label: 'STRAIGHT', href: '/collections/all-drops?category=straight' },
-  { id: 'cargo', label: 'CARGO', href: '/collections/all-drops?category=cargo' },
-  { id: 'denims', label: 'DENIMS', href: '/collections/all-drops?category=denims' },
-  { id: 'tops', label: 'TOPS', href: '/collections/all-drops?category=tops' },
 ];
 
-const DEFAULT_OBJECTS_SUBCATEGORIES = [
-  { id: 'obj-drops', label: 'OBJECT DROPS', href: '#object-drops', isGlow: true },
+const BASE_OBJECTS_NAV = [
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/objects-drops' },
-  { id: 'bags', label: 'BAGS', href: '/collections/objects-drops?category=bags' },
-  { id: 'chains', label: 'CHAINS', href: '/collections/objects-drops?category=chains' },
-  { id: 'caps', label: 'CAPS', href: '/collections/objects-drops?category=caps' },
-  { id: 'shades', label: 'SHADES', href: '/collections/objects-drops?category=shades' },
-  { id: 'bracelets', label: 'BRACELETS', href: '/collections/objects-drops?category=bracelets' },
-  { id: 'watches', label: 'WATCHES', href: '/collections/objects-drops?category=watches' },
-  { id: 'belts', label: 'BELTS', href: '/collections/objects-drops?category=belts' },
 ];
 
 const LEGACY_STATIC_CATEGORIES = new Set([
@@ -80,16 +63,18 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     let isMounted = true;
     const fetchSubcategories = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/content/subcategories`);
+        const res = await fetch(`${API_BASE_URL}/api/content/subcategories?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const data = await res.json();
-        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (res.ok && data.success && Array.isArray(data.data)) {
           cachedDynamicSubcategories = data.data;
           if (isMounted) {
             setDynamicSubcategories(data.data);
           }
         }
       } catch (err) {
-        // Fallback to static defaults
+        // Silently continue
       }
     };
 
@@ -125,9 +110,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
 
   const subcategories = useMemo(() => {
     const isObjects = activeMainCategory === 'VEYN-OBJECTS';
-    const baseDefaults = isObjects
-      ? DEFAULT_OBJECTS_SUBCATEGORIES
-      : DEFAULT_SELECTS_SUBCATEGORIES;
+    const baseNav = isObjects ? BASE_OBJECTS_NAV : BASE_SELECTS_NAV;
 
     const result = [];
     const seenLabels = new Set();
@@ -169,8 +152,8 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       adminItems.forEach((item) => addUnique(item));
     }
 
-    // 2. Add base navigation defaults (core streetwear fits & object categories)
-    baseDefaults.forEach((base) => {
+    // 2. Add base navigation links (HOME and ALL DROPS)
+    baseNav.forEach((base) => {
       addUnique(base);
     });
 

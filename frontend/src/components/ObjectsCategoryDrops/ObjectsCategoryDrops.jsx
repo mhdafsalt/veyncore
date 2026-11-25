@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
-import { OBJECTS_DROP_CATEGORIES, OBJECTS_CATEGORY_DATA } from '@/data/objectsData';
 import { API_BASE_URL } from '@/lib/constants';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsCategoryDrops.css';
@@ -313,8 +312,8 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
       <header className="objects-cat-drops__row-header">
         <h2 className="objects-cat-drops__row-heading">{categoryLabel}</h2>
         {products.length >= 8 && (
-          <Link href={collectionPath} className="objects-cat-drops__row-header-link" aria-label={`View ${categoryLabel}`}>
-            <span>View</span>
+          <Link href={collectionPath} className="objects-cat-drops__row-header-link" aria-label={`View all ${categoryLabel}`}>
+            <span>View all</span>
             <svg
               width="16"
               height="16"

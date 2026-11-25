@@ -26,8 +26,8 @@ function ProductCard({ product, priority = false }) {
   const [addedStatus, setAddedStatus] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const images = product.images && product.images.length > 0 
-    ? product.images 
+  const images = product.images && product.images.length > 0
+    ? product.images
     : ['/images/products/artic-blue-wide.jpg'];
   const mainImage = product.thumbnail || images[0];
 
@@ -133,9 +133,8 @@ function ProductCard({ product, priority = false }) {
           ) : (
             <button
               type="button"
-              className={`product-card__choose-button ${
-                addedStatus ? 'product-card__choose-button--added' : ''
-              }`}
+              className={`product-card__choose-button ${addedStatus ? 'product-card__choose-button--added' : ''
+                }`}
               onClick={handleQuickAddClick}
             >
               {addedStatus ? (
@@ -288,23 +287,38 @@ export default function NewArrivals() {
         <div className="new-arrivals__grid">
           {products.length > 0
             ? products.map((product, idx) => (
-                <div key={product.id || product.handle} className="new-arrivals__grid-item">
-                  <ProductCard product={product} priority={idx < 4} />
-                </div>
-              ))
+              <div key={product.id || product.handle} className="new-arrivals__grid-item">
+                <ProductCard product={product} priority={idx < 4} />
+              </div>
+            ))
             : [...Array(4)].map((_, i) => (
-                <div key={i} className="new-arrivals__grid-item new-arrivals__grid-item--skeleton">
-                  <div className="new-arrivals__skeleton-image" />
-                  <div className="new-arrivals__skeleton-title" />
-                  <div className="new-arrivals__skeleton-price" />
-                </div>
-              ))}
+              <div key={i} className="new-arrivals__grid-item new-arrivals__grid-item--skeleton">
+                <div className="new-arrivals__skeleton-image" />
+                <div className="new-arrivals__skeleton-title" />
+                <div className="new-arrivals__skeleton-price" />
+              </div>
+            ))}
         </div>
 
-        {/* Centered Minimalist "View all" Action */}
+        {/* Centered Minimalist "View All" Action matching reference design */}
         <div className="new-arrivals__footer">
-          <Link href="/collections/all-drops" className="new-arrivals__view-all-button">
-            View all
+          <Link href="/collections/all-drops" className="new-arrivals__view-all-button" aria-label="View all">
+            <span className="new-arrivals__view-all-text">VIEW ALL</span>
+            <svg
+              className="new-arrivals__view-all-arrow"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <polyline points="14 5 21 12 14 19" />
+            </svg>
           </Link>
         </div>
       </div>

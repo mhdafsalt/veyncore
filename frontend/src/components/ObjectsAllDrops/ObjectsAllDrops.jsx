@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { API_BASE_URL } from '@/lib/constants';
-import { matchProductCategory, DEFAULT_OBJECTS_CATEGORIES } from '@/lib/categoryFilterUtils';
+import { matchProductCategory } from '@/lib/categoryFilterUtils';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsAllDrops.css';
 
@@ -14,13 +14,6 @@ import './ObjectsAllDrops.css';
  * Format price to ensure Rs. and amount stay joined by non-breaking space
  */
 const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
-
-const OBJECT_CATEGORIES = [
-  { id: 'all', label: 'ALL', subCategory: null },
-  { id: 'bags', label: 'BAGS & UTILITY', subCategory: 'BAGS' },
-  { id: 'chains', label: 'CHAINS & HARDWARE', subCategory: 'CHAINS' },
-  { id: 'caps', label: 'CAPS & HEADWEAR', subCategory: 'CAPS' }
-];
 
 const SORT_OPTIONS = [
   { value: 'featured', label: 'Featured' },
@@ -449,32 +442,33 @@ function ObjectsAllDropsContent() {
   const currentSortLabel =
     SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || 'Featured';
 
-  // Dynamic Category Extraction from defaults and real products for Objects
+  // Dynamic Category Extraction from real products for Objects
   const dynamicObjectCategories = useMemo(() => {
     const map = new Map();
 
-    // 1. Seed with standard object categories
-    DEFAULT_OBJECTS_CATEGORIES.forEach((def) => {
-      map.set(def.id, {
-        id: def.id,
-        label: def.label,
-        count: def.id === 'all' ? productsList.length : 0,
-      });
+    // 1. Seed with ALL
+    map.set('all', {
+      id: 'all',
+      label: 'ALL',
+      count: productsList.length,
     });
 
-    // 2. Add any additional dynamic subcategories from products
+    // 2. Add dynamic categories directly from real products
     productsList.forEach((p) => {
-      const sub = (p.subCategory || '').trim();
-      if (sub) {
-        const key = sub.toLowerCase();
-        if (!map.has(key)) {
-          map.set(key, {
-            id: key,
-            label: sub.toUpperCase(),
-            count: 0,
-          });
+      const candidates = [p.subCategory, p.swipeCategory, p.fit].filter(Boolean);
+      candidates.forEach((cand) => {
+        const sub = String(cand).trim();
+        if (sub) {
+          const key = sub.toLowerCase();
+          if (key !== 'all' && !map.has(key)) {
+            map.set(key, {
+              id: key,
+              label: sub.toUpperCase(),
+              count: 0,
+            });
+          }
         }
-      }
+      });
     });
 
     // 3. Exact matching counts using robust matching utility
@@ -487,8 +481,11 @@ function ObjectsAllDropsContent() {
       cat.count = productsList.filter((p) => matchProductCategory(p, cat.id)).length;
     });
 
-    return entries;
-  }, [productsList]);
+    // Only return categories that actually have products (or currently active)
+    return entries.filter(
+      (cat) => cat.id === 'all' || cat.count > 0 || (activeCategoryTab && activeCategoryTab === cat.id)
+    );
+  }, [productsList, activeCategoryTab]);
 
   const badgeParam = searchParams ? searchParams.get('badge')?.toLowerCase() : null;
   const isNewDrops = badgeParam === 'new';

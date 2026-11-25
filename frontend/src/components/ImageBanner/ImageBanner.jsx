@@ -6,6 +6,8 @@ import { API_BASE_URL } from '@/lib/constants';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ImageBanner.css';
 
+const cachedBanners = {};
+
 export default function ImageBanner({
   targetSection = 'VEYN-SELECTS',
   buttonLink: customButtonLink,
@@ -15,28 +17,17 @@ export default function ImageBanner({
 }) {
   const isObjects = targetSection === 'VEYN-OBJECTS';
 
-  const defaultImageDesktop = isObjects
-    ? '/images/hero/ObjectHero03.jpg'
-    : '/images/ImageBanner.png';
-
-  const defaultImageMobile = isObjects
-    ? '/images/hero/ObjectHero03.jpg'
-    : '/images/ImageBanner-Mob.png';
-
-  const defaultButtonLink = isObjects
-    ? '/collections/objects-drops'
-    : '/collections/all-drops';
-
-  const defaultAltText = isObjects
-    ? 'VEYN-OBJECTS Artifacts Campaign'
-    : 'VEYNCORE Denim Campaign';
-
-  const [banner, setBanner] = useState({
-    imageDesktop: customImageDesktop || defaultImageDesktop,
-    imageMobile: customImageMobile || defaultImageMobile,
-    altText: customAltText || defaultAltText,
-    buttonLink: customButtonLink || defaultButtonLink,
-    active: true,
+  const [banner, setBanner] = useState(() => {
+    if (customImageDesktop || customImageMobile) {
+      return {
+        imageDesktop: customImageDesktop || '',
+        imageMobile: customImageMobile || customImageDesktop || '',
+        altText: customAltText || 'Campaign Banner',
+        buttonLink: customButtonLink || (isObjects ? '/collections/objects-drops' : '/collections/all-drops'),
+        active: true,
+      };
+    }
+    return cachedBanners[targetSection] || null;
   });
 
   // Fetch dynamic bottom banner settings from backend for the active section
@@ -45,32 +36,32 @@ export default function ImageBanner({
     const fetchBanner = async () => {
       try {
         const endpoint = isObjects
-          ? `${API_BASE_URL}/api/content/bottomBannerObjects`
-          : `${API_BASE_URL}/api/content/bottomBanner`;
+          ? `${API_BASE_URL}/api/content/bottomBannerObjects?t=${Date.now()}`
+          : `${API_BASE_URL}/api/content/bottomBanner?t=${Date.now()}`;
 
-        const res = await fetch(endpoint);
+        const res = await fetch(endpoint, { cache: 'no-store' });
         const data = await res.json();
         if (res.ok && data.success && data.data) {
+          const b = data.data;
+          const imgDesk = b.imageDesktop || customImageDesktop || '';
+          const imgMob = b.imageMobile || customImageMobile || imgDesk;
+          const hasImage = Boolean(imgDesk || imgMob);
+
+          const bannerObj = {
+            imageDesktop: imgDesk,
+            imageMobile: imgMob,
+            altText: b.altText || customAltText || (isObjects ? 'VEYN-OBJECTS Campaign' : 'VEYNCORE Campaign'),
+            buttonLink: b.buttonLink || customButtonLink || (isObjects ? '/collections/objects-drops' : '/collections/all-drops'),
+            active: b.active !== false && hasImage,
+          };
+
           if (isMounted) {
-            setBanner({
-              imageDesktop: data.data.imageDesktop || customImageDesktop || defaultImageDesktop,
-              imageMobile: data.data.imageMobile || customImageMobile || defaultImageMobile,
-              altText: data.data.altText || customAltText || defaultAltText,
-              buttonLink: data.data.buttonLink || customButtonLink || defaultButtonLink,
-              active: data.data.active !== false,
-            });
+            cachedBanners[targetSection] = bannerObj;
+            setBanner(bannerObj);
           }
         }
       } catch (err) {
-        if (isMounted) {
-          setBanner({
-            imageDesktop: customImageDesktop || defaultImageDesktop,
-            imageMobile: customImageMobile || defaultImageMobile,
-            altText: customAltText || defaultAltText,
-            buttonLink: customButtonLink || defaultButtonLink,
-            active: true,
-          });
-        }
+        // Silently preserve current state
       }
     };
 
@@ -78,35 +69,27 @@ export default function ImageBanner({
     return () => {
       isMounted = false;
     };
-  }, [
-    targetSection,
-    isObjects,
-    defaultButtonLink,
-    defaultImageDesktop,
-    defaultImageMobile,
-    defaultAltText,
-    customButtonLink,
-    customImageDesktop,
-    customImageMobile,
-    customAltText,
-  ]);
+  }, [targetSection, isObjects, customButtonLink, customImageDesktop, customImageMobile, customAltText]);
 
-  if (!banner.active) {
+  // If no dynamic banner image is configured or banner is disabled, do not render
+  if (!banner || !banner.active || (!banner.imageDesktop && !banner.imageMobile)) {
     return null;
   }
 
   return (
     <section className="image-banner" aria-label={banner.altText || 'VEYNCORE Campaign Banner'}>
       <Link
-        href={banner.buttonLink || defaultButtonLink}
+        href={banner.buttonLink || (isObjects ? '/collections/objects-drops' : '/collections/all-drops')}
         className="image-banner__link"
         aria-label={banner.altText || 'View campaign collection'}
       >
         <picture className="image-banner__picture">
-          <source media="(max-width: 768px)" srcSet={optimizeImageUrl(banner.imageMobile, 800)} />
+          {banner.imageMobile && (
+            <source media="(max-width: 768px)" srcSet={optimizeImageUrl(banner.imageMobile, 800)} />
+          )}
           <img
-            src={optimizeImageUrl(banner.imageDesktop, 1600)}
-            alt={banner.altText}
+            src={optimizeImageUrl(banner.imageDesktop || banner.imageMobile, 1600)}
+            alt={banner.altText || 'Campaign Banner'}
             className="image-banner__img"
             loading="lazy"
           />

@@ -7,7 +7,7 @@ import { useCart } from '@/context/CartContext';
 import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { SORT_OPTIONS, COLLECTION_PRICE_RANGE } from '@/data/allDropsData';
 import { API_BASE_URL } from '@/lib/constants';
-import { matchProductCategory, DEFAULT_SELECTS_CATEGORIES } from '@/lib/categoryFilterUtils';
+import { matchProductCategory } from '@/lib/categoryFilterUtils';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './AllDrops.css';
 
@@ -378,16 +378,12 @@ function AllDropsContent() {
   const dynamicCategories = useMemo(() => {
     const map = new Map();
 
-    // 1. Seed with standard categories
-    DEFAULT_SELECTS_CATEGORIES.forEach((def) => {
-      map.set(def.id, {
-        id: def.id,
-        label: def.label,
-        count: def.id === 'all' ? productsList.length : 0,
-      });
+    // 1. Seed with ALL
+    map.set('all', {
+      id: 'all',
+      label: 'ALL DROPS',
+      count: productsList.length,
     });
-
-    const priorityOrder = ['baggy', 'bootcut', 'wide', 'straight', 'cargo', 'denims', 'tops', 'accessories'];
 
     // 2. Extract dynamically from products
     productsList.forEach((p) => {
@@ -430,18 +426,15 @@ function AllDropsContent() {
       cat.count = productsList.filter((p) => matchProductCategory(p, cat.id)).length;
     });
 
-    // 5. Sort: "all" first, then priority order, then alphabetically
-    return entries.sort((a, b) => {
-      if (a.id === 'all') return -1;
-      if (b.id === 'all') return 1;
-      const idxA = priorityOrder.indexOf(a.id);
-      const idxB = priorityOrder.indexOf(b.id);
-      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-      if (idxA !== -1) return -1;
-      if (idxB !== -1) return 1;
-      return a.label.localeCompare(b.label);
-    });
-  }, [productsList, dynamicSubcategories]);
+    // 5. Only include categories with products (or currently selected in URL), "all" first, then alphabetically
+    return entries
+      .filter((cat) => cat.id === 'all' || cat.count > 0 || (selectedCategory && selectedCategory === cat.id))
+      .sort((a, b) => {
+        if (a.id === 'all') return -1;
+        if (b.id === 'all') return 1;
+        return a.label.localeCompare(b.label);
+      });
+  }, [productsList, dynamicSubcategories, selectedCategory]);
 
   // Handle category change and reflect in URL query params
   const handleCategoryChange = (catId) => {
