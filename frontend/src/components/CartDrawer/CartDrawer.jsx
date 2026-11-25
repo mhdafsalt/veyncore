@@ -10,8 +10,6 @@ import { parseNumericPrice } from '@/lib/priceUtils';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './CartDrawer.css';
 
-const FREE_SHIPPING_THRESHOLD = 999;
-
 const DEFAULT_COLLECTIONS = [
   {
     id: 'denims',
@@ -211,11 +209,6 @@ export default function CartDrawer() {
     }
   };
 
-  // Dynamic Free Shipping Progress Calculations
-  const isFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const remainingForFree = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const shippingPercent = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
-
   return (
     <div
       className={`cart-drawer ${isCartOpen ? 'cart-drawer--open' : ''}`}
@@ -264,27 +257,6 @@ export default function CartDrawer() {
                FILLED CART STATE (Dynamic & Real-time)
                ========================================= */
             <div className="cart-drawer__filled">
-              {/* Dynamic Free Shipping Progress Bar */}
-              <div className="cart-drawer__shipping-bar">
-                <p className="cart-drawer__shipping-text">
-                  {isFreeShipping ? (
-                    <span className="cart-drawer__shipping-text--success">
-                      🎉 Your order qualifies for <strong>FREE EXPRESS SHIPPING!</strong>
-                    </span>
-                  ) : (
-                    <span>
-                      Add <strong>Rs. {remainingForFree.toLocaleString('en-IN')}.00</strong> more to get <strong>FREE SHIPPING</strong>
-                    </span>
-                  )}
-                </p>
-                <div className="cart-drawer__shipping-track">
-                  <div
-                    className={`cart-drawer__shipping-fill ${isFreeShipping ? 'cart-drawer__shipping-fill--unlocked' : ''}`}
-                    style={{ width: `${shippingPercent}%` }}
-                  />
-                </div>
-              </div>
-
               {/* Items List */}
               <div className="cart-drawer__items-list">
                 {cartItems.map((item) => {
