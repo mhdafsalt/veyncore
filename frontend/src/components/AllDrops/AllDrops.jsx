@@ -306,8 +306,9 @@ function AllDropsContent() {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [desktopColumns, setDesktopColumns] = useState('4'); // '4' or '2' for desktop
   const [mobileColumns, setMobileColumns] = useState('2'); // '2' or '1' for mobile
-  const [displayCount, setDisplayCount] = useState(16);
+  const [displayCount, setDisplayCount] = useState(60);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(() => !cachedAllDropsProducts || cachedAllDropsProducts.length === 0);
 
   const dropdownRef = useRef(null);
   const sentinelRef = useRef(null);
@@ -347,6 +348,10 @@ function AllDropsContent() {
         }
       } catch (e) {
         // Silently fallback to static products
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     fetchProducts();
@@ -1046,7 +1051,21 @@ function AllDropsContent() {
         </div>
 
         {/* Product Grid */}
-        {filteredProducts.length === 0 ? (
+        {isLoading && productsList.length === 0 ? (
+          <div
+            className={`all-drops__grid all-drops__grid--${desktopColumns}col all-drops__grid--m${mobileColumns}col`}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((n) => (
+              <div key={n} className="all-drops-card all-drops-card--skeleton">
+                <div className="all-drops-card__media" />
+                <div className="all-drops-card__info">
+                  <div className="all-drops-card__skeleton-title" />
+                  <div className="all-drops-card__skeleton-price" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="all-drops__empty">
             <h2 className="all-drops__empty-title">No products found</h2>
             <p className="all-drops__empty-text">
@@ -1065,20 +1084,22 @@ function AllDropsContent() {
             className={`all-drops__grid all-drops__grid--${desktopColumns}col all-drops__grid--m${mobileColumns}col`}
           >
             {visibleProducts.map((product) => (
-              <DropsProductCard key={product.handle} product={product} />
+              <DropsProductCard key={product.handle || product.id} product={product} />
             ))}
           </div>
         )}
 
-        {/* Automated Lazy Loading Sentinel (Infinite Scroll) */}
+        {/* Load More Action (User-Initiated to prevent unprompted layout shift during scroll) */}
         {displayCount < filteredProducts.length && (
-          <div ref={sentinelRef} className="all-drops__lazy-loader" aria-live="polite">
-            <div className="all-drops__lazy-dots">
-              <span className="all-drops__lazy-dot" />
-              <span className="all-drops__lazy-dot" />
-              <span className="all-drops__lazy-dot" />
-            </div>
-            <span className="all-drops__lazy-text">Loading more drops...</span>
+          <div className="all-drops__load-more-wrap" style={{ textAlign: 'center', marginTop: '32px', marginBottom: '40px' }}>
+            <button
+              type="button"
+              className="all-drops__empty-btn"
+              onClick={() => setDisplayCount((prev) => prev + 36)}
+              aria-label="Load more drops"
+            >
+              LOAD MORE
+            </button>
           </div>
         )}
       </div>
@@ -1233,9 +1254,34 @@ function AllDropsContent() {
   );
 }
 
+export function AllDropsSkeleton() {
+  return (
+    <section className="all-drops">
+      <div className="all-drops__container">
+        <div className="all-drops__header">
+          <div className="all-drops__header-title-row">
+            <h1 className="all-drops__title">ALL DROPS</h1>
+          </div>
+        </div>
+        <div className="all-drops__grid all-drops__grid--4col all-drops__grid--m2col">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((n) => (
+            <div key={n} className="all-drops-card all-drops-card--skeleton">
+              <div className="all-drops-card__media" />
+              <div className="all-drops-card__info">
+                <div className="all-drops-card__skeleton-title" />
+                <div className="all-drops-card__skeleton-price" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function AllDrops() {
   return (
-    <Suspense fallback={<div className="all-drops" style={{ minHeight: '60vh' }} />}>
+    <Suspense fallback={<AllDropsSkeleton />}>
       <AllDropsContent />
     </Suspense>
   );

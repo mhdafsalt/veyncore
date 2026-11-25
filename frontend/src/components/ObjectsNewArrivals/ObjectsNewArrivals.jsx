@@ -260,10 +260,6 @@ export default function ObjectsNewArrivals() {
     };
   }, []);
 
-  if (!products || products.length === 0) {
-    return null;
-  }
-
   return (
     <section className="new-arrivals" id="object-drops">
       <div className="new-arrivals__container">
@@ -274,11 +270,19 @@ export default function ObjectsNewArrivals() {
 
         {/* 4-col desktop / 2-col mobile Grid */}
         <div className="new-arrivals__grid">
-          {products.map((product) => (
-            <div key={product.id || product.handle} className="new-arrivals__grid-item">
-              <ObjectCard product={product} />
-            </div>
-          ))}
+          {products.length > 0
+            ? products.map((product) => (
+              <div key={product.id || product.handle} className="new-arrivals__grid-item">
+                <ObjectCard product={product} />
+              </div>
+            ))
+            : [...Array(8)].map((_, i) => (
+              <div key={i} className="new-arrivals__grid-item new-arrivals__grid-item--skeleton">
+                <div className="new-arrivals__skeleton-image" />
+                <div className="new-arrivals__skeleton-title" />
+                <div className="new-arrivals__skeleton-price" />
+              </div>
+            ))}
         </div>
 
         {/* Centered Minimalist "View All" Action matching reference design */}

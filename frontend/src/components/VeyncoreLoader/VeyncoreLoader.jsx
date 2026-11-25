@@ -45,6 +45,8 @@ export default function VeyncoreLoader({ onComplete, duration = 1800 }) {
             className="veyn-loader__logo"
             src="/images/veyncoreLogo_black.svg"
             alt="Veyncore"
+            width={350}
+            height={70}
           />
         </div>
        

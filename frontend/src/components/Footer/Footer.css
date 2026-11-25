@@ -12,6 +12,7 @@
   position: relative;
   overflow: hidden;
   border-top: none !important;
+  contain: layout;
 }
 
 .modern-footer:has(.image-banner),
@@ -393,6 +394,7 @@
 .modern-footer__monogram-img {
   width: 80%;
   max-width: 80%;
+  aspect-ratio: 2798 / 369;
   height: auto;
   display: block;
   object-fit: contain;

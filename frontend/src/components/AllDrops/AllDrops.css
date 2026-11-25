@@ -5,6 +5,13 @@
  * Matches clean modern luxury streetwear typography (similar to VEYN-SELECTS)
  */
 
+.all-drops-page,
+.objects-drops-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .all-drops {
   width: 100%;
   min-height: 80vh;
@@ -12,6 +19,39 @@
   color: #111111;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
   padding: 24px 0 60px 0;
+  contain: layout;
+  flex: 1 0 auto;
+}
+
+@keyframes all-drops-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.all-drops-card--skeleton .all-drops-card__media {
+  background: linear-gradient(90deg, #f6f6f6 25%, #eeeeee 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation: all-drops-shimmer 1.6s infinite ease-in-out;
+}
+
+.all-drops-card__skeleton-title {
+  width: 75%;
+  height: 14px;
+  background: #f3f3f3;
+  margin-top: 10px;
+  border-radius: 2px;
+}
+
+.all-drops-card__skeleton-price {
+  width: 40%;
+  height: 12px;
+  background: #f3f3f3;
+  margin-top: 6px;
+  border-radius: 2px;
 }
 
 .all-drops *,

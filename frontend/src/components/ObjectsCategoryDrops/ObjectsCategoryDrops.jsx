@@ -8,8 +8,14 @@ import { API_BASE_URL } from '@/lib/constants';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './ObjectsCategoryDrops.css';
 
+const BASELINE_OBJECTS_CATEGORIES = [
+  { id: 'bags', label: 'BAGS', collectionPath: '/collections/objects-drops?category=bags', anchorId: 'bags', image: null },
+  { id: 'chains', label: 'CHAINS & HARDWARE', collectionPath: '/collections/objects-drops?category=chains', anchorId: 'chains', image: null },
+  { id: 'caps', label: 'CAPS & HEADWEAR', collectionPath: '/collections/objects-drops?category=caps', anchorId: 'caps', image: null },
+];
+
 // In-memory module cache for instant Frame-0 painting
-let cachedObjectsCategories = null;
+let cachedObjectsCategories = BASELINE_OBJECTS_CATEGORIES;
 let cachedObjectsCategoryData = null;
 
 /**
@@ -244,8 +250,9 @@ function ViewAllEndCard({ categoryLabel, collectionPath, image }) {
  * 2. Swipeable track with 6 cards + 1 "View" end card
  * 3. Left/Right floating navigation buttons
  */
-function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, collectionPath, viewAllImage }) {
-  if (!products || products.length === 0) return null;
+function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, collectionPath, viewAllImage, isLoading = false }) {
+  if (!isLoading && (!products || products.length === 0)) return null;
+  const isRowLoading = !products || products.length === 0;
 
   const trackRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -366,22 +373,38 @@ function CategorySwipeRow({ categoryId, categoryLabel, anchorId, products, colle
         <div
           ref={trackRef}
           className="objects-cat-drops__slider-track"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseDown={isRowLoading ? undefined : handleMouseDown}
+          onMouseMove={isRowLoading ? undefined : handleMouseMove}
+          onMouseUp={isRowLoading ? undefined : handleMouseUp}
+          onMouseLeave={isRowLoading ? undefined : handleMouseUp}
         >
-          {products.slice(0, 8).map((product) => (
-            <div key={product.id} className="objects-cat-drops__slider-item">
-              <ObjectProductCard product={product} />
-            </div>
-          ))}
+          {isRowLoading ? (
+            [1, 2, 3, 4].map((n) => (
+              <div key={n} className="objects-cat-drops__slider-item">
+                <article className="obj-drop-card obj-drop-card--skeleton">
+                  <div className="obj-drop-card__gallery" />
+                  <div className="obj-drop-card__details">
+                    <div className="obj-drop-card__skeleton-title" />
+                    <div className="obj-drop-card__skeleton-price" />
+                  </div>
+                </article>
+              </div>
+            ))
+          ) : (
+            <>
+              {products.slice(0, 8).map((product) => (
+                <div key={product.id} className="objects-cat-drops__slider-item">
+                  <ObjectProductCard product={product} />
+                </div>
+              ))}
 
-          {/* "View" End Card at the end of the swipe track */}
-          {products.length > 0 && (
-            <div className="objects-cat-drops__slider-item objects-cat-drops__slider-item--view-all">
-              <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} image={viewAllImage} />
-            </div>
+              {/* "View" End Card at the end of the swipe track */}
+              {products.length > 0 && (
+                <div className="objects-cat-drops__slider-item objects-cat-drops__slider-item--view-all">
+                  <ViewAllEndCard categoryLabel={categoryLabel} collectionPath={collectionPath} image={viewAllImage} />
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -567,8 +590,6 @@ export default function ObjectsCategoryDrops() {
             (catId === 'caps' ? categoryData.headwear : null) ||
             [];
 
-          if (!products || products.length === 0) return null;
-
           return (
             <CategorySwipeRow
               key={cat.id}
@@ -578,6 +599,7 @@ export default function ObjectsCategoryDrops() {
               products={products}
               collectionPath={cat.collectionPath}
               viewAllImage={cat.image}
+              isLoading={!cachedObjectsCategoryData}
             />
           );
         })}

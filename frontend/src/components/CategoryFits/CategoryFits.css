@@ -10,6 +10,39 @@
   padding: 8px 0 36px;
   position: relative;
   overflow: hidden;
+  min-height: 520px;
+  contain: layout;
+}
+
+@keyframes category-fits-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.fit-card--skeleton .fit-card__gallery {
+  background: linear-gradient(90deg, #f6f6f6 25%, #eeeeee 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation: category-fits-shimmer 1.6s infinite ease-in-out;
+}
+
+.fit-card__skeleton-title {
+  width: 70%;
+  height: 14px;
+  background: #f3f3f3;
+  margin-top: 10px;
+  border-radius: 2px;
+}
+
+.fit-card__skeleton-price {
+  width: 40%;
+  height: 12px;
+  background: #f3f3f3;
+  margin-top: 6px;
+  border-radius: 2px;
 }
 
 .category-fits__container {

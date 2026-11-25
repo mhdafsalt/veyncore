@@ -33,8 +33,23 @@ const toSlug = (str = '') =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-');
 
+// Default baseline subcategories to reserve space and eliminate Frame-0 layout shift
+const DEFAULT_DYNAMIC_SUBCATEGORIES = [
+  { id: 'denims', label: 'DENIMS', href: '/collections/all-drops?category=denims', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'cargo', label: 'CARGO', href: '/collections/all-drops?category=cargo', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'baggy', label: 'BAGGY', href: '/collections/all-drops?category=baggy', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'bootcut', label: 'BOOTCUT', href: '/collections/all-drops?category=bootcut', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'wide', label: 'WIDE', href: '/collections/all-drops?category=wide', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'straight', label: 'STRAIGHT', href: '/collections/all-drops?category=straight', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'tops', label: 'TOPS', href: '/collections/all-drops?category=tops', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'accessories', label: 'ACCESSORIES', href: '/collections/all-drops?category=accessories', mainCategory: 'VEYN-SELECTS', active: true },
+  { id: 'bags', label: 'BAGS', href: '/collections/objects-drops?category=bags', mainCategory: 'VEYN-OBJECTS', active: true },
+  { id: 'chains', label: 'CHAINS & HARDWARE', href: '/collections/objects-drops?category=chains', mainCategory: 'VEYN-OBJECTS', active: true },
+  { id: 'caps', label: 'CAPS & HEADWEAR', href: '/collections/objects-drops?category=caps', mainCategory: 'VEYN-OBJECTS', active: true },
+];
+
 // In-memory module cache for instant Frame-0 painting
-let cachedDynamicSubcategories = null;
+let cachedDynamicSubcategories = DEFAULT_DYNAMIC_SUBCATEGORIES;
 let cachedSubcategoriesCatalog = null;
 
 function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
@@ -148,7 +163,12 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       result.push(item);
     };
 
-    // 1. Dynamic subcategories configured in backend / admin (priority)
+    // 1. Add base navigation links (HOME and ALL DROPS) first so tab ordering is perfectly stable
+    baseNav.forEach((base) => {
+      addUnique(base);
+    });
+
+    // 2. Dynamic subcategories configured in backend / admin
     const adminItems = (dynamicSubcategories || []).filter(
       (sub) => sub.mainCategory === activeMainCategory && sub.active !== false
     );
@@ -156,11 +176,6 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     if (adminItems && adminItems.length > 0) {
       adminItems.forEach((item) => addUnique(item));
     }
-
-    // 2. Add base navigation links (HOME and ALL DROPS)
-    baseNav.forEach((base) => {
-      addUnique(base);
-    });
 
     // 3. Dynamically append any categories from real products if not already present
     const dropsPage = isObjects ? '/collections/objects-drops' : '/collections/all-drops';

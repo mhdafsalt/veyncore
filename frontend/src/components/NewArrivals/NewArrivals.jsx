@@ -296,7 +296,7 @@ export default function NewArrivals() {
                 <ProductCard product={product} priority={false} />
               </div>
             ))
-            : [...Array(4)].map((_, i) => (
+            : [...Array(8)].map((_, i) => (
               <div key={i} className="new-arrivals__grid-item new-arrivals__grid-item--skeleton">
                 <div className="new-arrivals__skeleton-image" />
                 <div className="new-arrivals__skeleton-title" />

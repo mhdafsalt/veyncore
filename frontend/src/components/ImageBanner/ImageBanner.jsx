@@ -90,8 +90,11 @@ export default function ImageBanner({
           <img
             src={optimizeImageUrl(banner.imageDesktop || banner.imageMobile, 1600)}
             alt={banner.altText || 'Campaign Banner'}
+            width={1898}
+            height={550}
             className="image-banner__img"
             loading="lazy"
+            decoding="async"
           />
         </picture>
       </Link>

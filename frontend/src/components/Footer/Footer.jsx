@@ -220,7 +220,11 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
             <img
               src="/images/veyncoreLogo_f3f3f5.svg"
               alt="VEYNCORE"
+              width={2798}
+              height={369}
               className="modern-footer__monogram-img"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>

@@ -8,8 +8,15 @@ import { API_BASE_URL } from '@/lib/constants';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import './CategoryFits.css';
 
+const BASELINE_SELECTS_SWIPE_CATEGORIES = [
+  { id: 'baggy', label: 'BAGGY', collectionPath: '/collections/all-drops?category=baggy', image: null },
+  { id: 'bootcut', label: 'BOOTCUT', collectionPath: '/collections/all-drops?category=bootcut', image: null },
+  { id: 'wide', label: 'WIDE', collectionPath: '/collections/all-drops?category=wide', image: null },
+  { id: 'straight', label: 'STRAIGHT', collectionPath: '/collections/all-drops?category=straight', image: null },
+];
+
 // In-memory module cache for instant Frame-0 painting
-let cachedSelectsCategories = null;
+let cachedSelectsCategories = BASELINE_SELECTS_SWIPE_CATEGORIES;
 let cachedSelectsCategoryData = null;
 
 /**
@@ -264,8 +271,9 @@ function ViewAllEndCard({ fitLabel, collectionPath, image }) {
  * 2. Swipeable track with 6 cards + 1 "View all" end card
  * 3. Centered bottom "View all" action button
  */
-function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage }) {
-  if (!products || products.length === 0) return null;
+function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage, isLoading = false }) {
+  if (!isLoading && (!products || products.length === 0)) return null;
+  const isRowLoading = !products || products.length === 0;
 
   const trackRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -381,23 +389,39 @@ function FitSwipeRow({ products, fitId, fitLabel, collectionPath, viewAllImage }
         <div
           ref={trackRef}
           className="category-fits__slider-track"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseDown={isRowLoading ? undefined : handleMouseDown}
+          onMouseMove={isRowLoading ? undefined : handleMouseMove}
+          onMouseUp={isRowLoading ? undefined : handleMouseUp}
+          onMouseLeave={isRowLoading ? undefined : handleMouseUp}
         >
-          {/* Latest added up to 8 product cards */}
-          {products.slice(0, 8).map((product) => (
-            <div key={product.id} className="category-fits__slider-item">
-              <FitProductCard product={product} />
-            </div>
-          ))}
+          {isRowLoading ? (
+            [1, 2, 3, 4].map((n) => (
+              <div key={n} className="category-fits__slider-item">
+                <article className="fit-card fit-card--skeleton">
+                  <div className="fit-card__gallery" />
+                  <div className="fit-card__details">
+                    <div className="fit-card__skeleton-title" />
+                    <div className="fit-card__skeleton-price" />
+                  </div>
+                </article>
+              </div>
+            ))
+          ) : (
+            <>
+              {/* Latest added up to 8 product cards */}
+              {products.slice(0, 8).map((product) => (
+                <div key={product.id} className="category-fits__slider-item">
+                  <FitProductCard product={product} />
+                </div>
+              ))}
 
-          {/* "View all" End Card appears at the end of the swipe row */}
-          {products.length > 0 && (
-            <div className="category-fits__slider-item category-fits__slider-item--view-all">
-              <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} image={viewAllImage} />
-            </div>
+              {/* "View all" End Card appears at the end of the swipe row */}
+              {products.length > 0 && (
+                <div className="category-fits__slider-item category-fits__slider-item--view-all">
+                  <ViewAllEndCard fitLabel={fitLabel} collectionPath={collectionPath} image={viewAllImage} />
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -576,7 +600,6 @@ export default function CategoryFits() {
       <div className="category-fits__container">
         {categories.map((cat) => {
           const products = categoryData[cat.id] || [];
-          if (!products || products.length === 0) return null;
           return (
             <FitSwipeRow
               key={cat.id}
@@ -585,6 +608,7 @@ export default function CategoryFits() {
               fitLabel={cat.label}
               collectionPath={cat.collectionPath}
               viewAllImage={cat.image}
+              isLoading={!cachedSelectsCategoryData}
             />
           );
         })}
