@@ -47,6 +47,8 @@ export default function VeyncoreLoader({ onComplete, duration = 1800 }) {
             alt="Veyncore"
             width={350}
             height={70}
+            loading="eager"
+            fetchPriority="high"
           />
         </div>
        

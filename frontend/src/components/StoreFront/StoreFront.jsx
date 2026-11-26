@@ -23,22 +23,11 @@ let hasIntroPlayed = false;
  */
 export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Instant Frame-0 painting with zero blocking overlay
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('veyn_intro_seen', '1');
-      hasIntroPlayed = true;
-    }
-  }, []);
+  const [isLoading, setIsLoading] = useState(() => !hasIntroPlayed);
 
   const handleLoaderComplete = useCallback(() => {
     hasIntroPlayed = true;
     setIsLoading(false);
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('veyn_intro_seen', '1');
-    }
   }, []);
 
   // Seamless zero-refresh in-place tab switch
@@ -54,10 +43,10 @@ export default function StoreFront({ initialCategory = 'VEYN-SELECTS' }) {
 
   return (
     <>
-      {/* Veyncore Full-Screen Intro Loader - Snappy luxury entrance on initial site entry */}
+      {/* Veyncore Full-Screen Intro Loader - Plays cleanly on first initial load */}
       {isLoading && (
         <VeyncoreLoader
-          duration={550}
+          duration={1800}
           onComplete={handleLoaderComplete}
         />
       )}

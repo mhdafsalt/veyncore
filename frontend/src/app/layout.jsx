@@ -29,6 +29,14 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        {/* Preload critical Veyncore Loader SVG Logo for instant Frame-0 intro */}
+        <link
+          rel="preload"
+          as="image"
+          type="image/svg+xml"
+          href="/images/veyncoreLogo_black.svg"
+          fetchPriority="high"
+        />
         {/* Preload critical Inter Latin font file to eliminate font-swap layout shift */}
         <link
           rel="preload"
