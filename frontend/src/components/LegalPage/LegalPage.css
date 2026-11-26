@@ -1,6 +1,7 @@
 /* =========================================================================
    VEYNCORE LEGAL & POLICY PAGE STYLES
    Native CSS - Monochromatic, Clean, Premium Streetwear Editorial
+   Matches Brand Inter / Subcategories Typography ('BOOTCUT' aesthetic)
    ========================================================================= */
 
 .legal-page {
@@ -10,6 +11,9 @@
   color: #0f172a;
   display: flex;
   flex-direction: column;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .legal-page__container {
@@ -20,83 +24,34 @@
   box-sizing: border-box;
 }
 
-/* Breadcrumb Navigation */
-.legal-page__breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
-  margin-bottom: 24px;
-}
-
-.legal-page__breadcrumb-link {
-  color: #64748b;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.legal-page__breadcrumb-link:hover {
-  color: #0f172a;
-}
-
-.legal-page__breadcrumb-separator {
-  color: #cbd5e1;
-}
-
-.legal-page__breadcrumb-current {
-  color: #0f172a;
-}
-
 /* Header Banner */
 .legal-page__header {
   border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 32px;
-  margin-bottom: 40px;
-}
-
-.legal-page__meta-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #475569;
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-
-.legal-page__meta-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #0f172a;
+  padding-bottom: 28px;
+  margin-bottom: 36px;
 }
 
 .legal-page__title {
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
   color: #0f172a;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   text-transform: uppercase;
 }
 
 .legal-page__subtitle {
-  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
   line-height: 1.6;
   color: #64748b;
   margin: 0;
   max-width: 720px;
+  text-transform: uppercase;
 }
 
 /* Layout: Quick Links Sidebar + Content Area */
@@ -119,11 +74,12 @@
 }
 
 .legal-page__sidebar-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #64748b;
   margin: 0 0 14px;
 }
 
@@ -138,11 +94,14 @@
 
 .legal-page__nav-item a {
   display: block;
-  font-size: 12.5px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
   font-weight: 500;
-  color: #475569;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #64748b;
   text-decoration: none;
-  padding: 6px 10px;
+  padding: 7px 10px;
   border-radius: 6px;
   transition: all 0.15s ease;
   line-height: 1.4;
@@ -161,8 +120,8 @@
 
 /* Section Card */
 .legal-section {
-  margin-bottom: 40px;
-  padding-bottom: 32px;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
   border-bottom: 1px solid #f1f5f9;
   scroll-margin-top: 120px;
 }
@@ -181,24 +140,28 @@
 }
 
 .legal-section__number {
-  font-size: 13px;
-  font-weight: 800;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
+  font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.05em;
-  font-family: monospace;
 }
 
 .legal-section__heading {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: #0f172a;
   margin: 0;
 }
 
 .legal-section__body {
-  font-size: 14.5px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13.5px;
   line-height: 1.75;
+  letter-spacing: 0.01em;
   color: #334155;
 }
 
@@ -220,6 +183,11 @@
   margin-bottom: 8px;
 }
 
+.legal-section__body strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
 /* Highlight Box */
 .legal-callout {
   background: #f8fafc;
@@ -235,8 +203,9 @@
 }
 
 .legal-callout__title {
-  font-size: 13px;
-  font-weight: 700;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #0f172a;
@@ -244,7 +213,8 @@
 }
 
 .legal-callout__text {
-  font-size: 13.5px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13px;
   line-height: 1.6;
   color: #475569;
   margin: 0;
@@ -271,16 +241,20 @@
 }
 
 .legal-support-card__info h3 {
-  font-size: 18px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   margin: 0 0 6px;
   color: #ffffff;
 }
 
 .legal-support-card__info p {
-  font-size: 13.5px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 13px;
   color: #94a3b8;
+  letter-spacing: 0.01em;
   margin: 0;
   line-height: 1.5;
 }
@@ -299,8 +273,11 @@
   height: 40px;
   padding: 0 18px;
   border-radius: 8px;
-  font-size: 12.5px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   text-decoration: none;
   transition: all 0.15s ease;
   white-space: nowrap;
@@ -362,6 +339,6 @@
   }
 
   .legal-section__heading {
-    font-size: 18px;
+    font-size: 15px;
   }
 }
