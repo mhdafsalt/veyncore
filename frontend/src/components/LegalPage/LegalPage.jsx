@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import { WHATSAPP_NUMBER } from '@/lib/constants';
@@ -21,23 +20,8 @@ export default function LegalPage({
 
       {/* 2. Main Policy Content */}
       <main className="legal-page__container">
-        {/* Breadcrumbs */}
-        <nav aria-label="Breadcrumb" className="legal-page__breadcrumbs">
-          <Link href="/" className="legal-page__breadcrumb-link">
-            HOME
-          </Link>
-          <span className="legal-page__breadcrumb-separator">/</span>
-          <span className="legal-page__breadcrumb-current">LEGAL POLICIES</span>
-          <span className="legal-page__breadcrumb-separator">/</span>
-          <span className="legal-page__breadcrumb-current">{title}</span>
-        </nav>
-
         {/* Page Header */}
         <header className="legal-page__header">
-          <div className="legal-page__meta-badge">
-            <span className="legal-page__meta-dot" />
-            <span>LAST REVISED &bull; {lastUpdated}</span>
-          </div>
           <h1 className="legal-page__title">{title}</h1>
           {subtitle && <p className="legal-page__subtitle">{subtitle}</p>}
         </header>
