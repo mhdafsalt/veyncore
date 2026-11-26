@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Launch Sale Dedicated Collection Page Styles
+   Strict visual parity with All Drops (.all-drops-page / .all-drops)
+   ========================================================================== */
+
+/* 1. Promotional Sale Discount Badge (Red Background, White Text) */
+.all-drops-card__badge--launch-sale {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+}
+
+/* 2. Sleek Minimalist Countdown Bar at Bottom of Image */
+.launch-card__timer-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, monospace !important;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  border-radius: 2px;
+  z-index: 3;
+  pointer-events: none;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease;
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.launch-card__timer-bar span,
+.launch-card__timer-text {
+  white-space: nowrap !important;
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+.all-drops-card:hover .launch-card__timer-bar {
+  opacity: 0.2;
+}
+
+.launch-card__timer-icon {
+  width: 12px;
+  height: 12px;
+  color: #f87171;
+  flex-shrink: 0;
+}
+
+/* 3. Responsive Breakpoints: Strict Single Line on Mobile */
+@media (max-width: 768px) {
+  .launch-card__timer-bar {
+    bottom: 6px;
+    left: 4px;
+    right: 4px;
+    padding: 3px 4px;
+    gap: 3px;
+    font-size: 9px;
+    letter-spacing: 0.01em;
+  }
+
+  .launch-card__timer-icon {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .launch-card__timer-bar {
+    bottom: 4px;
+    left: 3px;
+    right: 3px;
+    padding: 2.5px 3px;
+    gap: 2px;
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+
+  .launch-card__timer-icon {
+    width: 9px;
+    height: 9px;
+  }
+}

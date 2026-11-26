@@ -9,6 +9,7 @@ import './SubCategories.css';
 const BASE_SELECTS_NAV = [
   { id: 'home', label: 'HOME', href: '/' },
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/all-drops' },
+  { id: 'launch-sale', label: 'LAUNCH SALE ⚡️', href: '/collections/launch-sale', mainCategory: 'VEYN-SELECTS', active: true, isGlow: true },
 ];
 
 const BASE_OBJECTS_NAV = [
@@ -35,6 +36,7 @@ const toSlug = (str = '') =>
 
 // Default baseline subcategories to reserve space and eliminate Frame-0 layout shift
 const DEFAULT_DYNAMIC_SUBCATEGORIES = [
+  { id: 'launch-sale', label: 'LAUNCH SALE ⚡️', href: '/collections/launch-sale', mainCategory: 'VEYN-SELECTS', active: true, isGlow: true },
   { id: 'denims', label: 'DENIMS', href: '/collections/all-drops?category=denims', mainCategory: 'VEYN-SELECTS', active: true },
   { id: 'cargo', label: 'CARGO', href: '/collections/all-drops?category=cargo', mainCategory: 'VEYN-SELECTS', active: true },
   { id: 'baggy', label: 'BAGGY', href: '/collections/all-drops?category=baggy', mainCategory: 'VEYN-SELECTS', active: true },
@@ -219,7 +221,27 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
 
   // Resolve initial active tab based on path, query params, hash, or saved state
   const getInitialSubId = useCallback(() => {
-    // 1. If on collection drops page, inspect category or badge query param
+    // 1. Dedicated Launch Sale route (/collections/launch-sale or /launch-sale)
+    if (pathname && (pathname.includes('/launch-sale') || pathname === '/collections/launch-sale')) {
+      const saleTab = subcategories.find(
+        (s) => s.id === 'launch-sale' || s.href?.includes('launch-sale') || norm(s.label).includes('LAUNCH SALE')
+      );
+      if (saleTab) return saleTab.id;
+    }
+
+    // 2. Direct exact pathname match for any subcategory href
+    if (pathname && pathname !== '/' && pathname !== '/veyn-objects') {
+      const exactMatch = subcategories.find((s) => {
+        if (!s.href) return false;
+        const cleanHref = s.href.split('?')[0].replace(/#.*$/, '');
+        return cleanHref === pathname;
+      });
+      if (exactMatch && !categoryParam && !badgeParam) {
+        return exactMatch.id;
+      }
+    }
+
+    // 3. If on collection drops page, inspect category or badge query param
     const isDropsPage = pathname && (pathname.startsWith('/collections/all') || pathname.startsWith('/collections/objects'));
     if (isDropsPage) {
       if (categoryParam) {
@@ -246,11 +268,16 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     }
 
-    // 2. If URL has a specific hash (e.g. #flash-sale, #object-drops)
+    // 4. If URL has a specific hash (e.g. #launch-sale, #flash-sale, #object-drops, #fit-baggy)
     if (typeof window !== 'undefined') {
-      const hash = window.location.hash.replace('#', '');
+      const hash = window.location.hash.replace('#', '').toLowerCase();
       if (hash) {
-        const match = subcategories.find((s) => s.id === hash || s.href === `#${hash}`);
+        const match = subcategories.find(
+          (s) =>
+            (s.id && s.id.toLowerCase() === hash) ||
+            (s.id && `fit-${s.id.toLowerCase()}` === hash) ||
+            (s.href && s.href.toLowerCase() === `#${hash}`)
+        );
         if (match) return match.id;
       }
     }
@@ -266,9 +293,34 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
   // Keep active tab synced on route/param/hash navigation or real main category switch
   useEffect(() => {
     const isObjectsMain = activeMainCategory === 'VEYN-OBJECTS';
+
+    // 1. Dedicated Launch Sale route (/collections/launch-sale or /launch-sale)
+    if (pathname && (pathname.includes('/launch-sale') || pathname === '/collections/launch-sale')) {
+      const saleTab = subcategories.find(
+        (s) => s.id === 'launch-sale' || s.href?.includes('launch-sale') || norm(s.label).includes('LAUNCH SALE')
+      );
+      if (saleTab) {
+        setActiveSubId(saleTab.id);
+        return;
+      }
+    }
+
+    // 2. Direct exact pathname match for any subcategory href
+    if (pathname && pathname !== '/' && pathname !== '/veyn-objects') {
+      const exactMatch = subcategories.find((s) => {
+        if (!s.href) return false;
+        const cleanHref = s.href.split('?')[0].replace(/#.*$/, '');
+        return cleanHref === pathname;
+      });
+      if (exactMatch && !categoryParam && !badgeParam) {
+        setActiveSubId(exactMatch.id);
+        return;
+      }
+    }
+
     const isDropsPage = pathname && (pathname.startsWith('/collections/all') || pathname.startsWith('/collections/objects'));
 
-    // 1. If on drops page with a category query parameter, highlight matching category
+    // 3. If on drops page with a category query parameter, highlight matching category
     if (isDropsPage) {
       if (categoryParam) {
         const match = subcategories.find(
@@ -303,11 +355,16 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     }
 
-    // 2. If on storefront with a specific hash
+    // 4. If on storefront with a specific hash
     if (typeof window !== 'undefined') {
-      const hash = window.location.hash.replace('#', '');
+      const hash = window.location.hash.replace('#', '').toLowerCase();
       if (hash) {
-        const match = subcategories.find((s) => s.id === hash || s.href === `#${hash}`);
+        const match = subcategories.find(
+          (s) =>
+            (s.id && s.id.toLowerCase() === hash) ||
+            (s.id && `fit-${s.id.toLowerCase()}` === hash) ||
+            (s.href && s.href.toLowerCase() === `#${hash}`)
+        );
         if (match) {
           setActiveSubId(match.id);
           return;
@@ -315,7 +372,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     }
 
-    // 3. Category switch between SELECTS and OBJECTS
+    // 5. Category switch between SELECTS and OBJECTS
     if (prevMainCategoryRef.current !== activeMainCategory) {
       prevMainCategoryRef.current = activeMainCategory;
       const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
@@ -323,10 +380,12 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       return;
     }
 
-    // 4. Default home
+    // 6. Default home if on storefront and hash is empty
     if (pathname === '/' || pathname === '/veyn-objects') {
-      const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
-      setActiveSubId(defaultId);
+      if (typeof window !== 'undefined' && !window.location.hash) {
+        const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
+        setActiveSubId(defaultId);
+      }
     }
   }, [pathname, categoryParam, badgeParam, activeMainCategory, subcategories]);
 
@@ -379,9 +438,22 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     if (subId === 'home' || subHref === '#home' || subHref === '/' || subLabel === 'HOME') {
       const homeUrl = activeMainCategory === 'VEYN-OBJECTS' ? '/veyn-objects' : '/';
       if (pathname === homeUrl) {
+        if (typeof window !== 'undefined' && window.location.hash) {
+          window.history.replaceState(null, '', homeUrl);
+        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         router.push(homeUrl);
+      }
+      return;
+    }
+
+    // 1b. LAUNCH SALE tab -> Dedicated separate page like ALL DROPS
+    if (subId === 'launch-sale' || subLabel.includes('LAUNCH SALE')) {
+      if (pathname === '/collections/launch-sale') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        router.push('/collections/launch-sale');
       }
       return;
     }

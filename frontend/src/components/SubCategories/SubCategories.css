@@ -163,8 +163,8 @@
 }
 
 .subcategories__link--glow {
-  color: #111827;
-  font-weight: 600;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .subcategories__link--glow .subcategories__label {
@@ -192,9 +192,10 @@
   filter: drop-shadow(0 0 8px rgba(245, 158, 11, 1));
 }
 
+.subcategories__link--glow.subcategories__link--active,
 .subcategories__item--glow .subcategories__link--active {
   color: #000000 !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
 /* =========================================================

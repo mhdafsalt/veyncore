@@ -36,6 +36,11 @@ const nextConfig = {
         permanent: false,
       },
       {
+        source: '/launch-sale',
+        destination: '/collections/launch-sale',
+        permanent: true,
+      },
+      {
         source: '/terms',
         destination: '/pages/terms-of-service',
         permanent: true,

@@ -6,7 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { API_BASE_URL } from '@/lib/constants';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
-import { parseNumericPrice } from '@/lib/priceUtils';
+import { parseNumericPrice, formatINR } from '@/lib/priceUtils';
 import { generateDynamicMeasurements, isTopCategory } from '@/lib/sizeChartUtils';
 import { DEFAULT_SELECT_STORY, DEFAULT_DETAILS, DEFAULT_SHIPPING } from '@/data/productsData';
 import { OBJECTS_BRAND_STORY, OBJECTS_DETAILS, OBJECTS_SHIPPING } from '@/data/objectsData';
@@ -23,9 +23,82 @@ const formatPrice = (str) => (!str ? '' : str.replace(/Rs\.\s*/g, 'Rs.\u00A0'));
  * Humanized BEM classnames, responsive media gallery, size chart modal,
  * pincode estimator, collapsible accordions, social sharing, and related denims.
  */
-export default function ProductDetail({ product }) {
+export default function ProductDetail({ product, activeLaunchSale = null }) {
   const { addItem, whatsappNumber, openCheckout } = useCart();
   const isObject = Boolean(product?.isObject || product?.category === 'VEYN-OBJECTS');
+
+  // Launch Sale dynamic discount & countdown state
+  const [liveSale, setLiveSale] = useState(activeLaunchSale || null);
+  const [countdownString, setCountdownString] = useState('');
+
+  // Revalidate or client-fetch active sale
+  useEffect(() => {
+    let isMounted = true;
+    async function checkSale() {
+      if (!product?._id && !product?.handle) return;
+      try {
+        const idOrHandle = product._id || product.handle;
+        const res = await fetch(
+          `${API_BASE_URL}/api/launch-sales/product/${encodeURIComponent(idOrHandle)}?t=${Date.now()}`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && json.success && json.hasActiveSale && json.data) {
+            setLiveSale(json.data);
+          } else if (isMounted) {
+            setLiveSale(null);
+          }
+        }
+      } catch (err) {}
+    }
+    checkSale();
+    return () => {
+      isMounted = false;
+    };
+  }, [product?._id, product?.handle]);
+
+  // Live countdown ticker
+  useEffect(() => {
+    if (!liveSale?.endDateTime) {
+      setCountdownString('');
+      return;
+    }
+    const updateCountdown = () => {
+      const remaining = Math.max(0, new Date(liveSale.endDateTime).getTime() - Date.now());
+      if (remaining <= 0) {
+        setLiveSale(null);
+        setCountdownString('');
+        return;
+      }
+      const totalSec = Math.floor(remaining / 1000);
+      const d = Math.floor(totalSec / 86400);
+      const h = Math.floor((totalSec % 86400) / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      const pad = (n) => String(n).padStart(2, '0');
+      if (d > 0) {
+        setCountdownString(`${pad(d)}d : ${pad(h)}h : ${pad(m)}m : ${pad(s)}s`);
+      } else {
+        setCountdownString(`${pad(h)}h : ${pad(m)}m : ${pad(s)}s`);
+      }
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [liveSale?.endDateTime]);
+
+  // Dynamic Effective Pricing
+  const effectivePrice = liveSale
+    ? liveSale.discountedPrice
+    : parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
+
+  const effectiveComparePrice = liveSale
+    ? liveSale.originalPrice
+    : parseNumericPrice(product?.comparePrice ?? product?.regularPrice ?? null);
+
+  const effectiveDiscount = liveSale
+    ? `${liveSale.discountPercentage}% OFF`
+    : product?.discount;
 
   // State Management
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -191,8 +264,8 @@ export default function ProductDetail({ product }) {
 
   // Add to Cart
   const handleAddToCart = () => {
-    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
-    const numCompare = parseNumericPrice(product?.comparePrice ?? product?.regularPrice ?? null);
+    const numPrice = effectivePrice;
+    const numCompare = effectiveComparePrice;
 
     addItem({
       id: `${product.id}-${selectedSize}`,
@@ -213,7 +286,7 @@ export default function ProductDetail({ product }) {
   // Direct WhatsApp Order - Opens modern Delivery Details checkout modal
   const handleDirectWhatsAppClick = (e) => {
     e.preventDefault();
-    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
+    const numPrice = effectivePrice;
 
     const productUrl = typeof window !== 'undefined' ? window.location.href : '';
     const resolvedVariant =
@@ -240,7 +313,7 @@ export default function ProductDetail({ product }) {
 
   // Build Direct WhatsApp Order Link (legacy fallback)
   const buildDirectWhatsAppLink = () => {
-    const numPrice = parseNumericPrice(product?.price ?? product?.salePrice ?? 1299);
+    const numPrice = effectivePrice;
     const itemTotal = numPrice * quantity;
     const productUrl = typeof window !== 'undefined' ? window.location.href : '';
 
@@ -454,14 +527,43 @@ export default function ProductDetail({ product }) {
 
               {/* Pricing Row */}
               <div className="product-details__pricing">
-                <span className="product-details__sale-price">{formatPrice(product.salePrice)}</span>
-                {product.comparePrice && (
-                  <span className="product-details__compare-price">{formatPrice(product.regularPrice)}</span>
+                <span className="product-details__sale-price">
+                  {formatPrice(formatINR(effectivePrice))}
+                </span>
+                {(effectiveComparePrice > effectivePrice || product.comparePrice) && (
+                  <span className="product-details__compare-price">
+                    {formatPrice(formatINR(effectiveComparePrice || product.comparePrice))}
+                  </span>
                 )}
-                {product.discount && (
-                  <span className="product-details__discount-badge">{product.discount}</span>
+                {effectiveDiscount && (
+                  <span className="product-details__discount-badge">
+                    {effectiveDiscount}
+                  </span>
                 )}
               </div>
+
+              {/* Live Launch Sale Individual Countdown Banner */}
+              {liveSale && countdownString && (
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 14px',
+                    backgroundColor: '#0f172a',
+                    color: '#ffffff',
+                    borderRadius: '8px',
+                    margin: '12px 0 6px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                    fontFamily: 'Inter, monospace',
+                  }}
+                >
+                  <span style={{ color: '#f59e0b' }}>⚡️ LAUNCH SALE ENDS IN:</span>
+                  <span>{countdownString}</span>
+                </div>
+              )}
 
               {/* Taxes & Shipping Note */}
               <p className="product-details__tax-note">

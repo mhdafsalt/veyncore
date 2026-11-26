@@ -1,6 +1,7 @@
 import User from '../models/user.model.js';
 import Product from '../models/product.model.js';
 import WhatsAppClick from '../models/whatsappClick.model.js';
+import LaunchSale from '../models/launchSale.model.js';
 
 /**
  * GET /api/admin/overview
@@ -14,6 +15,13 @@ export const getAdminOverview = async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const selectsCount = await Product.countDocuments({ category: 'VEYN-SELECTS' });
     const objectsCount = await Product.countDocuments({ category: 'VEYN-OBJECTS' });
+
+    let launchSalesCount = 0;
+    try {
+      launchSalesCount = await LaunchSale.countDocuments();
+    } catch (saleErr) {
+      console.warn('[Admin Overview] Failed to fetch LaunchSale count:', saleErr.message);
+    }
 
     // WhatsApp Click Count
     let whatsappClicks = 0;
@@ -43,6 +51,7 @@ export const getAdminOverview = async (req, res) => {
         totalProducts,
         selectsCount,
         objectsCount,
+        launchSalesCount,
         whatsappClicks,
         recentWhatsAppClicks,
         recentUsers,

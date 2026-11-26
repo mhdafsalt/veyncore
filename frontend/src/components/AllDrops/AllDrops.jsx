@@ -295,8 +295,12 @@ function AllDropsContent() {
 
   useEffect(() => {
     const cat = searchParams ? searchParams.get('category')?.toLowerCase().trim() || '' : '';
+    if (cat === 'launch-sale' || cat === 'launch') {
+      router.replace('/collections/launch-sale');
+      return;
+    }
     setSelectedCategory(cat);
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [selectedAvailability, setSelectedAvailability] = useState([]);

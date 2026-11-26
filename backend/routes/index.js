@@ -6,6 +6,7 @@ import contentRoutes from './content.routes.js';
 import uploadRoutes from './upload.routes.js';
 import healthRoutes from './health.routes.js';
 import analyticsRoutes from './analytics.routes.js';
+import launchSaleRoutes from './launchSale.routes.js';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use('/content', contentRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/health', healthRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/launch-sales', launchSaleRoutes);
 
 export default router;

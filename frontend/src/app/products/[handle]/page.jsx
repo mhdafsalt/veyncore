@@ -30,6 +30,27 @@ async function resolveProduct(handle) {
 }
 
 /**
+ * Helper to resolve active launch sale from backend
+ */
+async function resolveActiveLaunchSale(handleOrId) {
+  if (!handleOrId) return null;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/launch-sales/product/${encodeURIComponent(handleOrId)}`, {
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.hasActiveSale && json.data) {
+        return json.data;
+      }
+    }
+  } catch (e) {
+    // Ignore network errors
+  }
+  return null;
+}
+
+/**
  * Generate Static Params for Next.js prerendering (Dynamic resolution on demand)
  */
 export async function generateStaticParams() {
@@ -85,6 +106,8 @@ export default async function ProductDetailPage({ params }) {
     notFound();
   }
 
+  const activeLaunchSale = await resolveActiveLaunchSale(product._id || handle);
+
   const initialCat =
     product?.isObject || product?.category === 'VEYN-OBJECTS'
       ? 'VEYN-OBJECTS'
@@ -96,7 +119,7 @@ export default async function ProductDetailPage({ params }) {
       <StoreHeader initialCategory={initialCat} />
 
       {/* 2. Product Details Component */}
-      <ProductDetail product={product} />
+      <ProductDetail product={product} activeLaunchSale={activeLaunchSale} />
 
       {/* 3. Modern VEYNCORE Footer */}
       <Footer />

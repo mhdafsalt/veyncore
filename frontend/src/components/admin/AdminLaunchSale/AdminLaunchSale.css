@@ -1,0 +1,154 @@
+/* AdminLaunchSale Styles */
+.admin-launch-sale-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-launch-sale-search {
+  position: relative;
+  min-width: 260px;
+  flex: 1;
+  max-width: 380px;
+}
+
+.admin-launch-sale-search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 34px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.admin-launch-sale-search input:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.admin-launch-sale-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* Product Info Cell */
+.admin-sale-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-sale-product-img {
+  width: 44px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 6px;
+  background-color: #f1f5f9;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-sale-product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-sale-product-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.admin-sale-product-category {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+/* Countdown Badge */
+.admin-sale-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.admin-sale-countdown--scheduled {
+  background-color: #0284c7;
+}
+
+.admin-sale-countdown--paused {
+  background-color: #f59e0b;
+}
+
+.admin-sale-countdown--expired {
+  background-color: #64748b;
+  opacity: 0.8;
+}
+
+.admin-sale-discount-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.admin-sale-price-bold {
+  font-weight: 700;
+  color: #15803d;
+  font-size: 14px;
+}
+
+.admin-sale-price-orig {
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-size: 12.5px;
+}
+
+/* Schedule formatted text */
+.admin-sale-schedule-cell {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.admin-sale-schedule-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-right: 4px;
+}

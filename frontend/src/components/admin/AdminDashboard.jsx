@@ -19,6 +19,7 @@ import AdminSwipeCategories from './AdminSwipeCategories/AdminSwipeCategories';
 import AdminBottomBanner from './AdminBottomBanner/AdminBottomBanner';
 import AdminUsers from './AdminUsers/AdminUsers';
 import AdminWhatsAppOrders from './AdminWhatsAppOrders/AdminWhatsAppOrders';
+import AdminLaunchSale from './AdminLaunchSale/AdminLaunchSale';
 import ItemModal from './AdminCommon/ItemModal';
 import DeleteConfirmModal from './AdminCommon/DeleteConfirmModal';
 import AdminToast from './AdminCommon/AdminToast';
@@ -51,6 +52,7 @@ export default function AdminDashboard() {
   const [siteContent, setSiteContent] = useState(null);
   const [usersList, setUsersList] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
+  const [launchSales, setLaunchSales] = useState([]);
 
   // Loading States
   const [loadingOverview, setLoadingOverview] = useState(true);
@@ -58,6 +60,7 @@ export default function AdminDashboard() {
   const [loadingContent, setLoadingContent] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingMedia, setLoadingMedia] = useState(false);
+  const [loadingLaunchSales, setLoadingLaunchSales] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -236,6 +239,28 @@ export default function AdminDashboard() {
     }
   }, [getAuthHeaders]);
 
+  // Fetch Launch Sales
+  const fetchLaunchSales = useCallback(async () => {
+    setLoadingLaunchSales(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/launch-sales`, {
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.data)) {
+        setLaunchSales(data.data);
+        setMetrics((prev) => ({
+          ...prev,
+          launchSalesCount: data.data.length,
+        }));
+      }
+    } catch (err) {
+      console.warn('[Admin Error] Failed to load launch sales:', err);
+    } finally {
+      setLoadingLaunchSales(false);
+    }
+  }, [getAuthHeaders]);
+
   // Initial Load
   useEffect(() => {
     if (!isLoading && user && user.role === 'admin') {
@@ -244,8 +269,9 @@ export default function AdminDashboard() {
       fetchContent();
       fetchUsers();
       fetchMediaFiles();
+      fetchLaunchSales();
     }
-  }, [isLoading, user, fetchOverview, fetchProducts, fetchContent, fetchUsers, fetchMediaFiles]);
+  }, [isLoading, user, fetchOverview, fetchProducts, fetchContent, fetchUsers, fetchMediaFiles, fetchLaunchSales]);
 
   // Re-fetch content automatically whenever navigating to content-related sections
   useEffect(() => {
@@ -256,7 +282,11 @@ export default function AdminDashboard() {
     ) {
       fetchContent();
     }
-  }, [activeTab, fetchContent]);
+    if (activeTab === 'launchSale') {
+      fetchLaunchSales();
+      if (products.length === 0) fetchProducts();
+    }
+  }, [activeTab, fetchContent, fetchLaunchSales, products.length, fetchProducts]);
 
   // Seed Catalog Action
   const handleSeedCatalog = async () => {
@@ -471,6 +501,92 @@ export default function AdminDashboard() {
       id: product._id || product.id || product.handle,
       title: product.title,
     });
+  };
+
+  // =========================================================================
+  // LAUNCH SALE ACTION HANDLERS
+  // =========================================================================
+  const handleCreateLaunchSale = async (payload) => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/launch-sales`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Launch sale product added successfully.', 'success');
+        fetchLaunchSales();
+      } else {
+        showToast(data.message || 'Failed to create launch sale.', 'error');
+      }
+    } catch (err) {
+      showToast('Network error creating launch sale.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdateLaunchSale = async (id, payload) => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/launch-sales/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Launch sale updated successfully.', 'success');
+        fetchLaunchSales();
+      } else {
+        showToast(data.message || 'Failed to update launch sale.', 'error');
+      }
+    } catch (err) {
+      showToast('Network error updating launch sale.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleToggleLaunchSaleStatus = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/launch-sales/${id}/status`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(data.message || 'Launch sale status updated.', 'success');
+        fetchLaunchSales();
+      } else {
+        showToast(data.message || 'Failed to update status.', 'error');
+      }
+    } catch (err) {
+      showToast('Error updating launch sale status.', 'error');
+    }
+  };
+
+  const handleDeleteLaunchSale = async (id) => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/launch-sales/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Launch sale entry removed. Product preserved in catalog.', 'success');
+        fetchLaunchSales();
+      } else {
+        showToast(data.message || 'Failed to delete launch sale.', 'error');
+      }
+    } catch (err) {
+      showToast('Error deleting launch sale.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // =========================================================================
@@ -850,6 +966,20 @@ export default function AdminDashboard() {
               onEditProduct={handleOpenEditProduct}
               onDeleteProduct={handleDeleteProduct}
               onToggleStock={handleToggleStock}
+            />
+          )}
+
+          {activeTab === 'launchSale' && (
+            <AdminLaunchSale
+              launchSales={launchSales}
+              products={products}
+              loading={loadingLaunchSales}
+              onRefresh={fetchLaunchSales}
+              onCreateSale={handleCreateLaunchSale}
+              onUpdateSale={handleUpdateLaunchSale}
+              onToggleStatus={handleToggleLaunchSaleStatus}
+              onDeleteSale={handleDeleteLaunchSale}
+              isSaving={isSaving}
             />
           )}
 
