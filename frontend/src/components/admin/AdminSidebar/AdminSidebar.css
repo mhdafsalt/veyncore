@@ -80,40 +80,47 @@
   border-top: 1px solid #e2e8f0;
 }
 
-.admin-sidebar__footer-label {
-  display: block;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #94a3b8;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-
-.admin-sidebar__actions {
+.admin-sidebar__live-site-btn {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  background: #0f172a;
+  border: 1px solid #0f172a;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
   margin-bottom: 12px;
 }
 
-.admin-sidebar__seed-btn {
-  flex: 1;
-  height: 28px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
+.admin-sidebar__live-site-btn:hover {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
 }
 
-.admin-sidebar__seed-btn:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #0f172a;
+.admin-sidebar__live-site-btn:active {
+  transform: translateY(0);
+}
+
+.admin-sidebar__live-icon {
+  flex-shrink: 0;
+  stroke: #38bdf8;
+}
+
+.admin-sidebar__external-icon {
+  flex-shrink: 0;
+  margin-left: 2px;
+  opacity: 0.8;
 }
 
 .admin-sidebar__status-pill {

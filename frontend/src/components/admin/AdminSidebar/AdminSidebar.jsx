@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import './AdminSidebar.css';
 
 const NAV_ITEMS = [
@@ -190,25 +191,47 @@ export default function AdminSidebar({
 
         {/* Sidebar Footer */}
         <div className="admin-sidebar__footer">
-          <span className="admin-sidebar__footer-label">SYSTEM RECOVERY</span>
-          <div className="admin-sidebar__actions">
-            <button
-              type="button"
-              className="admin-sidebar__seed-btn"
-              onClick={onSeedCatalog}
-              title="Seed MongoDB products from static database"
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="admin-sidebar__live-site-btn"
+            title="Open Live Website in a new tab"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="admin-sidebar__live-icon"
+              aria-hidden="true"
             >
-              Seed Products
-            </button>
-            <button
-              type="button"
-              className="admin-sidebar__seed-btn"
-              onClick={onSeedContent}
-              title="Reset Hero, announcements & banners to defaults"
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span>Live website</span>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="admin-sidebar__external-icon"
+              aria-hidden="true"
             >
-              Reset Content
-            </button>
-          </div>
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </Link>
           <div className="admin-sidebar__status-pill">
             <span className="admin-sidebar__status-dot" />
             <span>API Online &bull; v2.0</span>
