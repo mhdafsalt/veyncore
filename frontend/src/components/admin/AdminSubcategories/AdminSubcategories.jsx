@@ -5,6 +5,8 @@ import './AdminSubcategories.css';
 
 export default function AdminSubcategories({
   subcategories = [],
+  loading = false,
+  onRefresh,
   onAddItem,
   onEditItem,
   onDeleteItem,
@@ -20,6 +22,17 @@ export default function AdminSubcategories({
           </p>
         </div>
         <div className="admin-view__actions">
+          {onRefresh && (
+            <button
+              type="button"
+              className="admin-btn admin-btn--outline"
+              onClick={onRefresh}
+              disabled={loading}
+              title="Refresh subcategories from database"
+            >
+              ↻ Refresh
+            </button>
+          )}
           <button
             type="button"
             className="admin-btn admin-btn--black"
@@ -44,7 +57,16 @@ export default function AdminSubcategories({
               </tr>
             </thead>
             <tbody>
-              {subcategories && subcategories.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="admin-loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+                      <span>Loading subcategories from database...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : subcategories && subcategories.length > 0 ? (
                 subcategories.map((sub, idx) => (
                   <tr key={sub.id || idx}>
                     <td style={{ fontWeight: 700, color: '#0f172a' }}>

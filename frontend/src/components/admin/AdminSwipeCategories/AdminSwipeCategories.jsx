@@ -5,6 +5,8 @@ import './AdminSwipeCategories.css';
 
 export default function AdminSwipeCategories({
   swipeCategories = [],
+  loading = false,
+  onRefresh,
   onAddItem,
   onEditItem,
   onDeleteItem,
@@ -20,6 +22,17 @@ export default function AdminSwipeCategories({
           </p>
         </div>
         <div className="admin-view__actions">
+          {onRefresh && (
+            <button
+              type="button"
+              className="admin-btn admin-btn--outline"
+              onClick={onRefresh}
+              disabled={loading}
+              title="Refresh swipe categories from database"
+            >
+              ↻ Refresh
+            </button>
+          )}
           <button
             type="button"
             className="admin-btn admin-btn--black"
@@ -45,7 +58,16 @@ export default function AdminSwipeCategories({
               </tr>
             </thead>
             <tbody>
-              {swipeCategories && swipeCategories.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="admin-loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+                      <span>Loading swipe categories from database...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : swipeCategories && swipeCategories.length > 0 ? (
                 swipeCategories.map((item, idx) => (
                   <tr key={item.id || idx}>
                     <td>

@@ -5,6 +5,8 @@ import './AdminAnnouncements.css';
 
 export default function AdminAnnouncements({
   announcements = [],
+  loading = false,
+  onRefresh,
   onAddAnnouncement,
   onEditAnnouncement,
   onDeleteAnnouncement,
@@ -20,6 +22,17 @@ export default function AdminAnnouncements({
           </p>
         </div>
         <div className="admin-view__actions">
+          {onRefresh && (
+            <button
+              type="button"
+              className="admin-btn admin-btn--outline"
+              onClick={onRefresh}
+              disabled={loading}
+              title="Refresh announcements from database"
+            >
+              ↻ Refresh
+            </button>
+          )}
           <button
             type="button"
             className="admin-btn admin-btn--black"
@@ -42,7 +55,16 @@ export default function AdminAnnouncements({
               </tr>
             </thead>
             <tbody>
-              {announcements && announcements.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="admin-loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+                      <span>Loading announcements from database...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : announcements && announcements.length > 0 ? (
                 announcements.map((item, idx) => (
                   <tr key={item.id || idx}>
                     <td style={{ fontWeight: 700, color: '#94a3b8' }}>#{idx + 1}</td>

@@ -5,6 +5,8 @@ import './AdminHeroSlides.css';
 
 export default function AdminHeroSlides({
   heroSlides = [],
+  loading = false,
+  onRefresh,
   onAddSlide,
   onEditSlide,
   onDeleteSlide,
@@ -14,7 +16,7 @@ export default function AdminHeroSlides({
 
   const filteredSlides = (heroSlides || []).filter((s) => {
     if (filterSection === 'ALL') return true;
-    return s.targetSection === filterSection;
+    return (s.targetSection || 'VEYN-SELECTS') === filterSection;
   });
 
   return (
@@ -27,6 +29,17 @@ export default function AdminHeroSlides({
           </p>
         </div>
         <div className="admin-view__actions">
+          {onRefresh && (
+            <button
+              type="button"
+              className="admin-btn admin-btn--outline"
+              onClick={onRefresh}
+              disabled={loading}
+              title="Refresh hero slides from database"
+            >
+              ↻ Refresh
+            </button>
+          )}
           <button
             type="button"
             className="admin-btn admin-btn--black"
@@ -56,7 +69,7 @@ export default function AdminHeroSlides({
             }`}
             onClick={() => setFilterSection('VEYN-SELECTS')}
           >
-            VEYN-SELECTS ({heroSlides.filter((s) => s.targetSection === 'VEYN-SELECTS').length})
+            VEYN-SELECTS ({heroSlides.filter((s) => (s.targetSection || 'VEYN-SELECTS') === 'VEYN-SELECTS').length})
           </button>
           <button
             type="button"
@@ -72,7 +85,14 @@ export default function AdminHeroSlides({
 
       {/* Hero Visual Cards Grid */}
       <div className="admin-hero-cards-grid">
-        {filteredSlides.length > 0 ? (
+        {loading ? (
+          <div className="admin-hero-slides__empty" style={{ gridColumn: '1 / -1' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <span className="admin-loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+              <span>Loading hero slides from database...</span>
+            </div>
+          </div>
+        ) : filteredSlides.length > 0 ? (
           filteredSlides.map((slide, idx) => (
             <div key={slide.id || idx} className="admin-hero-card">
               <div className="admin-hero-card__media">

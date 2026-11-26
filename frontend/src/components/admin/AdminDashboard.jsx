@@ -163,21 +163,42 @@ export default function AdminDashboard() {
       setLoadingContent(true);
       const res = await fetch(`${API_BASE_URL}/api/content?t=${Date.now()}`, {
         cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store',
-          Pragma: 'no-cache',
-        },
+        headers: getAuthHeaders(),
       });
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok && data.success && data.data) {
         setSiteContent(data.data);
+      } else if (!res.ok) {
+        // Fallback to same-origin relative endpoint if cross-origin proxy had issues
+        try {
+          const fallbackRes = await fetch(`/api/content?t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: getAuthHeaders(),
+          });
+          const fallbackData = await fallbackRes.json();
+          if (fallbackRes.ok && fallbackData.success && fallbackData.data) {
+            setSiteContent(fallbackData.data);
+          }
+        } catch (_) {}
       }
     } catch (err) {
-      console.error('Failed to fetch site content:', err);
+      console.error('Failed to fetch site content, attempting same-origin fallback:', err);
+      try {
+        const fallbackRes = await fetch(`/api/content?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: getAuthHeaders(),
+        });
+        const fallbackData = await fallbackRes.json();
+        if (fallbackRes.ok && fallbackData.success && fallbackData.data) {
+          setSiteContent(fallbackData.data);
+        }
+      } catch (fbErr) {
+        console.error('Same-origin fallback also failed:', fbErr);
+      }
     } finally {
       setLoadingContent(false);
     }
-  }, []);
+  }, [getAuthHeaders]);
 
   // Fetch Users
   const fetchUsers = useCallback(async () => {
@@ -225,6 +246,17 @@ export default function AdminDashboard() {
       fetchMediaFiles();
     }
   }, [isLoading, user, fetchOverview, fetchProducts, fetchContent, fetchUsers, fetchMediaFiles]);
+
+  // Re-fetch content automatically whenever navigating to content-related sections
+  useEffect(() => {
+    if (
+      ['subcategories', 'hero', 'announcements', 'swipeCategories', 'bottomBanner', 'objectsBanner'].includes(
+        activeTab
+      )
+    ) {
+      fetchContent();
+    }
+  }, [activeTab, fetchContent]);
 
   // Seed Catalog Action
   const handleSeedCatalog = async () => {
@@ -506,19 +538,45 @@ export default function AdminDashboard() {
         currentList.push(newItem);
       }
 
-      const res = await fetch(`${API_BASE_URL}/api/content/${type}`, {
+      // Optimistically update React state immediately so the new/edited item appears with 0ms delay!
+      setSiteContent((prev) => ({
+        ...(prev || {}),
+        [type]: currentList,
+      }));
+
+      let res = await fetch(`${API_BASE_URL}/api/content/${type}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ items: currentList }),
       });
 
+      // Same-origin fallback if cross-origin proxy fails
+      if (!res.ok) {
+        try {
+          const fbRes = await fetch(`/api/content/${type}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ items: currentList }),
+          });
+          if (fbRes.ok) {
+            res = fbRes;
+          }
+        } catch (_) {}
+      }
+
       const data = await res.json();
       if (res.ok && data.success) {
         showToast('Site content updated and published live.', 'success');
         setIsItemModalOpen(false);
+        const updatedList = Array.isArray(data.data) ? data.data : currentList;
+        setSiteContent((prev) => ({
+          ...(prev || {}),
+          [type]: updatedList,
+        }));
         fetchContent();
       } else {
         showToast(data.message || 'Save failed', 'error');
+        fetchContent();
       }
     } catch (err) {
       showToast('Error saving content', 'error');
@@ -875,6 +933,8 @@ export default function AdminDashboard() {
           {activeTab === 'subcategories' && (
             <AdminSubcategories
               subcategories={siteContent?.subcategories || []}
+              loading={loadingContent}
+              onRefresh={fetchContent}
               onAddItem={() => handleOpenItemModal('subcategories', false)}
               onEditItem={(idx) => handleOpenItemModal('subcategories', true, idx)}
               onDeleteItem={(idx) => handleDeleteContentItem('subcategories', idx)}
@@ -885,6 +945,8 @@ export default function AdminDashboard() {
           {activeTab === 'hero' && (
             <AdminHeroSlides
               heroSlides={siteContent?.heroSlides || []}
+              loading={loadingContent}
+              onRefresh={fetchContent}
               onAddSlide={() => handleOpenItemModal('heroSlides', false)}
               onEditSlide={(idx) => handleOpenItemModal('heroSlides', true, idx)}
               onDeleteSlide={(idx) => handleDeleteContentItem('heroSlides', idx)}
@@ -895,6 +957,8 @@ export default function AdminDashboard() {
           {activeTab === 'announcements' && (
             <AdminAnnouncements
               announcements={siteContent?.announcements || []}
+              loading={loadingContent}
+              onRefresh={fetchContent}
               onAddAnnouncement={() => handleOpenItemModal('announcements', false)}
               onEditAnnouncement={(idx) => handleOpenItemModal('announcements', true, idx)}
               onDeleteAnnouncement={(idx) => handleDeleteContentItem('announcements', idx)}
@@ -905,6 +969,8 @@ export default function AdminDashboard() {
           {activeTab === 'swipeCategories' && (
             <AdminSwipeCategories
               swipeCategories={siteContent?.swipeCategories || []}
+              loading={loadingContent}
+              onRefresh={fetchContent}
               onAddItem={() => handleOpenItemModal('swipeCategories', false)}
               onEditItem={(idx) => handleOpenItemModal('swipeCategories', true, idx)}
               onDeleteItem={(idx) => handleDeleteContentItem('swipeCategories', idx)}

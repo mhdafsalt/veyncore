@@ -39,9 +39,9 @@ export const getContent = async (req, res) => {
 
     const contentObj = { ...content };
 
-    // Reflect active subcategories from MongoDB Atlas subcategories collection
+    // Reflect subcategories from MongoDB Atlas subcategories collection (returns all for admin)
     try {
-      const atlasSubs = await Subcategory.find({ active: true }).sort({ sortOrder: 1 }).lean();
+      const atlasSubs = await Subcategory.find({}).sort({ sortOrder: 1 }).lean();
       if (atlasSubs && atlasSubs.length > 0) {
         contentObj.subcategories = atlasSubs;
       }
@@ -90,7 +90,8 @@ export const getSectionContent = async (req, res) => {
 
     if (section === 'subcategories') {
       try {
-        const atlasSubcategories = await Subcategory.find({ active: true }).sort({ sortOrder: 1 }).lean();
+        const query = req.query.activeOnly === 'true' ? { active: true } : {};
+        const atlasSubcategories = await Subcategory.find(query).sort({ sortOrder: 1 }).lean();
         if (atlasSubcategories && atlasSubcategories.length > 0) {
           sectionData = atlasSubcategories;
         }
@@ -206,20 +207,22 @@ export const updateSectionContent = async (req, res) => {
     if (section === 'subcategories' && Array.isArray(sectionData)) {
       try {
         await Subcategory.deleteMany({});
-        await Subcategory.insertMany(
-          sectionData.map((item, idx) => ({
-            id: String(item.id || `sub-${Date.now()}-${idx}`),
-            slug: String(item.id || `sub-${Date.now()}-${idx}`),
-            parentCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
-            mainCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
-            label: String(item.label || '').trim().toUpperCase(),
-            href: String(item.href || '#').trim(),
-            image: String(item.image || '').trim(),
-            isGlow: Boolean(item.isGlow),
-            sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
-            active: item.active !== false,
-          }))
-        );
+        if (sectionData.length > 0) {
+          await Subcategory.insertMany(
+            sectionData.map((item, idx) => ({
+              id: String(item.id || `sub-${Date.now()}-${idx}`),
+              slug: String(item.id || `sub-${Date.now()}-${idx}`),
+              parentCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+              mainCategory: item.mainCategory === 'VEYN-OBJECTS' ? 'VEYN-OBJECTS' : 'VEYN-SELECTS',
+              label: String(item.label || '').trim().toUpperCase(),
+              href: String(item.href || '#').trim(),
+              image: String(item.image || '').trim(),
+              isGlow: Boolean(item.isGlow),
+              sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : idx,
+              active: item.active !== false,
+            }))
+          );
+        }
       } catch (syncErr) {
         console.error('[Content Controller] Error syncing subcategories to MongoDB Atlas:', syncErr);
       }
