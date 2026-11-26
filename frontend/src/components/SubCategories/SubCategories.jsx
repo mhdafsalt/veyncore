@@ -13,6 +13,7 @@ const BASE_SELECTS_NAV = [
 ];
 
 const BASE_OBJECTS_NAV = [
+  { id: 'home', label: 'HOME', href: '/veyn-objects' },
   { id: 'all-drops', label: 'ALL DROPS', href: '/collections/objects-drops' },
 ];
 
@@ -282,10 +283,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
       }
     }
 
-    const isObjectsMain = activeMainCategory === 'VEYN-OBJECTS';
-    return isObjectsMain
-      ? (subcategories[0]?.id || 'obj-drops')
-      : 'home';
+    return 'home';
   }, [pathname, categoryParam, badgeParam, subcategories, activeMainCategory]);
 
   const [activeSubId, setActiveSubId] = useState(getInitialSubId);
@@ -375,16 +373,14 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     // 5. Category switch between SELECTS and OBJECTS
     if (prevMainCategoryRef.current !== activeMainCategory) {
       prevMainCategoryRef.current = activeMainCategory;
-      const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
-      setActiveSubId(defaultId);
+      setActiveSubId('home');
       return;
     }
 
     // 6. Default home if on storefront and hash is empty
     if (pathname === '/' || pathname === '/veyn-objects') {
       if (typeof window !== 'undefined' && !window.location.hash) {
-        const defaultId = isObjectsMain ? (subcategories[0]?.id || 'obj-drops') : 'home';
-        setActiveSubId(defaultId);
+        setActiveSubId('home');
       }
     }
   }, [pathname, categoryParam, badgeParam, activeMainCategory, subcategories]);
