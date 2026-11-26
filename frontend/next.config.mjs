@@ -35,6 +35,51 @@ const nextConfig = {
         destination: '/account/login',
         permanent: false,
       },
+      {
+        source: '/terms',
+        destination: '/pages/terms-of-service',
+        permanent: true,
+      },
+      {
+        source: '/terms-and-conditions',
+        destination: '/pages/terms-of-service',
+        permanent: true,
+      },
+      {
+        source: '/terms-of-service',
+        destination: '/pages/terms-of-service',
+        permanent: true,
+      },
+      {
+        source: '/privacy',
+        destination: '/pages/privacy-policy',
+        permanent: true,
+      },
+      {
+        source: '/privacy-policy',
+        destination: '/pages/privacy-policy',
+        permanent: true,
+      },
+      {
+        source: '/refund',
+        destination: '/pages/refund-policy',
+        permanent: true,
+      },
+      {
+        source: '/refund-policy',
+        destination: '/pages/refund-policy',
+        permanent: true,
+      },
+      {
+        source: '/shipping',
+        destination: '/pages/shipping-policy',
+        permanent: true,
+      },
+      {
+        source: '/shipping-policy',
+        destination: '/pages/shipping-policy',
+        permanent: true,
+      },
     ];
   },
 };

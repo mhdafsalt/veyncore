@@ -710,7 +710,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               >
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#privacy"
+                    href="/pages/privacy-policy"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -719,7 +719,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#refund"
+                    href="/pages/refund-policy"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -728,7 +728,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#shipping"
+                    href="/pages/shipping-policy"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -737,7 +737,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 </li>
                 <li className="navbar__drawer-subitem">
                   <Link
-                    href="#terms"
+                    href="/pages/terms-of-service"
                     className="navbar__drawer-sublink"
                     onClick={() => setIsMenuOpen(false)}
                   >
