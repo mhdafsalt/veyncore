@@ -745,7 +745,7 @@ export default function AuthPage() {
                     checked={subscribeNewsletter}
                     onChange={(e) => setSubscribeNewsletter(e.target.checked)}
                   />
-                  <span>Subscribe to VIP Drop alerts via WhatsApp &amp; Email</span>
+                  <span>Get exclusive access to new drops, special offers</span>
                 </label>
               </div>
 

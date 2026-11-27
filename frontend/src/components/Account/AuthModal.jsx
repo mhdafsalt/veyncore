@@ -699,7 +699,7 @@ export default function AuthModal() {
                         checked={subscribeNewsletter}
                         onChange={(e) => setSubscribeNewsletter(e.target.checked)}
                       />
-                      <span>Get VIP notifications for secret raw denim archives</span>
+                      <span>Get exclusive access to new drops, special offers</span>
                     </label>
                   </div>
 
