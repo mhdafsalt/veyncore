@@ -736,6 +736,13 @@
   }
 }
 
+@media screen and (max-width: 768px) {
+  /* Hide VEYN-SELECTS Spotlight card on mobile responsive */
+  .about-selects {
+    display: none !important;
+  }
+}
+
 @media screen and (max-width: 640px) {
   .about-hero {
     padding: 44px 16px 36px;
