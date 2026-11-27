@@ -100,9 +100,13 @@ export const getSectionContent = async (req, res) => {
       }
     }
 
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
+    if (section === 'subcategories') {
+      res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    } else {
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+    }
     return res.status(200).json({
       success: true,
       section,

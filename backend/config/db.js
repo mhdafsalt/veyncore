@@ -63,6 +63,7 @@ export const connectDB = async () => {
     dbName: 'veyncore', // Guarantee target database name even if omitted from connection string
     bufferCommands: false, // Do NOT buffer queries for 10s when disconnected; fail fast instead
     serverSelectionTimeoutMS: 5000, // 5 seconds max to find a server
+    maxPoolSize: 10, // Maintain bounded pool size appropriate for serverless execution
     socketTimeoutMS: 45000,
     family: 4, // Force IPv4 to prevent IPv6 routing delays
   };

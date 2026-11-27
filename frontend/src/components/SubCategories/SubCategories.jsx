@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback, Suspense } fr
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { API_BASE_URL } from '@/lib/constants';
 import { matchProductCategory, toCategorySlug } from '@/lib/categoryFilterUtils';
+import { fetchProductsWithRetry } from '@/lib/productsApi';
 import './SubCategories.css';
 
 const BASE_SELECTS_NAV = [
@@ -106,30 +107,34 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
     };
   }, []);
 
-  // Fetch real product catalog to extract dynamic categories
+  // Fetch real product catalog to extract dynamic categories (deduplicated via productsApi)
   useEffect(() => {
     let isMounted = true;
+    const abortController = new AbortController();
+
     const fetchCatalog = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?limit=100`);
-        const data = await res.json();
-        if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          cachedSubcategoriesCatalog = data.data;
-          if (isMounted) {
-            setProductCatalog(data.data);
-          }
+        const url = `${API_BASE_URL}/api/products?category=${activeMainCategory}&limit=100`;
+        const data = await fetchProductsWithRetry(url, {
+          signal: abortController.signal,
+          fallbackUrl: `https://veyncorein.vercel.app/api/products?category=${activeMainCategory}&limit=100`,
+        });
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          cachedSubcategoriesCatalog = data;
+          setProductCatalog(data);
         }
       } catch (err) {
         // Silently continue
       }
     };
 
-    const timer = setTimeout(fetchCatalog, 600);
+    const timer = setTimeout(fetchCatalog, 100);
     return () => {
       isMounted = false;
       clearTimeout(timer);
+      abortController.abort();
     };
-  }, []);
+  }, [activeMainCategory]);
 
   const subcategories = useMemo(() => {
     const isObjects = activeMainCategory === 'VEYN-OBJECTS';

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import connectDB from '../config/db.js';
 import Product, {
   DEFAULT_PRODUCT_DETAILS,
   DEFAULT_PRODUCT_SHIPPING,
@@ -11,6 +12,7 @@ import Product, {
  */
 export const getProducts = async (req, res) => {
   try {
+    await connectDB();
     const {
       category,
       subCategory,
@@ -115,6 +117,7 @@ export const getProducts = async (req, res) => {
 
     const products = await query.limit(parseInt(limit, 10));
 
+    res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json({
       success: true,
       count: products.length,

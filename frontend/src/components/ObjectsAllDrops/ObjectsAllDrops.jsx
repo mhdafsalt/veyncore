@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -8,6 +9,7 @@ import MobileQuickBuyDrawer from '@/components/QuickBuy/MobileQuickBuyDrawer';
 import { API_BASE_URL } from '@/lib/constants';
 import { matchProductCategory } from '@/lib/categoryFilterUtils';
 import { optimizeImageUrl } from '@/lib/imageUtils';
+import { fetchProductsWithRetry, getCachedProducts, invalidateProductsCache } from '@/lib/productsApi';
 import './ObjectsAllDrops.css';
 
 /**
@@ -247,8 +249,16 @@ function ObjectsAllDropsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [productsList, setProductsList] = useState(() => cachedObjectsAllDropsProducts || []);
-  const [isLoading, setIsLoading] = useState(() => !cachedObjectsAllDropsProducts || cachedObjectsAllDropsProducts.length === 0);
+  const objectsApiUrl = `${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`;
+
+  const [productsList, setProductsList] = useState(
+    () => getCachedProducts(objectsApiUrl) || cachedObjectsAllDropsProducts || []
+  );
+  const [fetchError, setFetchError] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(
+    () => !getCachedProducts(objectsApiUrl) && (!cachedObjectsAllDropsProducts || cachedObjectsAllDropsProducts.length === 0)
+  );
 
   // Read initial category filter from URL search params (e.g. ?category=bags)
   const initialCategoryParam = searchParams.get('category')?.toLowerCase().trim() || 'all';
@@ -263,54 +273,80 @@ function ObjectsAllDropsContent() {
   const [maxPrice, setMaxPrice] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [desktopColumns, setDesktopColumns] = useState('4');
   const [mobileColumns, setMobileColumns] = useState('2');
 
   const dropdownRef = useRef(null);
 
-  // Fetch dynamic products from backend API
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Fetch dynamic products from backend API with timeout, retry, and deduplication
   useEffect(() => {
     let isMounted = true;
-    const fetchProducts = async () => {
+    const abortController = new AbortController();
+
+    const loadProducts = async () => {
+      if (reloadKey > 0 || productsList.length === 0) {
+        setIsLoading(true);
+      }
+      setFetchError(null);
+
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`);
-        const json = await res.json();
-        if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
-          const mapped = json.data.map((p) => ({
-            id: p._id || p.id,
-            title: p.title,
-            handle: p.handle,
-            category: 'VEYN-OBJECTS',
-            subCategory: p.subCategory || 'BAGS',
-            price: p.price,
-            comparePrice: p.comparePrice,
-            salePrice: p.salePrice || `Rs. ${p.price.toLocaleString('en-IN')}.00`,
-            regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
-            badge: p.badge || '',
-            images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
-            thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
-            availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
-            inStock: p.inStock !== false,
-            createdAt: p.createdAt || new Date().toISOString(),
-          }));
-          cachedObjectsAllDropsProducts = mapped;
-          if (isMounted) {
+        const data = await fetchProductsWithRetry(objectsApiUrl, {
+          timeoutMs: 12000,
+          maxAttempts: 4,
+          backoffDelays: [1000, 2000, 3000],
+          forceRefresh: reloadKey > 0,
+          signal: abortController.signal,
+          fallbackUrl: `https://veyncorein.vercel.app/api/products?category=VEYN-OBJECTS&limit=100`,
+        });
+
+        if (isMounted) {
+          if (Array.isArray(data)) {
+            const mapped = data.map((p) => ({
+              id: p._id || p.id,
+              title: p.title,
+              handle: p.handle,
+              category: 'VEYN-OBJECTS',
+              subCategory: p.subCategory || 'BAGS',
+              price: p.price,
+              comparePrice: p.comparePrice,
+              salePrice: p.salePrice || `Rs. ${p.price.toLocaleString('en-IN')}.00`,
+              regularPrice: p.regularPrice || (p.comparePrice ? `Rs. ${p.comparePrice.toLocaleString('en-IN')}.00` : ''),
+              badge: p.badge || '',
+              images: p.images && p.images.length > 0 ? p.images : ['/images/hero/hero-card-3.jpg'],
+              thumbnail: p.thumbnail || (p.images && p.images[0]) || '/images/hero/hero-card-3.jpg',
+              availableSizes: p.availableSizes && p.availableSizes.length > 0 ? p.availableSizes : ['ONE SIZE'],
+              inStock: p.inStock !== false,
+              createdAt: p.createdAt || new Date().toISOString(),
+            }));
+            cachedObjectsAllDropsProducts = mapped;
             setProductsList(mapped);
           }
+          setFetchError(null);
         }
-      } catch (e) {
-        // Silently fallback to static products
+      } catch (err) {
+        if (isMounted && err.name !== 'AbortError') {
+          console.error('[ObjectsAllDrops] Failed to load products after retries:', err);
+          setFetchError(err);
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
         }
       }
     };
-    fetchProducts();
+
+    loadProducts();
+
     return () => {
       isMounted = false;
+      abortController.abort();
     };
-  }, []);
+  }, [reloadKey, objectsApiUrl]);
 
   // Sync category state when URL param changes
   useEffect(() => {
@@ -380,6 +416,22 @@ function ObjectsAllDropsContent() {
     maxPrice !== '' ||
     sortBy !== 'featured' ||
     activeCategoryTab !== 'all';
+
+  // Available stock counts within current category context
+  const categoryProducts = useMemo(() => {
+    if (activeCategoryTab && activeCategoryTab !== 'all') {
+      return productsList.filter((p) => matchProductCategory(p, activeCategoryTab));
+    }
+    return productsList;
+  }, [productsList, activeCategoryTab]);
+
+  const inStockCount = useMemo(() => {
+    return categoryProducts.filter((p) => p.inStock).length;
+  }, [categoryProducts]);
+
+  const outOfStockCount = useMemo(() => {
+    return categoryProducts.filter((p) => !p.inStock).length;
+  }, [categoryProducts]);
 
   // Filtered & Sorted Objects
   const filteredProducts = useMemo(() => {
@@ -661,7 +713,7 @@ function ObjectsAllDropsContent() {
                         className="obj-all__checkbox-input"
                       />
                       <span className="obj-all__checkbox-custom" />
-                      <span>In stock (18)</span>
+                      <span>In stock ({inStockCount})</span>
                     </label>
                     <label className="obj-all__checkbox-label">
                       <input
@@ -671,7 +723,7 @@ function ObjectsAllDropsContent() {
                         className="obj-all__checkbox-input"
                       />
                       <span className="obj-all__checkbox-custom" />
-                      <span>Out of stock (0)</span>
+                      <span>Out of stock ({outOfStockCount})</span>
                     </label>
                   </div>
                 </div>
@@ -929,6 +981,24 @@ function ObjectsAllDropsContent() {
               </div>
             ))}
           </div>
+        ) : fetchError && productsList.length === 0 ? (
+          <div className="obj-all__empty">
+            <h2 className="obj-all__empty-title">Couldn&apos;t load objects</h2>
+            <p className="obj-all__empty-text">
+              We had trouble connecting to the server. Please check your connection and try again.
+            </p>
+            <button
+              type="button"
+              className="obj-all__empty-btn"
+              onClick={() => {
+                invalidateProductsCache(objectsApiUrl);
+                setFetchError(null);
+                setReloadKey((prev) => prev + 1);
+              }}
+            >
+              Try again
+            </button>
+          </div>
         ) : filteredProducts.length === 0 ? (
           <div className="obj-all__empty">
             <h2 className="obj-all__empty-title">No artifacts found</h2>
@@ -955,7 +1025,7 @@ function ObjectsAllDropsContent() {
       </div>
 
       {/* Mobile Slide-Over Filter Drawer */}
-      {isMobileDrawerOpen && (
+      {isMobileDrawerOpen && mounted && createPortal(
         <div className="obj-all-drawer">
           <div
             className="obj-all-drawer__backdrop"
@@ -975,25 +1045,6 @@ function ObjectsAllDropsContent() {
             </div>
 
             <div className="obj-all-drawer__body">
-              {/* Category Filter in Drawer */}
-              <div className="obj-all-drawer__section">
-                <h3 className="obj-all-drawer__section-title">Category</h3>
-                <div className="obj-all-drawer__pill-group">
-                  {dynamicObjectCategories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      className={`obj-all-drawer__pill ${
-                        activeCategoryTab === cat.id ? 'obj-all-drawer__pill--active' : ''
-                      }`}
-                      onClick={() => handleTabChange(cat.id)}
-                    >
-                      {cat.label} ({cat.count || 0})
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Sort Options in Drawer */}
               <div className="obj-all-drawer__section">
                 <h3 className="obj-all-drawer__section-title">Sort By</h3>
@@ -1027,7 +1078,7 @@ function ObjectsAllDropsContent() {
                       className="obj-all-drawer__checkbox-input"
                     />
                     <span className="obj-all-drawer__checkbox-custom" />
-                    <span>In stock (18)</span>
+                    <span>In stock ({inStockCount})</span>
                   </label>
                   <label className="obj-all-drawer__checkbox-label">
                     <input
@@ -1037,7 +1088,7 @@ function ObjectsAllDropsContent() {
                       className="obj-all-drawer__checkbox-input"
                     />
                     <span className="obj-all-drawer__checkbox-custom" />
-                    <span>Out of stock (0)</span>
+                    <span>Out of stock ({outOfStockCount})</span>
                   </label>
                 </div>
               </div>
@@ -1078,18 +1129,19 @@ function ObjectsAllDropsContent() {
                 className="obj-all-drawer__reset-btn"
                 onClick={handleResetFilters}
               >
-                Reset
+                Clear all
               </button>
               <button
                 type="button"
                 className="obj-all-drawer__apply-btn"
                 onClick={() => setIsMobileDrawerOpen(false)}
               >
-                Apply Filters ({filteredProducts.length})
+                See {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
