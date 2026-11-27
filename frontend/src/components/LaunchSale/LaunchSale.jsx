@@ -214,26 +214,19 @@ function LaunchSaleCard({ saleItem, onExpire }) {
               ) : (
                 <>
                   <svg
-                    className="all-drops-card__choose-icon"
-                    width="15"
-                    height="15"
-                    viewBox="0 0 20 20"
+                    className="all-drops-card__choose-icon all-drops-card__choose-icon--timer"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#dc2626"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
                   >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.2"
-                      d="M16.608 9.421V6.906H3.392v8.016c0 .567.224 1.112.624 1.513.4.402.941.627 1.506.627H8.63M8.818 3h2.333c.618 0 1.212.247 1.649.686a2.35 2.35 0 0 1 .683 1.658v1.562H6.486V5.344c0-.622.246-1.218.683-1.658A2.33 2.33 0 0 1 8.82 3"
-                    />
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeWidth="1.2"
-                      d="M14.608 12.563v5m2.5-2.5h-5"
-                    />
+                    <circle cx="12" cy="12" r="9.5" />
+                    <polyline points="12 6.5 12 12 15.5 14" />
                   </svg>
                   <span>Choose</span>
                 </>
