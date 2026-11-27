@@ -6,7 +6,7 @@
   position: relative;
   z-index: 15;
   box-sizing: border-box;
-  min-height: 43px;
+  min-height: 44px;
   contain: layout;
 }
 
@@ -31,6 +31,7 @@
   position: relative;
   border-right: 1px solid #e5e7eb;
   box-sizing: border-box;
+  height: 44px;
 }
 
 .main-categories__item:last-child {
@@ -38,10 +39,12 @@
 }
 
 .main-categories__link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  text-align: center;
-  padding: 11px 24px;
+  height: 100%;
+  padding: 0 16px;
   background-color: transparent;
   border: none;
   outline: none;
@@ -58,21 +61,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Base underline element (width 0 by default) */
-.main-categories__link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  max-width: 120px;
-  height: 2px;
-  background-color: transparent;
-  border-radius: 2px 2px 0 0;
-  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease;
-}
-
 /* Hover: subtle color darkening only on desktop devices with real mouse pointer.
    NEVER draw an underline on hover so two underlines never appear simultaneously! */
 @media (hover: hover) and (pointer: fine) {
@@ -81,38 +69,76 @@
   }
 }
 
+.main-categories__text {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 4px;
+}
+
+/* Base underline element attached to the text label so it precisely spans the label width */
+.main-categories__text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: transparent;
+  border-radius: 2px 2px 0 0;
+  transition: background-color 0.22s ease;
+  pointer-events: none;
+}
+
 /* Strictly ONLY the single active category gets the bold text and active black underline */
 .main-categories__link--active {
   color: #000000 !important;
   font-weight: 600 !important;
 }
 
-.main-categories__link--active::after {
-  width: 110px !important;
+.main-categories__link--active .main-categories__text::after {
   background-color: #000000 !important;
 }
 
 /* Responsive Design for Laptop, Tablet, Mobile */
 @media screen and (max-width: 1024px) {
+  .main-categories {
+    min-height: 42px;
+  }
+
+  .main-categories__item {
+    height: 42px;
+  }
+
   .main-categories__link {
-    padding: 10px 16px;
     font-size: 13px;
+    padding: 0 12px;
   }
 }
 
 @media screen and (max-width: 749px) {
+  .main-categories {
+    min-height: 40px;
+  }
+
   .main-categories__list {
     width: 100%;
     padding: 0;
   }
 
-  .main-categories__link {
-    padding: 10px 12px;
-    font-size: 12.5px;
-    letter-spacing: 0.06em;
+  .main-categories__item {
+    height: 40px;
   }
 
-  .main-categories__link--active::after {
-    width: 90px !important;
+  .main-categories__link {
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    padding: 0 8px;
+  }
+
+  .main-categories__text {
+    padding: 0 2px;
   }
 }

@@ -9,7 +9,7 @@ const CATEGORIES = [
   { id: 'VEYN-OBJECTS', label: 'VEYN-OBJECTS', path: '/veyn-objects' }
 ];
 
-export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSelectCategory }) {
+export default function MainCategories({ activeCategory = null, onSelectCategory }) {
   const router = useRouter();
   const pathname = usePathname();
   const [selectedCat, setSelectedCat] = useState(activeCategory);
@@ -26,9 +26,7 @@ export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSele
 
   // Keep selectedCat synchronized with incoming activeCategory prop
   useEffect(() => {
-    if (activeCategory) {
-      setSelectedCat(activeCategory);
-    }
+    setSelectedCat(activeCategory || null);
   }, [activeCategory]);
 
   const handleClick = (e, cat) => {
@@ -85,7 +83,7 @@ export default function MainCategories({ activeCategory = 'VEYN-SELECTS', onSele
                 aria-selected={isActive}
                 onClick={(e) => handleClick(e, cat)}
               >
-                {cat.label}
+                <span className="main-categories__text">{cat.label}</span>
               </button>
             </div>
           );

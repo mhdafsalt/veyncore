@@ -11,12 +11,18 @@ export default function LegalPage({
   subtitle,
   lastUpdated = 'November 2026',
   sections = [],
-  initialCategory = 'VEYN-SELECTS',
+  initialCategory = null,
+  showSubCategories = false,
+  showMainCategories = true,
 }) {
   return (
     <div className="legal-page">
-      {/* 1. Standard Store Header */}
-      <StoreHeader initialCategory={initialCategory} />
+      {/* 1. Standard Store Header without subcategory bar */}
+      <StoreHeader
+        initialCategory={initialCategory}
+        showMainCategories={showMainCategories}
+        showSubCategories={showSubCategories}
+      />
 
       {/* 2. Main Policy Content */}
       <main className="legal-page__container">
@@ -33,13 +39,21 @@ export default function LegalPage({
             <aside className="legal-page__sidebar" aria-label="Table of contents">
               <h2 className="legal-page__sidebar-title">QUICK SECTIONS</h2>
               <ul className="legal-page__nav-list">
-                {sections.map((sec, idx) => (
-                  <li key={sec.id || idx} className="legal-page__nav-item">
-                    <a href={`#${sec.id || `section-${idx}`}`}>
-                      {idx + 1}. {sec.title}
-                    </a>
-                  </li>
-                ))}
+                {sections.map((sec, idx) => {
+                  const numberPrefix =
+                    sec.number !== undefined
+                      ? sec.number === false || sec.number === ''
+                        ? ''
+                        : `${sec.number}. `
+                      : `${idx + 1}. `;
+                  return (
+                    <li key={sec.id || idx} className="legal-page__nav-item">
+                      <a href={`#${sec.id || `section-${idx}`}`}>
+                        {numberPrefix}{sec.title}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             </aside>
           )}
@@ -53,9 +67,13 @@ export default function LegalPage({
                 className="legal-section"
               >
                 <div className="legal-section__header">
-                  <span className="legal-section__number">
-                    {String(idx + 1).padStart(2, '0')}.
-                  </span>
+                  {sec.number !== false && (
+                    <span className="legal-section__number">
+                      {sec.number !== undefined
+                        ? String(sec.number).padStart(2, '0') + '.'
+                        : String(idx + 1).padStart(2, '0') + '.'}
+                    </span>
+                  )}
                   <h2 className="legal-section__heading">{sec.title}</h2>
                 </div>
                 <div className="legal-section__body">{sec.content}</div>
@@ -82,7 +100,7 @@ export default function LegalPage({
                   WhatsApp Concierge
                 </a>
                 <a
-                  href={`mailto:support@veyncore.com?subject=${encodeURIComponent(
+                  href={`mailto:veyncore.in@gmail.com?subject=${encodeURIComponent(
                     `Inquiry Regarding VEYNCORE ${title}`
                   )}`}
                   className="legal-support-card__btn legal-support-card__btn--outline"

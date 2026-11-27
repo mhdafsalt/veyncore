@@ -69,7 +69,7 @@ const refundSections = [
         </p>
         <ol>
           <li>
-            <strong>Submit Your Request:</strong> Contact our support team via WhatsApp Concierge at <strong>+91 94463 91166</strong> or email <strong>support@veyncore.com</strong> within 7 days of delivery. State your Order ID and reason for return or preferred replacement size.
+            <strong>Submit Your Request:</strong> Contact our support team via WhatsApp Concierge at <strong>+91 94463 91166</strong> or email <strong>veyncore.in@gmail.com</strong> within 7 days of delivery. State your Order ID and reason for return or preferred replacement size.
           </li>
           <li>
             <strong>Reverse Pickup Scheduled:</strong> Once approved, our courier partner will arrive at your original delivery address within 24 to 48 hours to collect the securely packaged parcel.
@@ -158,7 +158,8 @@ const refundSections = [
         <p>
           <strong>VEYNCORE Returns &amp; Exchange Desk</strong><br />
           WhatsApp Concierge: +91 94463 91166 (10:00 AM – 8:00 PM IST)<br />
-          Email: <a href="mailto:support@veyncore.com" style={{ color: '#0f172a', fontWeight: 600 }}>support@veyncore.com</a><br />
+          Email: <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a><br />
+          Official Website: <a href="https://veyncore.in" target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in</a><br />
           Operating Hub: Kerala, India
         </p>
       </>

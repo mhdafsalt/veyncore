@@ -198,10 +198,10 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                       <FaWhatsapp size={19} aria-hidden="true" />
                     </a>
                     <a
-                      href="mailto:support@veyncore.com"
+                      href="mailto:veyncore.in@gmail.com"
                       className="modern-footer__channel-icon-btn"
                       aria-label="Email Support"
-                      title="support@veyncore.com"
+                      title="veyncore.in@gmail.com"
                     >
                       <FaEnvelope size={17} aria-hidden="true" />
                     </a>

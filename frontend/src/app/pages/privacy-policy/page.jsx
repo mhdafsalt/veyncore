@@ -143,7 +143,7 @@ const privacySections = [
           <li>Request the closure of your account and deletion of non-essential personal information, subject to statutory record-keeping requirements.</li>
         </ul>
         <p>
-          To exercise any of these rights, simply email our dedicated privacy officer at <a href="mailto:support@veyncore.com" style={{ color: '#0f172a', fontWeight: 600 }}>support@veyncore.com</a>.
+          To exercise any of these rights, simply email our dedicated privacy officer at <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a>.
         </p>
       </>
     ),
@@ -161,9 +161,9 @@ const privacySections = [
         </p>
         <p>
           <strong>VEYNCORE Data Protection Officer</strong><br />
-          Email: <a href="mailto:support@veyncore.com" style={{ color: '#0f172a', fontWeight: 600 }}>support@veyncore.com</a><br />
+          Email: <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a><br />
           WhatsApp Support: +91 94463 91166<br />
-          Official Website: <a href="https://veyncorein.vercel.app" style={{ color: '#0f172a', fontWeight: 600 }}>veyncorein.vercel.app</a>
+          Official Website: <a href="https://veyncore.in" target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in</a>
         </p>
       </>
     ),

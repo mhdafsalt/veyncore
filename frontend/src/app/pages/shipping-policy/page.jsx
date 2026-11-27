@@ -130,8 +130,8 @@ const shippingSections = [
         <p>
           <strong>VEYNCORE Logistics Desk</strong><br />
           WhatsApp Concierge: +91 94463 91166 (Mon – Sat, 10:00 AM – 8:00 PM IST)<br />
-          Email: <a href="mailto:support@veyncore.com" style={{ color: '#0f172a', fontWeight: 600 }}>support@veyncore.com</a><br />
-          Official Website: <a href="https://veyncorein.vercel.app" style={{ color: '#0f172a', fontWeight: 600 }}>veyncorein.vercel.app</a>
+          Email: <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a><br />
+          Official Website: <a href="https://veyncore.in" target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in</a>
         </p>
       </>
     ),

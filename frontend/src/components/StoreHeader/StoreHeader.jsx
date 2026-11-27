@@ -12,11 +12,18 @@ import SubCategories from '@/components/SubCategories/SubCategories';
  * Encapsulates AnnouncementBar, Navbar, MainCategories bar, and SubCategories bar
  * with interactive synchronized category state across PDP and Collection pages.
  */
-export default function StoreHeader({ initialCategory = 'VEYN-SELECTS' }) {
+export default function StoreHeader({
+  initialCategory = 'VEYN-SELECTS',
+  showMainCategories = true,
+  showSubCategories = true,
+}) {
   const pathname = usePathname();
   const [activeCategory, setActiveCategory] = useState(() => {
     if (pathname && (pathname.includes('objects') || pathname.includes('veyn-objects'))) {
       return 'VEYN-OBJECTS';
+    }
+    if (pathname && pathname.startsWith('/pages/')) {
+      return null;
     }
     return initialCategory;
   });
@@ -24,7 +31,9 @@ export default function StoreHeader({ initialCategory = 'VEYN-SELECTS' }) {
   useEffect(() => {
     if (pathname && (pathname.includes('objects') || pathname.includes('veyn-objects'))) {
       setActiveCategory('VEYN-OBJECTS');
-    } else if (initialCategory) {
+    } else if (pathname && pathname.startsWith('/pages/')) {
+      setActiveCategory(null);
+    } else if (initialCategory !== undefined) {
       setActiveCategory(initialCategory);
     }
   }, [initialCategory, pathname]);
@@ -41,13 +50,17 @@ export default function StoreHeader({ initialCategory = 'VEYN-SELECTS' }) {
       />
 
       {/* 3. Main Category Bar (normal document flow, scrolls away under Navbar) */}
-      <MainCategories
-        activeCategory={activeCategory}
-        onSelectCategory={setActiveCategory}
-      />
+      {showMainCategories && (
+        <MainCategories
+          activeCategory={activeCategory}
+          onSelectCategory={setActiveCategory}
+        />
+      )}
 
       {/* 4. Subcategory Bar (Sticky directly below Navbar at top: 56px/50px, z-index: 90) */}
-      <SubCategories activeMainCategory={activeCategory} />
+      {showSubCategories && (
+        <SubCategories activeMainCategory={activeCategory} />
+      )}
     </>
   );
 }
