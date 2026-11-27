@@ -22,7 +22,10 @@ export default function StoreHeader({
     if (pathname && (pathname.includes('objects') || pathname.includes('veyn-objects'))) {
       return 'VEYN-OBJECTS';
     }
-    if (pathname && pathname.startsWith('/pages/')) {
+    if (
+      pathname &&
+      (pathname.startsWith('/pages/') || pathname === '/about' || pathname === '/contact')
+    ) {
       return null;
     }
     return initialCategory;
@@ -31,7 +34,10 @@ export default function StoreHeader({
   useEffect(() => {
     if (pathname && (pathname.includes('objects') || pathname.includes('veyn-objects'))) {
       setActiveCategory('VEYN-OBJECTS');
-    } else if (pathname && pathname.startsWith('/pages/')) {
+    } else if (
+      pathname &&
+      (pathname.startsWith('/pages/') || pathname === '/about' || pathname === '/contact')
+    ) {
       setActiveCategory(null);
     } else if (initialCategory !== undefined) {
       setActiveCategory(initialCategory);

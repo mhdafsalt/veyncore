@@ -833,6 +833,21 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                 CONTACT US
               </Link>
             </li>
+
+            {/* 11. ABOUT VEYNCORE */}
+            <li className="navbar__drawer-item">
+              <Link
+                href="/pages/about"
+                className={`navbar__drawer-link ${
+                  pathname === '/pages/about' || pathname === '/about'
+                    ? 'navbar__drawer-link--active'
+                    : ''
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                ABOUT VEYNCORE
+              </Link>
+            </li>
           </ul>
         </div>
 

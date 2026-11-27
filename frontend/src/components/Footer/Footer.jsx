@@ -66,6 +66,11 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                       </Link>
                     </li>
                     <li>
+                      <Link href="/pages/about" className="modern-footer__accordion-link">
+                        ABOUT VEYNCORE
+                      </Link>
+                    </li>
+                    <li>
                       <Link href="/collections/all-drops" className="modern-footer__accordion-link">
                         ALL DROPS
                       </Link>
