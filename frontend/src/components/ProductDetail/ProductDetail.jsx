@@ -542,26 +542,15 @@ export default function ProductDetail({ product, activeLaunchSale = null }) {
                 )}
               </div>
 
-              {/* Live Launch Sale Individual Countdown Banner */}
+              {/* Live Launch Sale Individual Countdown Banner - Single Line */}
               {liveSale && countdownString && (
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 14px',
-                    backgroundColor: '#0f172a',
-                    color: '#ffffff',
-                    borderRadius: '8px',
-                    margin: '12px 0 6px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    fontFamily: 'Inter, monospace',
-                  }}
-                >
-                  <span style={{ color: '#f59e0b' }}>⚡️ LAUNCH SALE ENDS IN:</span>
-                  <span>{countdownString}</span>
+                <div className="product-details__sale-timer-banner">
+                  <span className="product-details__sale-timer-label">
+                    ⚡️ LAUNCH SALE ENDS IN:
+                  </span>
+                  <span className="product-details__sale-timer-countdown">
+                    {countdownString}
+                  </span>
                 </div>
               )}
 
