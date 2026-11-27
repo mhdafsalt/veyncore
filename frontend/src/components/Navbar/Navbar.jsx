@@ -532,22 +532,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
 
         <div className="navbar__drawer-body">
           <ul className="navbar__drawer-menu">
-            {/* 1. HOME */}
-            <li className="navbar__drawer-item">
-              <Link
-                href="/"
-                className={`navbar__drawer-link ${
-                  pathname === '/' && activeMainCategory !== 'VEYN-OBJECTS'
-                    ? 'navbar__drawer-link--active'
-                    : ''
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                HOME
-              </Link>
-            </li>
-
-            {/* 2. VEYN-SELECTS */}
+            {/* 1. VEYN-SELECTS */}
             <li className="navbar__drawer-item">
               <button
                 type="button"
