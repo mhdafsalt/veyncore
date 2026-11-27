@@ -281,6 +281,27 @@ function DropsProductCard({ product }) {
 let cachedAllDropsProducts = null;
 let cachedAllDropsSubcategories = null;
 
+const SWR_ALL_DROPS_CACHE_KEY = 'veyn_all_drops_products_v1';
+
+const getStoredAllDropsProducts = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(SWR_ALL_DROPS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const setStoredAllDropsProducts = (products) => {
+  if (typeof window === 'undefined' || !Array.isArray(products) || products.length === 0) return;
+  try {
+    sessionStorage.setItem(SWR_ALL_DROPS_CACHE_KEY, JSON.stringify(products));
+  } catch (e) {}
+};
+
 /**
  * Main ALL DROPS Collection View
  */
@@ -290,9 +311,9 @@ function AllDropsContent() {
 
   const selectsApiUrl = `${API_BASE_URL}/api/products?category=VEYN-SELECTS&limit=100`;
 
-  const [productsList, setProductsList] = useState(
-    () => getCachedProducts(selectsApiUrl) || cachedAllDropsProducts || []
-  );
+  const [productsList, setProductsList] = useState(() => {
+    return cachedAllDropsProducts || [];
+  });
   const [dynamicSubcategories, setDynamicSubcategories] = useState(() => cachedAllDropsSubcategories);
   const [fetchError, setFetchError] = useState(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -321,15 +342,27 @@ function AllDropsContent() {
   const [mobileColumns, setMobileColumns] = useState('2'); // '2' or '1' for mobile
   const [displayCount, setDisplayCount] = useState(60);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isLoading, setIsLoading] = useState(
-    () => !getCachedProducts(selectsApiUrl) && (!cachedAllDropsProducts || cachedAllDropsProducts.length === 0)
-  );
+  const [isLoading, setIsLoading] = useState(() => {
+    return !cachedAllDropsProducts || cachedAllDropsProducts.length === 0;
+  });
 
   const dropdownRef = useRef(null);
   const sentinelRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Hydrate stored cache on client mount to guarantee exact SSR match
+  useEffect(() => {
+    if (!cachedAllDropsProducts) {
+      const stored = getStoredAllDropsProducts();
+      if (stored && stored.length > 0) {
+        cachedAllDropsProducts = stored;
+        setProductsList(stored);
+        setIsLoading(false);
+      }
+    }
   }, []);
 
   // Fetch dynamic products from backend API with timeout, retry, and deduplication
@@ -350,12 +383,13 @@ function AllDropsContent() {
           maxAttempts: 4,
           backoffDelays: [1000, 2000, 3000],
           forceRefresh: reloadKey > 0,
+          retryOnEmpty: true,
           signal: abortController.signal,
           fallbackUrl: `https://veyncorein.vercel.app/api/products?category=VEYN-SELECTS&limit=100`,
         });
 
         if (isMounted) {
-          if (Array.isArray(data)) {
+          if (Array.isArray(data) && data.length > 0) {
             const mapped = data.map((p) => ({
               id: p._id || p.id,
               title: p.title,
@@ -377,14 +411,23 @@ function AllDropsContent() {
               createdAt: p.createdAt || new Date().toISOString(),
             }));
             cachedAllDropsProducts = mapped;
+            setStoredAllDropsProducts(mapped);
             setProductsList(mapped);
+            setFetchError(null);
+          } else if (Array.isArray(data) && data.length === 0) {
+            // Only clear products if no cached stale data exists
+            if (!cachedAllDropsProducts && !getStoredAllDropsProducts()) {
+              setProductsList([]);
+            }
           }
-          setFetchError(null);
         }
       } catch (err) {
         if (isMounted && err.name !== 'AbortError') {
-          console.error('[AllDrops] Failed to load products after retries:', err);
-          setFetchError(err);
+          console.warn('[AllDrops] Failed to load products after all retries:', err.message);
+          // Only show error UI if we don't have any products in state/sessionStorage
+          if (!productsList || productsList.length === 0) {
+            setFetchError(err);
+          }
         }
       } finally {
         if (isMounted) {
@@ -1132,6 +1175,9 @@ function AllDropsContent() {
               type="button"
               className="all-drops__empty-btn"
               onClick={() => {
+                if (typeof window !== 'undefined') {
+                  sessionStorage.removeItem(SWR_ALL_DROPS_CACHE_KEY);
+                }
                 invalidateProductsCache(selectsApiUrl);
                 setFetchError(null);
                 setReloadKey((prev) => prev + 1);
@@ -1188,7 +1234,7 @@ function AllDropsContent() {
           />
           <div className="all-drops-drawer__panel">
             <div className="all-drops-drawer__header">
-              <h2 className="all-drops-drawer__title">FILTERS &amp; SORT</h2>
+              <h2 className="all-drops-drawer__title">FILTERS & SORT</h2>
               <button
                 type="button"
                 className="all-drops-drawer__close"

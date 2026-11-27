@@ -212,7 +212,7 @@ export default function ContactPage() {
                   >
                     <option value="General Inquiry">General Inquiry</option>
                     <option value="Order Tracking">Order Tracking</option>
-                    <option value="Sizing & Fit Advice">Sizing &amp; Fit Advice</option>
+                    <option value="Sizing & Fit Advice">Sizing & Fit Advice</option>
                     <option value="Return or Exchange">Return or Exchange Request</option>
                     <option value="Launch Sale Inquiry">Launch Sale Inquiry</option>
                     <option value="Collaboration / PR">Collaboration / PR</option>

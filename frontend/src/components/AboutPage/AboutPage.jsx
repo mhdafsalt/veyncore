@@ -195,15 +195,15 @@ export default function AboutPage() {
             <div className="about-metrics" role="list">
               <div className="about-metric" role="listitem">
                 <span className="about-metric__label">BRAND LINES</span>
-                <span className="about-metric__value">VEYN SELECTS &amp; OBJECTS</span>
+                <span className="about-metric__value">VEYN SELECTS & OBJECTS</span>
               </div>
               <div className="about-metric" role="listitem">
                 <span className="about-metric__label">SIGNATURE FITS</span>
-                <span className="about-metric__value">OVERSIZED, BAGGY &amp; STRAIGHT</span>
+                <span className="about-metric__value">OVERSIZED, BAGGY & STRAIGHT</span>
               </div>
               <div className="about-metric" role="listitem">
                 <span className="about-metric__label">ORDERING CHANNELS</span>
-                <span className="about-metric__value">ONLINE CART &amp; WHATSAPP</span>
+                <span className="about-metric__value">ONLINE CART & WHATSAPP</span>
               </div>
               <div className="about-metric" role="listitem">
                 <span className="about-metric__label">PAN-INDIA DELIVERY</span>
@@ -258,7 +258,7 @@ export default function AboutPage() {
             <div className="about-section-header">
               <span className="about-section-tag">OUR WARDROBE</span>
               <h2 id="heading-collections" className="about-section-title">
-                Our Fashion &amp; Streetwear Collections
+                Our Fashion & Streetwear Collections
               </h2>
               <p className="about-section-desc">
                 Engineered with deliberate cuts and relaxed dimensions, our
@@ -290,7 +290,7 @@ export default function AboutPage() {
               <article className="about-card">
                 <div className="about-card__header">
                   <span className="about-card__index">02</span>
-                  <h3 className="about-card__title">Denim &amp; Baggy Pants</h3>
+                  <h3 className="about-card__title">Denim & Baggy Pants</h3>
                 </div>
                 <p className="about-card__text">
                   Wide-leg cuts and spacious leg openings designed with
@@ -308,7 +308,7 @@ export default function AboutPage() {
               <article className="about-card">
                 <div className="about-card__header">
                   <span className="about-card__index">03</span>
-                  <h3 className="about-card__title">Straight-Fit &amp; Bootcut</h3>
+                  <h3 className="about-card__title">Straight-Fit & Bootcut</h3>
                 </div>
                 <p className="about-card__text">
                   Clean vertical lines with tailored knee-to-hem flares that break
@@ -326,7 +326,7 @@ export default function AboutPage() {
               <article className="about-card">
                 <div className="about-card__header">
                   <span className="about-card__index">04</span>
-                  <h3 className="about-card__title">Curated Selects &amp; Objects</h3>
+                  <h3 className="about-card__title">Curated Selects & Objects</h3>
                 </div>
                 <p className="about-card__text">
                   Handpicked fashion pieces via <strong>VEYN-SELECTS</strong> and
@@ -375,7 +375,7 @@ export default function AboutPage() {
               <div className="about-pillar">
                 <div className="about-pillar__marker">02</div>
                 <div className="about-pillar__content">
-                  <h3 className="about-pillar__title">Everyday Function &amp; Ease</h3>
+                  <h3 className="about-pillar__title">Everyday Function & Ease</h3>
                   <p className="about-pillar__text">
                     Streetwear must be lived in. We prioritize comfortable
                     silhouettes, breathable weights, and unrestrictive cuts that

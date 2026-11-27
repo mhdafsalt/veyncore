@@ -1037,7 +1037,7 @@ export default function ProductDetail({ product, activeLaunchSale = null }) {
                           </tr>
                           <tr>
                             <td className="size-modal__cell-size">Hardware</td>
-                            <td>Matte Black Zinc Alloy Buckles &amp; YKK Reverse Zips</td>
+                            <td>Matte Black Zinc Alloy Buckles & YKK Reverse Zips</td>
                           </tr>
                           <tr>
                             <td className="size-modal__cell-size">Water Resistance</td>
@@ -1081,7 +1081,7 @@ export default function ProductDetail({ product, activeLaunchSale = null }) {
 
                   <div className="size-modal__tip" style={{ marginTop: '20px' }}>
                     <span>
-                      🛡️ <strong>VEYN-OBJECTS Material Guarantee:</strong> Solid surgical-grade 316L stainless steel &amp; high-tenacity canvas. 100% waterproof, rust-proof, and hypoallergenic.
+                      🛡️ <strong>VEYN-OBJECTS Material Guarantee:</strong> Solid surgical-grade 316L stainless steel & high-tenacity canvas. 100% waterproof, rust-proof, and hypoallergenic.
                     </span>
                   </div>
                 </div>

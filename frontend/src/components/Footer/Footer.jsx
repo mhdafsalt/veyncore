@@ -133,7 +133,7 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                   <ul className="modern-footer__accordion-list">
                     <li>
                       <Link href="/pages/terms-of-service" className="modern-footer__accordion-link">
-                        TERMS &amp; CONDITIONS
+                        TERMS & CONDITIONS
                       </Link>
                     </li>
                     <li>

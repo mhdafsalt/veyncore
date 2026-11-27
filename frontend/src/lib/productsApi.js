@@ -5,9 +5,10 @@
  * 1. In-flight request deduplication by URL (prevents redundant cold-start requests)
  * 2. In-memory response caching for Frame-0 painting
  * 3. 12-second AbortController timeout per attempt
- * 4. Exponential backoff retry (up to 4 attempts total: initial + 3 retries with 1s, 2s, 3s backoff)
- * 5. Does NOT retry on valid successful responses (res.ok && json.success === true) even if data is []
- * 6. Immediate abort without retries when caller unmounts
+ * 4. Exponential backoff retry (up to 4 attempts total: 1 initial + 3 retries with 1s, 2s, 3s backoff)
+ * 5. Retry on suspicious empty array responses (success: true but 0 products)
+ * 6. Detailed debug console.warn logs on each failed attempt (attempt #, status, body length, reason)
+ * 7. Clean abort signal propagation when caller unmounts
  */
 
 const memoryCache = new Map();
@@ -55,7 +56,7 @@ function wait(ms, signal) {
 }
 
 /**
- * Fetch products with 12s timeout, 4 attempts total, deduplication, and caching.
+ * Fetch products with 12s timeout, 4 attempts total, deduplication, retry on empty, and caching.
  *
  * @param {string} url - Target API URL
  * @param {object} [options]
@@ -63,22 +64,24 @@ function wait(ms, signal) {
  * @param {number} [options.maxAttempts=4] - Total attempts (1 initial + up to 3 retries)
  * @param {number[]} [options.backoffDelays=[1000, 2000, 3000]] - Delays in ms between retries
  * @param {boolean} [options.forceRefresh=false] - Bypass cache and in-flight deduplication
+ * @param {boolean} [options.retryOnEmpty=true] - Retry if response contains an empty products array
  * @param {AbortSignal} [options.signal] - Caller abort signal (e.g. component unmount)
  * @param {string} [options.fallbackUrl] - Secondary URL if local server fails
  * @returns {Promise<Array>} Products array
  */
-export async function fetchProductsWithRetry(url, options = {}) {
+export async function fetchProducts(url, options = {}) {
   const {
     timeoutMs = 12000,
     maxAttempts = 4,
     backoffDelays = [1000, 2000, 3000],
     forceRefresh = false,
+    retryOnEmpty = true,
     signal: callerSignal,
     fallbackUrl,
   } = options;
 
   if (!url) {
-    throw new Error('fetchProductsWithRetry: url is required');
+    throw new Error('fetchProducts: url is required');
   }
 
   // 1. Return cached data immediately if available and refresh is not forced
@@ -111,8 +114,11 @@ export async function fetchProductsWithRetry(url, options = {}) {
       const handleCallerAbort = () => attemptController.abort();
       callerSignal?.addEventListener('abort', handleCallerAbort, { once: true });
 
+      let statusCode = 0;
+      let bodyLength = 0;
+
       try {
-        // Use requested URL, or fallbackUrl if local endpoint failed and fallbackUrl provided
+        // Use requested URL, or fallbackUrl if local endpoint failed on final attempt
         let targetUrl = url;
         if (attempt === maxAttempts && fallbackUrl && url.includes('localhost')) {
           targetUrl = fallbackUrl;
@@ -128,26 +134,41 @@ export async function fetchProductsWithRetry(url, options = {}) {
         clearTimeout(timeoutId);
         callerSignal?.removeEventListener('abort', handleCallerAbort);
 
+        statusCode = res.status;
+
         if (!res.ok) {
-          throw new Error(`HTTP error ${res.status}: ${res.statusText}`);
+          const rawText = await res.text().catch(() => '');
+          bodyLength = rawText.length;
+          throw new Error(`HTTP error ${res.status}: ${res.statusText || 'Failed'}`);
         }
 
-        const json = await res.json();
+        const rawText = await res.text();
+        bodyLength = rawText.length;
+
+        let json = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch (jsonErr) {
+          throw new Error(`Failed to parse JSON response (${bodyLength} bytes)`);
+        }
 
         // If backend explicitly returned success: false, treat as error to retry
         if (!json || json.success === false) {
-          throw new Error(json?.message || 'Server returned unsuccessful response');
+          throw new Error(json?.message || 'Server returned success: false');
         }
 
-        // Response is successful (res.ok && json.success === true)
-        // Note: Do NOT retry even if productsData is legitimately []
         const productsData = Array.isArray(json.data)
           ? json.data
           : Array.isArray(json)
           ? json
           : [];
 
-        // Save to cache
+        // Suspicious empty response check: a store that has products should not return empty array
+        if (retryOnEmpty && productsData.length === 0 && attempt < maxAttempts) {
+          throw new Error('API returned success: true with empty array (suspicious cold-start state)');
+        }
+
+        // Response is successful and valid
         memoryCache.set(url, productsData);
         if (targetUrl !== url) {
           memoryCache.set(targetUrl, productsData);
@@ -164,12 +185,15 @@ export async function fetchProductsWithRetry(url, options = {}) {
         }
 
         const isTimeout = timeoutFired || (err.name === 'AbortError' && timeoutFired);
-        lastError = isTimeout
-          ? new Error(`Request timed out after ${timeoutMs / 1000}s on attempt ${attempt}/${maxAttempts}`)
-          : err;
+        const reason = isTimeout
+          ? `Request timed out after ${timeoutMs / 1000}s`
+          : err.message || 'Unknown error';
 
+        lastError = isTimeout ? new Error(reason) : err;
+
+        // Requirement C: Debug logging for failed attempt
         console.warn(
-          `[productsApi] Attempt ${attempt}/${maxAttempts} failed for ${url}: ${lastError.message}`
+          `[productsApi] Attempt ${attempt}/${maxAttempts} failed for ${url} | Status: ${statusCode || 'NetworkError'} | BodyLength: ${bodyLength} | Reason: ${reason}`
         );
 
         // If more attempts remain, wait backoff delay before retrying
@@ -193,3 +217,7 @@ export async function fetchProductsWithRetry(url, options = {}) {
     inFlightRequests.delete(url);
   }
 }
+
+// Backward-compatible alias
+export const fetchProductsWithRetry = fetchProducts;
+export default fetchProducts;

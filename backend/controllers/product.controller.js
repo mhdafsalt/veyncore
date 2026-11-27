@@ -13,6 +13,13 @@ import Product, {
 export const getProducts = async (req, res) => {
   try {
     await connectDB();
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection is not ready. Please try again shortly.',
+        error: 'DATABASE_DISCONNECTED',
+      });
+    }
     const {
       category,
       subCategory,

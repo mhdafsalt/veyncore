@@ -221,7 +221,7 @@ const termsSections = [
           You confirm that you own or have the necessary rights to submit the Feedback and that it does not violate the rights of any third party, including copyright, trademark, privacy, or other legal rights.
         </p>
         <p>
-          VEYNCORE is not obligated to keep Feedback confidential, provide compensation, or respond to any submission unless otherwise required by law. We reserve the right to review, moderate, or remove Feedback that we consider unlawful, misleading, abusive, offensive, defamatory, spam-related, or in violation of these Terms &amp; Conditions or any third-party rights.
+          VEYNCORE is not obligated to keep Feedback confidential, provide compensation, or respond to any submission unless otherwise required by law. We reserve the right to review, moderate, or remove Feedback that we consider unlawful, misleading, abusive, offensive, defamatory, spam-related, or in violation of these Terms & Conditions or any third-party rights.
         </p>
         <p>
           You agree not to submit Feedback containing false information, harmful content, malicious software, or misleading identity details. You are solely responsible for the Feedback you provide and its accuracy. We are not endorse or accept responsibility for opinions, comments, or reviews submitted by customers or other third parties.
@@ -265,7 +265,7 @@ const termsSections = [
           <li>(c) To infringe upon the intellectual property rights of VEYNCORE or any third party.</li>
           <li>(d) To harass, abuse, threaten, insult, defame, or harm VEYNCORE, its employees, customers, or any other person.</li>
           <li>(e) To submit or transmit false, misleading, or inaccurate information.</li>
-          <li>(f) To upload, share, or distribute content that violates these Terms &amp; Conditions.</li>
+          <li>(f) To upload, share, or distribute content that violates these Terms & Conditions.</li>
           <li>(g) To send unsolicited advertisements, promotional messages, spam, or other unauthorised communications.</li>
           <li>(h) To impersonate another person, business, or organisation.</li>
           <li>(i) To engage in any activity that disrupts the website, affects other users, or causes harm to VEYNCORE or its Services.</li>
@@ -282,7 +282,7 @@ const termsSections = [
           <li>(f) Interfere with, bypass, or attempt to compromise the website’s security, access controls, or other protective features.</li>
         </ul>
         <p>
-          VEYNCORE reserves the right to restrict or suspend access to its website and Services, refuse service, or take appropriate legal action if any user violates these Terms &amp; Conditions, subject to applicable law.
+          VEYNCORE reserves the right to restrict or suspend access to its website and Services, refuse service, or take appropriate legal action if any user violates these Terms & Conditions, subject to applicable law.
         </p>
       </>
     ),
@@ -326,7 +326,7 @@ const termsSections = [
     content: (
       <>
         <p>
-          We may terminate these Terms &amp; Conditions or your access to the Services (or any part thereof) at our sole discretion, at any time, where permitted by applicable law. You will remain liable for all amounts due, obligations, or liabilities incurred up to and including the date of termination.
+          We may terminate these Terms & Conditions or your access to the Services (or any part thereof) at our sole discretion, at any time, where permitted by applicable law. You will remain liable for all amounts due, obligations, or liabilities incurred up to and including the date of termination.
         </p>
         <p>
           The following sections will continue to apply following any termination: Intellectual Property, Feedback, Termination, Disclaimer of Warranties, Limitation of Liability, Indemnification, Severability, Waiver; Entire Agreement, Assignment, Governing Law, Privacy Policy, and any other provisions that by their nature should survive termination.
@@ -380,7 +380,7 @@ const termsSections = [
           You agree to indemnify, defend, and hold harmless VEYNCORE, its owners, partners, directors, officers, employees, affiliates, agents, contractors, licensors, and service providers from and against any losses, damages, liabilities, claims, demands, or expenses, including reasonable legal fees, arising from or related to:
         </p>
         <ul>
-          <li>(1) Your breach of these Terms &amp; Conditions or any documents incorporated by reference;</li>
+          <li>(1) Your breach of these Terms & Conditions or any documents incorporated by reference;</li>
           <li>(2) Your violation of any applicable law, regulation, or the rights of any third party; or</li>
           <li>(3) Your misuse of or unauthorised access to the VEYNCORE website or Services.</li>
         </ul>
@@ -400,10 +400,10 @@ const termsSections = [
     content: (
       <>
         <p>
-          If any provision of these Terms &amp; Conditions is determined to be unlawful, void, or unenforceable under applicable law, such provision shall remain enforceable to the fullest extent permitted by law, and the unenforceable portion shall be deemed severed from these Terms &amp; Conditions. Such determination shall not affect the validity or enforceability of the remaining provisions.
+          If any provision of these Terms & Conditions is determined to be unlawful, void, or unenforceable under applicable law, such provision shall remain enforceable to the fullest extent permitted by law, and the unenforceable portion shall be deemed severed from these Terms & Conditions. Such determination shall not affect the validity or enforceability of the remaining provisions.
         </p>
         <p>
-          Nothing in these Terms &amp; Conditions shall limit or exclude any rights or remedies available to you under applicable consumer protection laws or any other laws that cannot be waived by contract. If any provision of these Terms conflicts with such rights, the applicable legal rights shall prevail.
+          Nothing in these Terms & Conditions shall limit or exclude any rights or remedies available to you under applicable consumer protection laws or any other laws that cannot be waived by contract. If any provision of these Terms conflicts with such rights, the applicable legal rights shall prevail.
         </p>
       </>
     ),
@@ -415,13 +415,13 @@ const termsSections = [
     content: (
       <>
         <p>
-          The failure of VEYNCORE to exercise or enforce any right or provision of these Terms &amp; Conditions shall not constitute a waiver of such right or provision.
+          The failure of VEYNCORE to exercise or enforce any right or provision of these Terms & Conditions shall not constitute a waiver of such right or provision.
         </p>
         <p>
-          These Terms &amp; Conditions, together with our Privacy Policy, Shipping Policy, Refund, Return &amp; Cancellation Policy, and any other policies or operating rules published on our website, constitute the entire agreement and understanding between you and VEYNCORE and govern your access to and use of our Services. They supersede all prior or contemporaneous agreements, communications, and proposals, whether oral or written, relating to the subject matter of these Terms &amp; Conditions.
+          These Terms & Conditions, together with our Privacy Policy, Shipping Policy, Refund, Return & Cancellation Policy, and any other policies or operating rules published on our website, constitute the entire agreement and understanding between you and VEYNCORE and govern your access to and use of our Services. They supersede all prior or contemporaneous agreements, communications, and proposals, whether oral or written, relating to the subject matter of these Terms & Conditions.
         </p>
         <p>
-          Any ambiguity in the interpretation of these Terms &amp; Conditions shall not automatically be interpreted against the party responsible for drafting them. Nothing in this section shall override any rights or protections available under applicable law.
+          Any ambiguity in the interpretation of these Terms & Conditions shall not automatically be interpreted against the party responsible for drafting them. Nothing in this section shall override any rights or protections available under applicable law.
         </p>
       </>
     ),
@@ -432,7 +432,7 @@ const termsSections = [
     number: 21,
     content: (
       <p>
-        You may not delegate, transfer, or assign these Terms &amp; Conditions or any of your rights or obligations under these Terms without the prior written consent of VEYNCORE. Any unauthorised attempt to do so shall be null and void. VEYNCORE may transfer, assign, or delegate these Terms &amp; Conditions and its rights and obligations without your prior consent or notice, subject to applicable law.
+        You may not delegate, transfer, or assign these Terms & Conditions or any of your rights or obligations under these Terms without the prior written consent of VEYNCORE. Any unauthorised attempt to do so shall be null and void. VEYNCORE may transfer, assign, or delegate these Terms & Conditions and its rights and obligations without your prior consent or notice, subject to applicable law.
       </p>
     ),
   },
@@ -443,7 +443,7 @@ const termsSections = [
     content: (
       <>
         <p>
-          These Terms &amp; Conditions shall be governed by and interpreted in accordance with the laws of India, without regard to conflict-of-law principles.
+          These Terms & Conditions shall be governed by and interpreted in accordance with the laws of India, without regard to conflict-of-law principles.
         </p>
         <p>
           You and VEYNCORE agree that any disputes arising out of or relating to these Terms or your use of the Services shall be subject to the jurisdiction of the competent courts in Kerala, India, subject to applicable law. Nothing in this section limits any rights you may have to bring claims before a competent consumer forum or rely on mandatory legal protections available under applicable Indian law.
@@ -457,7 +457,7 @@ const termsSections = [
     number: 23,
     content: (
       <p>
-        These Terms &amp; Conditions may be made available in languages other than English for your convenience. In the event of any inconsistency or conflict between the English version and any translated version, the English version shall prevail to the extent permitted by applicable law. Any disputes arising out of these Terms &amp; Conditions shall be interpreted in accordance with the English version, subject to applicable law.
+        These Terms & Conditions may be made available in languages other than English for your convenience. In the event of any inconsistency or conflict between the English version and any translated version, the English version shall prevail to the extent permitted by applicable law. Any disputes arising out of these Terms & Conditions shall be interpreted in accordance with the English version, subject to applicable law.
       </p>
     ),
   },
@@ -467,7 +467,7 @@ const termsSections = [
     number: 24,
     content: (
       <p>
-        The headings used in these Terms &amp; Conditions are included for convenience and reference purposes only and shall not limit, define, or otherwise affect the interpretation of any provision of these Terms.
+        The headings used in these Terms & Conditions are included for convenience and reference purposes only and shall not limit, define, or otherwise affect the interpretation of any provision of these Terms.
       </p>
     ),
   },
@@ -477,7 +477,7 @@ const termsSections = [
     number: 25,
     content: (
       <p>
-        By using the VEYNCORE Services, contacting us, or placing an order, you agree that we may communicate with you electronically through WhatsApp, email, telephone, SMS, or other available communication channels. Such communications may relate to your orders, payments, delivery updates, returns, exchanges, customer support, these Terms &amp; Conditions, or other service-related matters. You are responsible for providing accurate and up-to-date contact information to ensure that you receive relevant communications.
+        By using the VEYNCORE Services, contacting us, or placing an order, you agree that we may communicate with you electronically through WhatsApp, email, telephone, SMS, or other available communication channels. Such communications may relate to your orders, payments, delivery updates, returns, exchanges, customer support, these Terms & Conditions, or other service-related matters. You are responsible for providing accurate and up-to-date contact information to ensure that you receive relevant communications.
       </p>
     ),
   },
@@ -488,13 +488,13 @@ const termsSections = [
     content: (
       <>
         <p>
-          You may review the most current version of these Terms &amp; Conditions at any time on this page.
+          You may review the most current version of these Terms & Conditions at any time on this page.
         </p>
         <p>
-          We reserves the right, at its discretion, to update, modify, or replace any part of these Terms &amp; Conditions by publishing the revised version on our website. It is your responsibility to review this page periodically for any changes.
+          We reserves the right, at its discretion, to update, modify, or replace any part of these Terms & Conditions by publishing the revised version on our website. It is your responsibility to review this page periodically for any changes.
         </p>
         <p>
-          Where required by applicable law, we will notify you of material changes and specify the date on which such changes become effective. Your continued use of or access to the VEYNCORE Services after the revised Terms &amp; Conditions have been published shall constitute acceptance of those changes, to the extent permitted by applicable law.
+          Where required by applicable law, we will notify you of material changes and specify the date on which such changes become effective. Your continued use of or access to the VEYNCORE Services after the revised Terms & Conditions have been published shall constitute acceptance of those changes, to the extent permitted by applicable law.
         </p>
       </>
     ),

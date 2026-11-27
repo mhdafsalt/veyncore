@@ -242,6 +242,27 @@ function ObjectCardItem({ product }) {
 // In-memory module cache for instant Frame-0 painting
 let cachedObjectsAllDropsProducts = null;
 
+const SWR_OBJECTS_CACHE_KEY = 'veyn_objects_all_drops_products_v1';
+
+const getStoredObjectsProducts = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(SWR_OBJECTS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const setStoredObjectsProducts = (products) => {
+  if (typeof window === 'undefined' || !Array.isArray(products) || products.length === 0) return;
+  try {
+    sessionStorage.setItem(SWR_OBJECTS_CACHE_KEY, JSON.stringify(products));
+  } catch (e) {}
+};
+
 /**
  * Inner Collection Component that consumes URL Search Params
  */
@@ -251,14 +272,26 @@ function ObjectsAllDropsContent() {
 
   const objectsApiUrl = `${API_BASE_URL}/api/products?category=VEYN-OBJECTS&limit=100`;
 
-  const [productsList, setProductsList] = useState(
-    () => getCachedProducts(objectsApiUrl) || cachedObjectsAllDropsProducts || []
-  );
+  const [productsList, setProductsList] = useState(() => {
+    return cachedObjectsAllDropsProducts || [];
+  });
   const [fetchError, setFetchError] = useState(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [isLoading, setIsLoading] = useState(
-    () => !getCachedProducts(objectsApiUrl) && (!cachedObjectsAllDropsProducts || cachedObjectsAllDropsProducts.length === 0)
-  );
+  const [isLoading, setIsLoading] = useState(() => {
+    return !cachedObjectsAllDropsProducts || cachedObjectsAllDropsProducts.length === 0;
+  });
+
+  // Hydrate stored cache on client mount to guarantee exact SSR match
+  useEffect(() => {
+    if (!cachedObjectsAllDropsProducts) {
+      const stored = getStoredObjectsProducts();
+      if (stored && stored.length > 0) {
+        cachedObjectsAllDropsProducts = stored;
+        setProductsList(stored);
+        setIsLoading(false);
+      }
+    }
+  }, []);
 
   // Read initial category filter from URL search params (e.g. ?category=bags)
   const initialCategoryParam = searchParams.get('category')?.toLowerCase().trim() || 'all';
@@ -300,12 +333,13 @@ function ObjectsAllDropsContent() {
           maxAttempts: 4,
           backoffDelays: [1000, 2000, 3000],
           forceRefresh: reloadKey > 0,
+          retryOnEmpty: true,
           signal: abortController.signal,
           fallbackUrl: `https://veyncorein.vercel.app/api/products?category=VEYN-OBJECTS&limit=100`,
         });
 
         if (isMounted) {
-          if (Array.isArray(data)) {
+          if (Array.isArray(data) && data.length > 0) {
             const mapped = data.map((p) => ({
               id: p._id || p.id,
               title: p.title,
@@ -324,14 +358,21 @@ function ObjectsAllDropsContent() {
               createdAt: p.createdAt || new Date().toISOString(),
             }));
             cachedObjectsAllDropsProducts = mapped;
+            setStoredObjectsProducts(mapped);
             setProductsList(mapped);
+            setFetchError(null);
+          } else if (Array.isArray(data) && data.length === 0) {
+            if (!cachedObjectsAllDropsProducts && !getStoredObjectsProducts()) {
+              setProductsList([]);
+            }
           }
-          setFetchError(null);
         }
       } catch (err) {
         if (isMounted && err.name !== 'AbortError') {
-          console.error('[ObjectsAllDrops] Failed to load products after retries:', err);
-          setFetchError(err);
+          console.warn('[ObjectsAllDrops] Failed to load products after all retries:', err.message);
+          if (!productsList || productsList.length === 0) {
+            setFetchError(err);
+          }
         }
       } finally {
         if (isMounted) {
@@ -1033,7 +1074,7 @@ function ObjectsAllDropsContent() {
           />
           <div className="obj-all-drawer__content">
             <div className="obj-all-drawer__header">
-              <h2 className="obj-all-drawer__title">Filters &amp; Sort</h2>
+              <h2 className="obj-all-drawer__title">Filters & Sort</h2>
               <button
                 type="button"
                 className="obj-all-drawer__close"

@@ -915,7 +915,7 @@ export default function AuthPage() {
                     className="auth-button auth-button--primary auth-button--full"
                     disabled={submitting}
                   >
-                    <span>{submitting ? 'VERIFYING...' : 'VERIFY &amp; SIGN IN'}</span>
+                    <span>{submitting ? 'VERIFYING...' : 'VERIFY & SIGN IN'}</span>
                   </button>
                 </>
               )}
