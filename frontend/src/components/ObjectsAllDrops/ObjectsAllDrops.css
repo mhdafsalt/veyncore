@@ -1147,15 +1147,20 @@
   }
 
   .obj-all__grid-switch--mobile .obj-all__grid-btn {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     border: 1px solid #e5e7eb;
-    border-radius: 4px;
+    border-radius: 3px;
     background: #ffffff;
     color: #64748b;
     outline: none;
     -webkit-tap-highlight-color: transparent;
     transition: all 0.2s ease;
+  }
+
+  .obj-all__grid-switch--mobile .obj-all__grid-btn svg {
+    width: 13px;
+    height: 13px;
   }
 
   .obj-all__grid-switch--mobile .obj-all__grid-btn--active {
