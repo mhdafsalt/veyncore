@@ -21,7 +21,14 @@ export const authenticate = async (req, res, next) => {
       });
     }
 
-    const secret = process.env.JWT_SECRET || 'veyncore_syndicate_secret_jwt_key_2026_super_secure';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('[Auth Middleware] Critical configuration error: JWT_SECRET environment variable is missing.');
+      return res.status(500).json({
+        success: false,
+        message: 'Authentication service configuration error. Please contact administrator.',
+      });
+    }
 
     let decoded;
     try {

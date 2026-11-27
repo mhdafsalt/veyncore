@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { fetchProducts } from '@/lib/productsApi';
 import { API_BASE_URL, WHATSAPP_NUMBER } from '@/lib/constants';
 import './Navbar.css';
 
@@ -32,15 +33,22 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
   const lastScrollYRef = useRef(0);
   const scrollDeltaRef = useRef(0);
 
-  // Fetch real catalog products & dynamic tags on mount for instant search preview
+  // Fetch catalog products & dynamic tags on mount using deduplicated productsApi
   useEffect(() => {
     let isMounted = true;
+    const abortController = new AbortController();
+
     const fetchSearchData = async () => {
       try {
-        const prodRes = await fetch(`${API_BASE_URL}/api/products?limit=16`);
-        const prodJson = await prodRes.json();
-        if (isMounted && prodRes.ok && prodJson.success && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
-          const formatted = prodJson.data.map((p) => {
+        const prodData = await fetchProducts(`${API_BASE_URL}/api/products?limit=16`, {
+          timeoutMs: 10000,
+          maxAttempts: 3,
+          retryOnEmpty: false,
+          signal: abortController.signal,
+        });
+
+        if (isMounted && Array.isArray(prodData) && prodData.length > 0) {
+          const formatted = prodData.map((p) => {
             const rawPrice = p.price ?? p.salePrice ?? 1299;
             const rawCompare = p.comparePrice ?? p.regularPrice ?? null;
             return {
@@ -67,13 +75,14 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
           }
         }
       } catch (e) {
-        // Fallback silently
+        // Fallback silently if aborted or error
       }
     };
 
     fetchSearchData();
     return () => {
       isMounted = false;
+      abortController.abort();
     };
   }, []);
 

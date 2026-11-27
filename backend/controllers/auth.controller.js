@@ -1,21 +1,35 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'veyncore_syndicate_secret_jwt_key_2026_super_secure';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+/**
+ * Get JWT Secret from environment variables with fail-safe validation.
+ * Never falls back to hardcoded strings in source code.
+ */
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is not configured.');
+  }
+  return secret;
+};
+
+const getJwtExpiresIn = () => {
+  return process.env.JWT_EXPIRES_IN || '7d';
+};
 
 /**
  * Generate a JWT token containing user ID and role
  */
 const generateToken = (user) => {
+  const secret = getJwtSecret();
   return jwt.sign(
     {
       id: user._id,
       role: user.role,
     },
-    JWT_SECRET,
+    secret,
     {
-      expiresIn: JWT_EXPIRES_IN,
+      expiresIn: getJwtExpiresIn(),
     }
   );
 };

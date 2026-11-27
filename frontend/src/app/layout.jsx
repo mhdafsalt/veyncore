@@ -6,8 +6,61 @@ import AuthModal from '@/components/Account/AuthModal';
 import WhatsAppCheckoutModal from '@/components/Checkout/WhatsAppCheckoutModal';
 
 export const metadata = {
-  title: 'Veyncore',
-  description: 'Official Veyncore Store',
+  metadataBase: new URL('https://veyncore.in'),
+  title: {
+    default: 'VEYNCORE | Contemporary Luxury Denim & Utilitarian Streetwear',
+    template: '%s | VEYNCORE',
+  },
+  description:
+    'Official VEYNCORE Store. Contemporary tailored raw denim, structured silhouettes, baggy jeans, semi bootcut cuts, and premium utilitarian streetwear craftsmanship.',
+  keywords: [
+    'VEYNCORE',
+    'raw denim',
+    'selvedge denim',
+    'baggy jeans',
+    'bootcut denim',
+    'streetwear india',
+    'luxury streetwear',
+    'utilitarian fashion',
+    'kerala streetwear',
+  ],
+  authors: [{ name: 'VEYNCORE' }],
+  creator: 'VEYNCORE',
+  publisher: 'VEYNCORE',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: 'https://veyncore.in',
+  },
+  openGraph: {
+    title: 'VEYNCORE | Contemporary Luxury Denim & Utilitarian Streetwear',
+    description:
+      'Official VEYNCORE Store. Handcrafted raw selvedge denim, structured silhouettes, and luxury utility artifacts.',
+    url: 'https://veyncore.in',
+    siteName: 'VEYNCORE',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: 'https://res.cloudinary.com/sod0mks1/image/upload/f_auto,q_auto,w_1200,c_limit/v1795542507/veyncore_uploads/heroimg01-1795542507039-6510.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'VEYNCORE Luxury Streetwear & Raw Denim',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VEYNCORE | Contemporary Luxury Denim & Streetwear',
+    description:
+      'Official VEYNCORE Store. Handcrafted raw selvedge denim and luxury utility artifacts.',
+    images: [
+      'https://res.cloudinary.com/sod0mks1/image/upload/f_auto,q_auto,w_1200,c_limit/v1795542507/veyncore_uploads/heroimg01-1795542507039-6510.jpg',
+    ],
+  },
   icons: {
     icon: [
       { url: '/icons/favicon.svg', type: 'image/svg+xml' },
@@ -69,6 +122,49 @@ export default function RootLayout({ children }) {
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
           />
         </noscript>
+        {/* Schema.org Organization and WebSite Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://veyncore.in/#organization',
+                  name: 'VEYNCORE',
+                  url: 'https://veyncore.in',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: 'https://veyncore.in/images/veyncoreLogo_black.svg',
+                  },
+                  sameAs: ['https://www.instagram.com/veyncore'],
+                  contactPoint: {
+                    '@type': 'ContactPoint',
+                    telephone: '+91-8848419616',
+                    contactType: 'customer service',
+                    areaServed: 'IN',
+                    availableLanguage: ['en', 'ml'],
+                  },
+                },
+                {
+                  '@type': 'WebSite',
+                  '@id': 'https://veyncore.in/#website',
+                  url: 'https://veyncore.in',
+                  name: 'VEYNCORE',
+                  publisher: {
+                    '@id': 'https://veyncore.in/#organization',
+                  },
+                  potentialAction: {
+                    '@type': 'SearchAction',
+                    target: 'https://veyncore.in/collections/all-drops?search={search_term_string}',
+                    'query-input': 'required name=search_term_string',
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body>
         <AuthProvider>

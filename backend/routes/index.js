@@ -7,6 +7,7 @@ import uploadRoutes from './upload.routes.js';
 import healthRoutes from './health.routes.js';
 import analyticsRoutes from './analytics.routes.js';
 import launchSaleRoutes from './launchSale.routes.js';
+import orderRoutes from './order.routes.js';
 
 const router = Router();
 
@@ -14,6 +15,7 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
 router.use('/products', productRoutes);
+router.use('/orders', orderRoutes);
 router.use('/content', contentRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/health', healthRoutes);

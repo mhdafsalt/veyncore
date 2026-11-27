@@ -160,41 +160,18 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  // Instant Demo Quick Login
+  // Demo login (Disabled in production - requires real backend authentication)
   const loginDemo = async () => {
-    const demoUser = {
-      id: 'usr_demo_member',
-      name: 'Veyn Member',
-      email: 'member@veyncore.com',
-      role: 'user',
-      mobileNumber: '+91 98765 43210',
-      vipNotifications: true,
-    };
-    setUser(demoUser);
-    try {
-      localStorage.setItem('veyncore_user', JSON.stringify(demoUser));
-    } catch (e) {}
-    return { success: true, user: demoUser };
+    throw new Error(
+      'Demo login is disabled. Please sign in using your registered email and password for a secure, verified session.'
+    );
   };
 
-  // Mobile OTP Login
+  // Mobile OTP Login (Disabled until real SMS/OTP provider is integrated)
   const loginWithOtp = async (phone, otp) => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    const otpUser = {
-      id: `usr_${Date.now()}`,
-      name: 'VERIFIED MEMBER',
-      email: `${phone.replace(/\D/g, '')}@veyncore.member`,
-      mobileNumber: phone,
-      role: 'user',
-      vipNotifications: true,
-    };
-    setUser(otpUser);
-    try {
-      localStorage.setItem('veyncore_user', JSON.stringify(otpUser));
-    } catch (e) {
-      console.warn('Could not save user', e);
-    }
-    return { success: true, user: otpUser };
+    throw new Error(
+      'Mobile OTP login is temporarily unavailable. Please sign in with your email and password.'
+    );
   };
 
   // Logout
@@ -210,17 +187,18 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Forgot Password Reset
+  // Password Reset (Disabled until transactional email service is configured)
   const requestPasswordReset = async (email) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return { success: true, message: `Reset link has been sent to ${email}` };
+    throw new Error(
+      'Automated email password reset is temporarily unavailable. Please contact VEYNCORE Support via WhatsApp (+91 94463 91166) to verify your account and reset your password.'
+    );
   };
 
   const value = {
     user,
     token,
-    isAuthenticated: Boolean(user),
-    isAdmin: user?.role === 'admin',
+    isAuthenticated: Boolean(user && token),
+    isAdmin: Boolean(user && token && user?.role === 'admin'),
     isLoading,
     orders,
     addresses,

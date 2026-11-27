@@ -469,22 +469,6 @@ export default function AuthPage() {
             </Link>
           </div>
 
-          {/* Quick Demo Login Pill */}
-          <div className="auth-card__demo-banner">
-            <div className="auth-card__demo-copy">
-              <span className="auth-card__demo-badge">DEV DEMO</span>
-              <span>Test with a pre-configured VIP Syndicate Account</span>
-            </div>
-            <button
-              type="button"
-              className="auth-card__demo-button"
-              onClick={handleDemoLogin}
-              disabled={submitting}
-            >
-              {submitting ? 'LOGGING IN...' : '⚡ 1-CLICK DEMO LOGIN'}
-            </button>
-          </div>
-
           {/* Mode Switcher Tabs (Sign In / Register) */}
           {(mode === 'login' || mode === 'register') && (
             <div className="auth-card__tabs">
@@ -781,47 +765,25 @@ export default function AuthPage() {
              MODE 3: FORGOT PASSWORD
              ============================================================== */}
           {mode === 'forgot' && (
-            <form noValidate className="auth-form" onSubmit={handleForgotSubmit}>
+            <div className="auth-form">
               <div className="auth-form__header">
                 <h2 className="auth-form__title">RESET YOUR PASSWORD</h2>
                 <p className="auth-form__subtitle">
-                  We will send you a secure link to your email to reset your account password.
+                  Automated email password reset is temporarily unavailable. Please contact VEYNCORE Support directly via WhatsApp with your registered email to reset your credentials.
                 </p>
               </div>
 
-              {forgotSuccess ? (
-                <div className="auth-card__alert auth-card__alert--success">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>{forgotSuccess}</span>
-                </div>
-              ) : (
-                <>
-                  <div className="auth-form__group">
-                    <label className="auth-form__label" htmlFor="forgot-email">
-                      EMAIL ADDRESS <span className="auth-form__required">*</span>
-                    </label>
-                    <input
-                      id="forgot-email"
-                      type="email"
-                      className="auth-form__input"
-                      placeholder="Enter registered email"
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="auth-button auth-button--primary auth-button--full"
-                    disabled={submitting}
-                  >
-                    <span>{submitting ? 'SENDING...' : 'SEND RESET LINK'}</span>
-                  </button>
-                </>
-              )}
+              <div style={{ textAlign: 'center', margin: '24px 0' }}>
+                <a
+                  href="https://wa.me/919446391166?text=Hello%20VEYNCORE%20Support%2C%20I%20need%20help%20resetting%20my%20account%20password."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="auth-button auth-button--primary auth-button--full"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}
+                >
+                  CONTACT SUPPORT VIA WHATSAPP
+                </a>
+              </div>
 
               <div className="auth-form__switch-footer">
                 <button
@@ -836,89 +798,33 @@ export default function AuthPage() {
                   ← Return to Sign In
                 </button>
               </div>
-            </form>
+            </div>
           )}
 
           {/* ==============================================================
              MODE 4: MOBILE OTP SIGN IN
              ============================================================== */}
           {mode === 'otp' && (
-            <form
-              className="auth-form"
-              onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}
-            >
+            <div className="auth-form">
               <div className="auth-form__header">
                 <h2 className="auth-form__title">SIGN IN WITH OTP</h2>
                 <p className="auth-form__subtitle">
-                  {otpSent
-                    ? `Enter the 4-digit verification code sent to +91 ${otpPhone}.`
-                    : 'Enter your 10-digit mobile number to receive a secure login code.'}
+                  Mobile OTP authentication is temporarily under maintenance. Please use your email and password to log in.
                 </p>
               </div>
 
-              {!otpSent ? (
-                <>
-                  <div className="auth-form__group">
-                    <label className="auth-form__label" htmlFor="otp-phone">
-                      MOBILE NUMBER <span className="auth-form__required">*</span>
-                    </label>
-                    <div className="auth-form__phone-wrapper">
-                      <span className="auth-form__phone-prefix">+91</span>
-                      <input
-                        id="otp-phone"
-                        type="tel"
-                        className="auth-form__input auth-form__input--phone"
-                        placeholder="98765 43210"
-                        value={otpPhone}
-                        onChange={(e) => setOtpPhone(e.target.value)}
-                        required
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="auth-button auth-button--primary auth-button--full"
-                  >
-                    <span>GET VERIFICATION CODE</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="auth-form__group">
-                    <label className="auth-form__label">
-                      4-DIGIT CODE <span className="auth-form__required">*</span>
-                    </label>
-                    <div className="auth-form__otp-row">
-                      {[0, 1, 2, 3].map((idx) => (
-                        <input
-                          key={idx}
-                          id={`otp-input-${idx}`}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          className="auth-form__otp-digit"
-                          value={otpCode[idx]}
-                          onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
-                          autoFocus={idx === 0}
-                        />
-                      ))}
-                    </div>
-                    <span className="auth-form__hint">
-                      Demo Code: Enter <strong>1234</strong> or any 4 digits.
-                    </span>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="auth-button auth-button--primary auth-button--full"
-                    disabled={submitting}
-                  >
-                    <span>{submitting ? 'VERIFYING...' : 'VERIFY & SIGN IN'}</span>
-                  </button>
-                </>
-              )}
+              <div style={{ textAlign: 'center', margin: '24px 0' }}>
+                <button
+                  type="button"
+                  className="auth-button auth-button--primary auth-button--full"
+                  onClick={() => {
+                    setMode('login');
+                    setError('');
+                  }}
+                >
+                  SIGN IN WITH EMAIL & PASSWORD
+                </button>
+              </div>
 
               <div className="auth-form__switch-footer">
                 <button
@@ -933,6 +839,8 @@ export default function AuthPage() {
                   ← Return to Email Sign In
                 </button>
               </div>
+            </div>
+          )}
             </form>
           )}
         </div>

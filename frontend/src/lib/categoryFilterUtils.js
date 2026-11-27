@@ -59,6 +59,23 @@ export function matchProductCategory(product, targetCategory) {
   const fitSlug = toCategorySlug(pFit);
   const swipeSlug = toCategorySlug(pSwipe);
 
+  // Strict separation: VEYN-SELECTS and VEYN-OBJECTS are completely independent
+  const isObjectTarget = [
+    'bags', 'chains', 'caps', 'shades', 'bracelets', 'hardware', 'eyewear', 'headwear'
+  ].includes(targetSlug);
+  const isSelectsTarget = [
+    'denims', 'denim', 'baggy', 'bootcut', 'wide', 'wideleg', 'straight', 'cargo', 'tops', 'top', 'tees'
+  ].includes(targetSlug);
+
+  const isObjectProduct = Boolean(product?.isObject || pCat === 'VEYN-OBJECTS');
+
+  if (isObjectProduct && isSelectsTarget) {
+    return false;
+  }
+  if (!isObjectProduct && isObjectTarget) {
+    return false;
+  }
+
   // 1. Direct or slug equality on any category field
   if (
     pSub === targetRaw ||
@@ -84,8 +101,9 @@ export function matchProductCategory(product, targetCategory) {
 
   // 3. Domain-Specific Streetwear Category Mappings
 
-  // --- TOPS (Tees, T-shirts, Hoodies, Shirts, Jackets) ---
+  // --- TOPS (Tees, T-shirts, Hoodies, Shirts, Jackets, Sweaters) ---
   if (targetSlug === 'top' || targetSlug === 'tops' || targetSlug === 'tees' || targetSlug === 'tee') {
+    if (isObjectProduct) return false;
     return (
       subSlug.includes('top') ||
       fitSlug.includes('top') ||
@@ -93,12 +111,14 @@ export function matchProductCategory(product, targetCategory) {
       subSlug.includes('shirt') ||
       subSlug.includes('hoodie') ||
       subSlug.includes('jacket') ||
-      /\b(top|tops|tee|tees|t-shirt|shirt|hoodie|jacket|sweater)\b/i.test(pTitle)
+      subSlug.includes('sweater') ||
+      /\b(top|tops|tee|tees|t-shirt|shirt|hoodie|jacket|sweater|knit|polo)\b/i.test(pTitle)
     );
   }
 
-  // --- DENIMS (All denim fits & pants; strictly excludes tops) ---
+  // --- DENIMS (All denim fits & pants; strictly excludes tops & accessories) ---
   if (targetSlug === 'denim' || targetSlug === 'denims') {
+    if (isObjectProduct) return false;
     const isTopItem =
       subSlug.includes('top') ||
       fitSlug.includes('top') ||
@@ -108,20 +128,33 @@ export function matchProductCategory(product, targetCategory) {
       /\b(top|tops|tee|tees|t-shirt|shirt|hoodie|jacket)\b/i.test(pTitle);
     if (isTopItem) return false;
 
+    if (subSlug.includes('accessory') || subSlug.includes('accessories')) return false;
+
     return (
-      pCat === 'VEYN-SELECTS' ||
       subSlug.includes('denim') ||
+      fitSlug.includes('denim') ||
+      subSlug.includes('jean') ||
+      fitSlug.includes('jean') ||
       subSlug.includes('baggy') ||
+      fitSlug.includes('baggy') ||
       subSlug.includes('bootcut') ||
+      fitSlug.includes('bootcut') ||
       subSlug.includes('wide') ||
+      fitSlug.includes('wide') ||
       subSlug.includes('straight') ||
       subSlug.includes('stright') ||
-      subSlug.includes('cargo')
+      fitSlug.includes('straight') ||
+      fitSlug.includes('stright') ||
+      subSlug.includes('cargo') ||
+      fitSlug.includes('cargo') ||
+      /\b(denim|jean|jeans|pant|pants|trousers|bottoms|baggy|bootcut|wide|straight|cargo)\b/i.test(pTitle) ||
+      (pCat === 'VEYN-SELECTS' && (subSlug === '' || subSlug === 'denims'))
     );
   }
 
   // --- WIDE / WIDE LEG ---
-  if (targetSlug === 'wide' || targetSlug === 'wideleg') {
+  if (targetSlug === 'wide' || targetSlug === 'wideleg' || targetSlug === 'wide-leg') {
+    if (isObjectProduct) return false;
     return (
       subSlug.includes('wide') ||
       fitSlug.includes('wide') ||
@@ -132,6 +165,7 @@ export function matchProductCategory(product, targetCategory) {
 
   // --- BAGGY ---
   if (targetSlug === 'baggy' || targetSlug === 'baggies') {
+    if (isObjectProduct) return false;
     return (
       subSlug.includes('baggy') ||
       fitSlug.includes('baggy') ||
@@ -142,6 +176,7 @@ export function matchProductCategory(product, targetCategory) {
 
   // --- BOOTCUT ---
   if (targetSlug === 'bootcut' || targetSlug === 'boot') {
+    if (isObjectProduct) return false;
     return (
       subSlug.includes('boot') ||
       fitSlug.includes('boot') ||
@@ -152,6 +187,7 @@ export function matchProductCategory(product, targetCategory) {
 
   // --- STRAIGHT / STRIGHT ---
   if (targetSlug === 'straight' || targetSlug === 'stright') {
+    if (isObjectProduct) return false;
     return (
       subSlug.includes('straight') ||
       subSlug.includes('stright') ||
@@ -165,6 +201,7 @@ export function matchProductCategory(product, targetCategory) {
 
   // --- CARGO ---
   if (targetSlug === 'cargo' || targetSlug === 'cargos') {
+    if (isObjectProduct) return false;
     return (
       subSlug.includes('cargo') ||
       fitSlug.includes('cargo') ||

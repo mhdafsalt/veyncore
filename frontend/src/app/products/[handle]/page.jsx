@@ -113,8 +113,45 @@ export default async function ProductDetailPage({ params }) {
       ? 'VEYN-OBJECTS'
       : 'VEYN-SELECTS';
 
+  const priceValue = activeLaunchSale?.salePrice || product.price || 0;
+  const inStock = (product.stockQuantity ?? 10) > 0;
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    image: product.images?.length
+      ? product.images
+      : [product.thumbnail || '/images/products/artic-blue-wide.jpg'],
+    description: product.description || `${product.title} by VEYNCORE`,
+    sku: product.sku || String(product._id || ''),
+    brand: {
+      '@type': 'Brand',
+      name: 'VEYNCORE',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://veyncore.in/products/${encodeURIComponent(product.handle || handle)}`,
+      priceCurrency: 'INR',
+      price: priceValue,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: inStock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'VEYNCORE',
+      },
+    },
+  };
+
   return (
     <main className="product-page-wrapper">
+      {/* Schema.org Product Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+
       {/* 1. Header with AnnouncementBar, Navbar, MainCategories & SubCategories */}
       <StoreHeader initialCategory={initialCat} />
 

@@ -57,6 +57,10 @@ launchSaleSchema.methods.calculateCurrentStatus = function () {
   return 'active';
 };
 
+// Indexes for fast active sale queries and countdown timers
+launchSaleSchema.index({ status: 1, startDateTime: 1, endDateTime: 1 });
+launchSaleSchema.index({ productId: 1, status: 1 });
+
 const LaunchSale = mongoose.models.LaunchSale || mongoose.model('LaunchSale', launchSaleSchema);
 
 export default LaunchSale;

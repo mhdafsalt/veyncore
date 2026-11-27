@@ -55,6 +55,10 @@ const subcategorySchema = new mongoose.Schema(
   }
 );
 
+// Compound indexes for storefront subcategory navigation
+subcategorySchema.index({ mainCategory: 1, active: 1, sortOrder: 1 });
+subcategorySchema.index({ slug: 1 });
+
 const Subcategory =
   mongoose.models.Subcategory || mongoose.model('Subcategory', subcategorySchema);
 

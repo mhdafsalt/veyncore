@@ -731,51 +731,31 @@ export default function AuthModal() {
                 <div className="auth-modal__sub-header">
                   <h3 className="auth-modal__title">RESET PASSWORD</h3>
                   <p className="auth-modal__subtext">
-                    Enter your registered email and we will send you instructions to reset your password.
+                    Automated email password reset is temporarily unavailable. Please contact our support desk directly via WhatsApp with your registered email to reset your account password securely.
                   </p>
                 </div>
 
-                <form noValidate onSubmit={handleForgotSubmit} className="auth-modal__form">
-                  <div className={`auth-modal__floating-field ${fieldErrors.forgotEmail ? 'auth-modal__floating-field--error' : ''}`}>
-                    <input
-                      id="modal-forgot-email"
-                      type="email"
-                      className="auth-modal__floating-input"
-                      placeholder=" "
-                      value={forgotEmail}
-                      onChange={(e) => {
-                        setForgotEmail(e.target.value);
-                        if (fieldErrors.forgotEmail) {
-                          setFieldErrors((prev) => ({ ...prev, forgotEmail: '' }));
-                        }
-                      }}
-                    />
-                    <label className="auth-modal__floating-label" htmlFor="modal-forgot-email">
-                      Registered Email
-                    </label>
-                    {fieldErrors.forgotEmail && (
-                      <span className="auth-modal__field-error">{fieldErrors.forgotEmail}</span>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
+                <div style={{ textAlign: 'center', marginTop: '16px', marginBottom: '20px' }}>
+                  <a
+                    href="https://wa.me/919446391166?text=Hello%20VEYNCORE%20Support%2C%20I%20need%20help%20resetting%20my%20account%20password."
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="auth-modal__btn auth-modal__btn--primary"
-                    disabled={submitting}
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none' }}
                   >
-                    {submitting ? 'SENDING...' : 'SEND RESET LINK'}
-                  </button>
+                    CONTACT SUPPORT VIA WHATSAPP
+                  </a>
+                </div>
 
-                  <div className="auth-modal__back-link">
-                    <button
-                      type="button"
-                      className="auth-modal__text-link"
-                      onClick={() => setAuthModalMode('login')}
-                    >
-                      ← Back to Sign In
-                    </button>
-                  </div>
-                </form>
+                <div className="auth-modal__back-link">
+                  <button
+                    type="button"
+                    className="auth-modal__text-link"
+                    onClick={() => setAuthModalMode('login')}
+                  >
+                    ← Back to Sign In
+                  </button>
+                </div>
               </div>
             )}
 
@@ -785,105 +765,29 @@ export default function AuthModal() {
                 <div className="auth-modal__sub-header">
                   <h3 className="auth-modal__title">MOBILE OTP LOGIN</h3>
                   <p className="auth-modal__subtext">
-                    {otpSent
-                      ? `Enter the 4-digit verification code sent to +91 ${otpPhone}`
-                      : 'Enter your 10-digit mobile number to receive a secure login code.'}
+                    Mobile OTP verification is temporarily under scheduled maintenance. Please use your email and password to sign in to your verified VEYNCORE account.
                   </p>
                 </div>
 
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className="auth-modal__form">
-                    <div className="auth-modal__field">
-                      <label className="auth-modal__label" htmlFor="modal-otp-phone">
-                        MOBILE NUMBER
-                      </label>
-                      <div className="auth-modal__phone-input-wrap">
-                        <span className="auth-modal__phone-prefix">+91</span>
-                        <input
-                          id="modal-otp-phone"
-                          type="tel"
-                          className="auth-modal__input auth-modal__input--phone"
-                          placeholder="98765 43210"
-                          value={otpPhone}
-                          onChange={(e) => setOtpPhone(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
+                <div style={{ textAlign: 'center', marginTop: '16px', marginBottom: '20px' }}>
+                  <button
+                    type="button"
+                    className="auth-modal__btn auth-modal__btn--primary"
+                    onClick={() => setAuthModalMode('login')}
+                  >
+                    SIGN IN WITH EMAIL & PASSWORD
+                  </button>
+                </div>
 
-                    <button
-                      type="submit"
-                      className="auth-modal__btn auth-modal__btn--primary"
-                    >
-                      SEND VERIFICATION CODE
-                    </button>
-
-                    <div className="auth-modal__back-link">
-                      <button
-                        type="button"
-                        className="auth-modal__text-link"
-                        onClick={() => setAuthModalMode('login')}
-                      >
-                        ← Back to Email Sign In
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyOtp} className="auth-modal__form">
-                    <div className="auth-modal__otp-grid">
-                      {otpCode.map((digit, i) => (
-                        <input
-                          key={i}
-                          id={`auth-modal-otp-${i}`}
-                          type="text"
-                          maxLength={1}
-                          className="auth-modal__otp-box"
-                          value={digit}
-                          onChange={(e) => handleOtpChange(e.target.value, i)}
-                          autoFocus={i === 0}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="auth-modal__otp-resend">
-                      {otpCountdown > 0 ? (
-                        <span>Resend code in {otpCountdown}s</span>
-                      ) : (
-                        <button
-                          type="button"
-                          className="auth-modal__link-bold"
-                          onClick={() => {
-                            setOtpCountdown(30);
-                            setOtpCode(['', '', '', '']);
-                          }}
-                        >
-                          Resend Code Now
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="auth-modal__btn auth-modal__btn--primary"
-                      disabled={submitting}
-                    >
-                      {submitting ? 'VERIFYING...' : 'VERIFY & SIGN IN'}
-                    </button>
-
-                    <div className="auth-modal__back-link">
-                      <button
-                        type="button"
-                        className="auth-modal__text-link"
-                        onClick={() => {
-                          setOtpSent(false);
-                          setOtpCode(['', '', '', '']);
-                        }}
-                      >
-                        ← Change Phone Number
-                      </button>
-                    </div>
-                  </form>
-                )}
+                <div className="auth-modal__back-link">
+                  <button
+                    type="button"
+                    className="auth-modal__text-link"
+                    onClick={() => setAuthModalMode('login')}
+                  >
+                    ← Back to Sign In
+                  </button>
+                </div>
               </div>
             )}
           </div>

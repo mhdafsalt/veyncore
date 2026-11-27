@@ -5,7 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { trackWhatsAppClick } from '@/lib/trackWhatsApp';
 import { parseNumericPrice, formatINR } from '@/lib/priceUtils';
-import { WHATSAPP_NUMBER } from '@/lib/constants';
+import { API_BASE_URL, WHATSAPP_NUMBER } from '@/lib/constants';
 import './WhatsAppCheckoutModal.css';
 
 /**
@@ -362,9 +362,12 @@ export default function WhatsAppCheckoutModal() {
 
   /**
    * Form submission handler
+   * Persists the Order record to MongoDB via backend API,
+   * then launches WhatsApp with the confirmed order reference.
    */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     // Mark all as touched
     const newTouched = {
@@ -401,12 +404,58 @@ export default function WhatsAppCheckoutModal() {
     setIsSubmitting(true);
 
     try {
-      const currentRef = orderId || generateOrderReference();
-      const message = buildWhatsAppMessage(currentRef);
-      const WHATSAPP_NUMBER = '919446391166';
-      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      let currentRef = orderId || generateOrderReference();
 
-      // Analytics click track
+      // 1. Prepare Order Payload for Server Persistence
+      const orderPayload = {
+        customer: {
+          name: (formData.name || '').trim(),
+          phone: (formData.phone || '').trim(),
+          email: user?.email || '',
+          userId: user?._id || user?.id || null,
+        },
+        shippingAddress: {
+          addressLine: (formData.address || '').trim(),
+          pincode: (formData.pincode || '').trim(),
+        },
+        items: items.map((item) => ({
+          productId: item.productId || item._id || item.id || null,
+          handle: item.handle || '',
+          title: item.title || 'Product',
+          color: item.variant || item.color || item.fit || 'Standard',
+          size: item.size || 'ONE SIZE',
+          quantity: Number(item.quantity) || 1,
+          price: parseNumericPrice(item.price),
+          url: item.url || '',
+          thumbnail: item.image || item.thumbnail || '',
+        })),
+        discountCode: appliedDiscount?.code || '',
+        source: checkoutSource || 'whatsapp_checkout',
+      };
+
+      // 2. Persist Order in MongoDB before WhatsApp Redirection
+      try {
+        const orderRes = await fetch(`${API_BASE_URL}/api/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderPayload),
+        });
+        const orderJson = await orderRes.json();
+        if (orderRes.ok && orderJson.success && orderJson.orderNumber) {
+          currentRef = orderJson.orderNumber;
+          setOrderId(currentRef);
+        }
+      } catch (persistErr) {
+        console.warn('[WhatsApp Checkout] Backend order persist warning:', persistErr.message);
+        // Fail-safe: continue with client reference so customer is never blocked
+      }
+
+      // 3. Construct WhatsApp Message with Order Reference
+      const message = buildWhatsAppMessage(currentRef);
+      const targetNumber = WHATSAPP_NUMBER || '919446391166';
+      const whatsappUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
+
+      // 4. Analytics Click Track
       trackWhatsAppClick({
         productHandle: items.map((i) => i.handle || i.id || '').join(', '),
         productTitle: items.map((i) => i.title || '').join(', '),
@@ -417,7 +466,7 @@ export default function WhatsAppCheckoutModal() {
         userPhone: formData.phone,
       });
 
-      // Open WhatsApp in new tab
+      // 5. Open WhatsApp
       const win = window.open(whatsappUrl, '_blank');
 
       if (!win || win.closed || typeof win.closed === 'undefined') {
@@ -425,7 +474,7 @@ export default function WhatsAppCheckoutModal() {
         setPopupBlockedUrl(whatsappUrl);
         setIsSubmitting(false);
       } else {
-        // Give short delay then close checkout modal
+        // Short delay then close checkout modal
         setTimeout(() => {
           setIsSubmitting(false);
           closeCheckout();

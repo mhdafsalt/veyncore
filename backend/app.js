@@ -11,29 +11,36 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-// Dynamic CORS configuration supporting local development and deployed frontend
+// Dynamic CORS configuration supporting production domains, Vercel deployments, and local development
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  'https://veyncore.in',
+  'https://www.veyncore.in',
   'https://veyncorein.vercel.app',
   'https://veyncore.vercel.app',
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
+const devOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://127.0.0.1:3000',
-].filter(Boolean);
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    // Allow server-to-server, mobile app, and CLI health probes (no Origin header)
     if (!origin) return callback(null, true);
 
-    const isAllowed =
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isAllowedProd =
       allowedOrigins.includes(origin) ||
       origin.endsWith('.vercel.app');
+    const isAllowedDev = !isProduction && devOrigins.includes(origin);
 
-    if (isAllowed) {
+    if (isAllowedProd || isAllowedDev) {
       return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error(`CORS policy violation: Access from origin ${origin} is not allowed.`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

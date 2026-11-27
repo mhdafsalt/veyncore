@@ -58,13 +58,16 @@ export const connectDB = async () => {
     return null;
   }
 
-  // 4. Connection options optimized for serverless environments
+  // 4. Connection options tuned specifically for serverless and low-latency operation
   const opts = {
     dbName: 'veyncore', // Guarantee target database name even if omitted from connection string
-    bufferCommands: false, // Do NOT buffer queries for 10s when disconnected; fail fast instead
+    bufferCommands: false, // Do NOT buffer queries when disconnected; fail fast instead
     serverSelectionTimeoutMS: 5000, // 5 seconds max to find a server
     maxPoolSize: 10, // Maintain bounded pool size appropriate for serverless execution
-    socketTimeoutMS: 45000,
+    minPoolSize: 0, // Never keep idle connection floors in ephemeral serverless containers
+    maxIdleTimeMS: 30000, // Close idle connections after 30s to prevent Atlas connection exhaustion
+    socketTimeoutMS: 45000, // 45s socket timeout
+    autoIndex: process.env.NODE_ENV !== 'production', // Disable automatic background index builds in production
     family: 4, // Force IPv4 to prevent IPv6 routing delays
   };
 

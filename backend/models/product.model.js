@@ -179,6 +179,26 @@ productSchema.pre('save', function (next) {
   next();
 });
 
+// Compound indexes for collection drop listings and multi-attribute filters
+productSchema.index({ category: 1, sortOrder: 1, createdAt: -1 });
+productSchema.index({ category: 1, subCategory: 1, createdAt: -1 });
+productSchema.index({ category: 1, fit: 1, createdAt: -1 });
+productSchema.index({ category: 1, price: 1 });
+productSchema.index({ category: 1, price: -1 });
+productSchema.index({ category: 1, isObject: 1 });
+
+// Storefront highlight filters
+productSchema.index({ featured: 1, createdAt: -1 });
+productSchema.index({ newArrival: 1, createdAt: -1 });
+productSchema.index({ isObject: 1, createdAt: -1 });
+productSchema.index({ inStock: 1 });
+productSchema.index({ swipeCategory: 1 });
+
+// Standalone price and timestamp sorting
+productSchema.index({ price: 1 });
+productSchema.index({ price: -1 });
+productSchema.index({ createdAt: -1 });
+
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
 export default Product;

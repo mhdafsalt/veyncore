@@ -57,8 +57,16 @@ export default function AdminOverview({
           tabIndex={0}
         >
           <span className="admin-kpi-card__label">WHATSAPP ORDERS</span>
-          <div className="admin-kpi-card__val">{metrics?.whatsappClicks ?? 0}</div>
-          <span className="admin-kpi-card__sub">Direct WhatsApp order button clicks</span>
+          <div className="admin-kpi-card__val">
+            {metrics?.totalOrders !== undefined && metrics?.totalOrders > 0
+              ? metrics.totalOrders
+              : metrics?.whatsappClicks ?? 0}
+          </div>
+          <span className="admin-kpi-card__sub">
+            {metrics?.totalOrders !== undefined && metrics?.totalOrders > 0
+              ? `${metrics.pendingOrders || 0} Pending • ${metrics.confirmedOrders || 0} Confirmed`
+              : 'Direct WhatsApp order button clicks'}
+          </span>
         </div>
 
         <div className="admin-kpi-card" onClick={() => onNavigateTab('announcements')} role="button" tabIndex={0}>

@@ -113,3 +113,220 @@
   color: #334155;
   border: 1px solid #e2e8f0;
 }
+
+/* Mode Switcher (Orders vs Clicks) */
+.admin-whatsapp-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--admin-surface-subtle, #f1f5f9);
+  padding: 4px;
+  border-radius: var(--admin-radius-lg, 10px);
+  border: 1px solid var(--admin-border, #e2e8f0);
+}
+
+.admin-mode-pill {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--admin-radius-md, 7px);
+  border: none;
+  background: transparent;
+  color: var(--admin-text-secondary, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.admin-mode-pill:hover {
+  color: var(--admin-text-main, #0f172a);
+}
+
+.admin-mode-pill--active {
+  background-color: var(--admin-surface, #ffffff);
+  color: var(--admin-text-main, #0f172a);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Order Status Badges */
+.admin-order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-order-status-badge--pending,
+.admin-order-status-badge--whatsapp_opened {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.admin-order-status-badge--contacted {
+  background-color: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.admin-order-status-badge--confirmed {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.admin-order-status-badge--processing {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+
+.admin-order-status-badge--shipped {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.admin-order-status-badge--delivered {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-order-status-badge--cancelled {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Geo Badges */
+.admin-order-geo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.admin-order-geo-badge--kerala {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.admin-order-geo-badge--national {
+  background-color: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* WhatsApp Link */
+.admin-order-wa-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #15803d;
+  text-decoration: none;
+  margin-top: 2px;
+  transition: opacity 0.15s ease;
+}
+
+.admin-order-wa-link:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
+/* Items Preview in Table */
+.admin-order-items-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 240px;
+}
+
+.admin-order-item-chip {
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* Actions Cell */
+.admin-order-actions-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.admin-order-status-select {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--admin-border, #cbd5e1);
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-order-status-select:focus {
+  border-color: #0f172a;
+}
+
+/* Order Detail Modal */
+.admin-modal--order-detail {
+  max-width: 680px;
+}
+
+.admin-order-detail-card {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.admin-order-detail-card__heading {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.admin-order-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.admin-order-detail-label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.admin-order-detail-val {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.admin-order-detail-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}

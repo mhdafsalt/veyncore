@@ -7,8 +7,15 @@ import Product, {
 } from '../models/product.model.js';
 
 /**
+ * Helper to escape special regex characters for safe MongoDB queries
+ * Prevents ReDoS attacks and regex syntax errors from special user inputs
+ */
+const escapeRegex = (str = '') =>
+  String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
  * GET /api/products
- * Query products with optional filters
+ * Query products with optional filters, safe regex matching, pagination, and caching
  */
 export const getProducts = async (req, res) => {
   try {
@@ -29,23 +36,27 @@ export const getProducts = async (req, res) => {
       featured,
       newArrival,
       sort,
+      page = 1,
       limit = 100,
     } = req.query;
 
     const filter = {};
 
+    // 1. Category filter with strict independence between VEYN-SELECTS and VEYN-OBJECTS
     if (category) {
       if (category === 'VEYN-OBJECTS') {
         filter.$or = [{ category: 'VEYN-OBJECTS' }, { isObject: true }];
       } else if (category === 'VEYN-SELECTS') {
-        filter.$or = [{ category: 'VEYN-SELECTS' }, { isObject: false }, { isObject: { $exists: false } }];
+        filter.category = 'VEYN-SELECTS';
+        filter.isObject = { $ne: true };
       } else {
         filter.category = category;
       }
     }
 
+    // 2. Subcategory filter with safe regex
     if (subCategory) {
-      const cleanSub = String(subCategory).trim().replace(/[-_]/g, ' ');
+      const cleanSub = escapeRegex(String(subCategory).trim().replace(/[-_]/g, ' '));
       filter.$or = [
         { subCategory: new RegExp(cleanSub, 'i') },
         { fit: new RegExp(cleanSub, 'i') },
@@ -53,8 +64,9 @@ export const getProducts = async (req, res) => {
       ];
     }
 
+    // 3. Fit filter with safe regex
     if (fit) {
-      const cleanFit = String(fit).trim().replace(/[-_]/g, ' ');
+      const cleanFit = escapeRegex(String(fit).trim().replace(/[-_]/g, ' '));
       if (filter.$or) {
         filter.$and = [
           { $or: filter.$or },
@@ -75,7 +87,8 @@ export const getProducts = async (req, res) => {
     }
 
     if (swipeCategory) {
-      filter.swipeCategory = new RegExp(`^${swipeCategory}$`, 'i');
+      const cleanSwipe = escapeRegex(String(swipeCategory).trim());
+      filter.swipeCategory = new RegExp(`^${cleanSwipe}$`, 'i');
     }
 
     if (featured === 'true') {
@@ -86,14 +99,15 @@ export const getProducts = async (req, res) => {
       filter.newArrival = true;
     }
 
+    // 4. Safe Search across title, handle, subCategory, fit, and swipeCategory
     if (search && String(search).trim()) {
-      const cleanSearch = String(search).trim();
+      const safeSearch = escapeRegex(String(search).trim());
       const searchConditions = [
-        { title: { $regex: cleanSearch, $options: 'i' } },
-        { handle: { $regex: cleanSearch, $options: 'i' } },
-        { subCategory: { $regex: cleanSearch, $options: 'i' } },
-        { fit: { $regex: cleanSearch, $options: 'i' } },
-        { swipeCategory: { $regex: cleanSearch, $options: 'i' } },
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { handle: { $regex: safeSearch, $options: 'i' } },
+        { subCategory: { $regex: safeSearch, $options: 'i' } },
+        { fit: { $regex: safeSearch, $options: 'i' } },
+        { swipeCategory: { $regex: safeSearch, $options: 'i' } },
       ];
 
       if (filter.$or) {
@@ -111,7 +125,7 @@ export const getProducts = async (req, res) => {
 
     let query = Product.find(filter);
 
-    // Sorting
+    // 5. Indexed Sorting
     if (sort === 'price-low') {
       query = query.sort({ price: 1 });
     } else if (sort === 'price-high') {
@@ -122,7 +136,12 @@ export const getProducts = async (req, res) => {
       query = query.sort({ sortOrder: 1, createdAt: -1 });
     }
 
-    const products = await query.limit(parseInt(limit, 10));
+    // 6. Pagination & High-performance Lean Query Execution
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 100));
+    const skip = (pageNum - 1) * limitNum;
+
+    const products = await query.skip(skip).limit(limitNum).lean();
 
     res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json({
@@ -146,15 +165,25 @@ export const getProducts = async (req, res) => {
  */
 export const getProductByHandleOrId = async (req, res) => {
   try {
+    await connectDB();
     const { handleOrId } = req.params;
 
+    if (!handleOrId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product handle or ID is required.',
+      });
+    }
+
     let product = null;
-    if (handleOrId.match(/^[0-9a-fA-F]{24}$/)) {
-      product = await Product.findById(handleOrId);
+    const cleanHandle = String(handleOrId).trim();
+
+    if (mongoose.Types.ObjectId.isValid(cleanHandle)) {
+      product = await Product.findById(cleanHandle).lean();
     }
 
     if (!product) {
-      product = await Product.findOne({ handle: handleOrId.toLowerCase() });
+      product = await Product.findOne({ handle: cleanHandle.toLowerCase() }).lean();
     }
 
     if (!product) {
@@ -164,7 +193,7 @@ export const getProductByHandleOrId = async (req, res) => {
       });
     }
 
-    const prodObj = product.toObject ? product.toObject() : { ...product };
+    const prodObj = { ...product };
     if (!prodObj.details || !Array.isArray(prodObj.details) || prodObj.details.length === 0) {
       prodObj.details = [...DEFAULT_PRODUCT_DETAILS];
     }
@@ -175,6 +204,7 @@ export const getProductByHandleOrId = async (req, res) => {
       prodObj.selectStory = DEFAULT_SELECT_STORY;
     }
 
+    res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json({
       success: true,
       data: prodObj,

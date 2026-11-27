@@ -74,6 +74,10 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
+// Indexes for administrative lookups and filtering
+userSchema.index({ role: 1, createdAt: -1 });
+userSchema.index({ mobileNumber: 1 });
+
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;

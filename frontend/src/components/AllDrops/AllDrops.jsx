@@ -394,9 +394,9 @@ function AllDropsContent() {
               id: p._id || p.id,
               title: p.title,
               handle: p.handle,
-              category: 'VEYN-SELECTS',
-              subCategory: p.subCategory || 'BAGGY',
-              fit: p.fit || 'baggy',
+              category: p.category || 'VEYN-SELECTS',
+              subCategory: p.subCategory || '',
+              fit: p.fit || '',
               swipeCategory: p.swipeCategory || '',
               price: p.price,
               comparePrice: p.comparePrice,
@@ -1258,7 +1258,7 @@ function AllDropsContent() {
                       className="all-drops__checkbox-input"
                     />
                     <span className="all-drops__checkbox-custom" />
-                    <span>In stock ({inStockCount})</span>
+                    <span>In stock ({isLoading && categoryProducts.length === 0 ? '...' : inStockCount})</span>
                   </label>
                   <label className="all-drops__checkbox-label">
                     <input
@@ -1268,7 +1268,7 @@ function AllDropsContent() {
                       className="all-drops__checkbox-input"
                     />
                     <span className="all-drops__checkbox-custom" />
-                    <span>Out of stock ({outOfStockCount})</span>
+                    <span>Out of stock ({isLoading && categoryProducts.length === 0 ? '...' : outOfStockCount})</span>
                   </label>
                 </div>
               </div>
@@ -1336,7 +1336,9 @@ function AllDropsContent() {
                 className="all-drops-drawer__apply-btn"
                 onClick={() => setIsMobileDrawerOpen(false)}
               >
-                See {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
+                {isLoading && filteredProducts.length === 0
+                  ? 'Loading items...'
+                  : `See ${filteredProducts.length} ${filteredProducts.length === 1 ? 'item' : 'items'}`}
               </button>
             </div>
           </div>

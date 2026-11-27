@@ -7,11 +7,11 @@
 
 .obj-all {
   width: 100%;
-  min-height: 80vh;
+  min-height: auto;
   background-color: #ffffff;
   color: #111111;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  padding: 24px 0 28px 0;
+  padding: 24px 0 20px 0;
   flex: 1 0 auto;
 }
 
@@ -480,7 +480,7 @@
   align-items: center;
   gap: 8px;
   background: transparent;
-  border: none;
+  border: none !important;
   border-radius: 0;
   padding: 6px 0;
   font-family: inherit;
@@ -492,13 +492,17 @@
   cursor: pointer;
   position: relative;
   outline: none !important;
+  box-shadow: none !important;
   -webkit-tap-highlight-color: transparent !important;
   transition: opacity 0.2s ease;
 }
 
 .obj-all__mobile-trigger:hover,
-.obj-all__mobile-trigger:active {
-  border: none;
+.obj-all__mobile-trigger:active,
+.obj-all__mobile-trigger:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
   background-color: transparent;
   color: #000000;
   opacity: 0.7;
@@ -1098,11 +1102,12 @@
 
 @media (max-width: 768px) {
   .obj-all {
-    padding: 16px 0 10px 0;
+    min-height: auto;
+    padding: 16px 0 6px 0;
   }
 
   .obj-all__grid {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .obj-all__header {
@@ -1151,8 +1156,8 @@
   }
 
   .obj-all__grid-switch--mobile .obj-all__grid-btn {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border: 1px solid #e5e7eb;
     border-radius: 3px;
     background: #ffffff;
@@ -1163,8 +1168,8 @@
   }
 
   .obj-all__grid-switch--mobile .obj-all__grid-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
   }
 
   .obj-all__grid-switch--mobile .obj-all__grid-btn--active {
