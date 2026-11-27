@@ -14,7 +14,7 @@ function LaunchSaleFallback() {
   return (
     <div className="all-drops">
       <div className="all-drops__container">
-        <div className="all-drops__header">
+        <div className="all-drops__header launch-sale__header">
           <div className="all-drops__header-title-row">
             <h1 className="all-drops__title">LAUNCH SALE</h1>
           </div>

@@ -3,6 +3,20 @@
    Strict visual parity with All Drops (.all-drops-page / .all-drops)
    ========================================================================== */
 
+/* 0. Header Divider Bottom Line matching All Drops & other sections */
+.launch-sale__header {
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+@media (max-width: 768px) {
+  .launch-sale__header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+}
+
 /* 1. Promotional Sale Discount Badge (Red Background, White Text) */
 .all-drops-card__badge--launch-sale {
   background-color: #dc2626 !important;

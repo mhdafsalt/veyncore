@@ -194,11 +194,50 @@ function LaunchSaleCard({ saleItem, onExpire }) {
               onClick={handleQuickAddClick}
               aria-label="Choose size"
             >
-              <svg className="all-drops-card__choose-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              <span>{addedStatus ? 'ADDED' : 'CHOOSE'}</span>
+              {addedStatus ? (
+                <>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="all-drops-card__choose-icon"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Added</span>
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="all-drops-card__choose-icon"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.2"
+                      d="M16.608 9.421V6.906H3.392v8.016c0 .567.224 1.112.624 1.513.4.402.941.627 1.506.627H8.63M8.818 3h2.333c.618 0 1.212.247 1.649.686a2.35 2.35 0 0 1 .683 1.658v1.562H6.486V5.344c0-.622.246-1.218.683-1.658A2.33 2.33 0 0 1 8.82 3"
+                    />
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeWidth="1.2"
+                      d="M14.608 12.563v5m2.5-2.5h-5"
+                    />
+                  </svg>
+                  <span>Choose</span>
+                </>
+              )}
             </button>
           ) : (
             <div className="all-drops-card__sizes-overlay">
@@ -296,8 +335,8 @@ export default function LaunchSale() {
   return (
     <section className="all-drops">
       <div className="all-drops__container">
-        {/* Collection Header matching All Drops exactly */}
-        <header className="all-drops__header">
+        {/* Collection Header matching All Drops with bottom divider line */}
+        <header className="all-drops__header launch-sale__header">
           <div className="all-drops__header-title-row">
             <h1 className="all-drops__title">LAUNCH SALE</h1>
             {!loading && (
