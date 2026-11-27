@@ -2,135 +2,88 @@ import React from 'react';
 import LegalPage from '@/components/LegalPage/LegalPage';
 
 export const metadata = {
-  title: 'SHIPPING & DELIVERY POLICY | VEYNCORE',
+  title: 'Shipping policy | VEYNCORE',
   description:
-    'Learn about VEYNCORE Pan-India delivery timelines, dispatch processing, free shipping coverage, and real-time tracking.',
+    'Learn about VEYNCORE delivery timeframes, order processing via WhatsApp, shipping charges, and order tracking.',
 };
 
 const shippingSections = [
   {
-    id: 'pan-india-coverage',
-    title: 'Pan-India Delivery Coverage',
+    id: 'overview',
+    title: 'Overview',
+    number: false,
     content: (
-      <>
-        <p>
-          <strong>VEYNCORE</strong> delivers contemporary raw denim drops and utilitarian objects across India. Through our network of premier logistics and express courier partners (including Bluedart, Delhivery, and Shiprocket), we service over <strong>26,000+ pin codes</strong> across all 28 states and 8 union territories.
+      <div className="legal-callout legal-callout--accent">
+        <p className="legal-callout__title">Thank you for shopping with VEYNCORE!</p>
+        <p className="legal-callout__text">
+          We are committed to delivering our curated collections and objects to you safely and efficiently. Below you will find all information regarding our delivery timeframes, processing schedules, shipping charges, and tracking guidelines.
         </p>
-        <div className="legal-callout legal-callout--accent">
-          <p className="legal-callout__title">Free Shipping Across India</p>
-          <p className="legal-callout__text">
-            We are proud to offer <strong>Complimentary Standard Shipping on all orders across India</strong>. No hidden delivery fees, minimum order values, or surprise charges at checkout.
-          </p>
-        </div>
-      </>
+      </div>
     ),
   },
   {
-    id: 'processing-dispatch',
-    title: 'Order Processing & Dispatch Timelines',
+    id: 'delivery-timeframe',
+    title: 'Delivery timeframe',
+    number: 1,
     content: (
-      <>
-        <p>
-          We pride ourselves on swift order handling and artisanal packaging:
-        </p>
-        <ul>
-          <li><strong>Processing Window:</strong> Orders placed before 2:00 PM IST (Monday through Saturday) are typically processed and handed over to our couriers within <strong>24 to 48 hours</strong>.</li>
-          <li><strong>Sundays &amp; National Holidays:</strong> Orders placed on Sundays or public holidays will be dispatched on the following business day.</li>
-          <li><strong>Drop Releases:</strong> During high-volume seasonal collection launches, processing may take up to 72 hours due to intense order influx.</li>
-        </ul>
-      </>
+      <p>
+        Orders are generally delivered within <strong>3–7 working days</strong> from the date of dispatch. Delivery timelines may vary depending on the customer’s location, courier service, and other logistical factors.
+      </p>
     ),
   },
   {
-    id: 'delivery-timelines',
-    title: 'Estimated Delivery Timelines',
+    id: 'order-processing',
+    title: 'Order processing',
+    number: 2,
     content: (
-      <>
-        <p>
-          Once dispatched from our central distribution hub in South India, transit timelines typically adhere to the following schedules:
-        </p>
-        <ul>
-          <li><strong>Metro Cities (Mumbai, Delhi NCR, Bengaluru, Hyderabad, Chennai, Kolkata):</strong> 3 to 5 business days.</li>
-          <li><strong>Tier 2 &amp; Tier 3 Cities / Regional Hubs:</strong> 4 to 6 business days.</li>
-          <li><strong>Remote Zones &amp; North East India:</strong> 5 to 7 business days.</li>
-        </ul>
-        <p>
-          <em>Note: Unforeseen environmental disruptions, severe monsoon events, or local regulatory inspections may occasionally extend delivery times by 24 to 48 hours.</em>
-        </p>
-      </>
+      <p>
+        Orders are confirmed and processed through our official WhatsApp ordering channel. Processing and dispatch take place on working days only. Orders confirmed on Sundays or public holidays will be processed on the next working day.
+      </p>
     ),
   },
   {
-    id: 'order-tracking',
-    title: 'Live Tracking & Real-Time Updates',
+    id: 'shipping-charges',
+    title: 'Shipping charges',
+    number: 3,
     content: (
-      <>
-        <p>
-          You will never have to guess where your VEYNCORE pieces are:
-        </p>
-        <ul>
-          <li><strong>Instant Dispatch Alert:</strong> The moment your parcel is scanned by our carrier, you will receive an SMS, Email, and WhatsApp notification containing your unique Air Waybill (AWB) tracking number and direct live tracking link.</li>
-          <li><strong>Real-Time Milestones:</strong> Track your package from warehouse pickup, hub transitions, out-for-delivery status, to final verified delivery.</li>
-        </ul>
-      </>
+      <p>
+        Shipping charges may vary depending on the delivery location and order details. Free shipping is available only in selected areas, as specified on our website or communicated at the time of ordering.
+      </p>
     ),
   },
   {
-    id: 'cash-on-delivery',
-    title: 'Cash on Delivery (COD) Guidelines',
+    id: 'delivery-delays',
+    title: 'Delivery delays',
+    number: 4,
     content: (
-      <>
-        <p>
-          To make premium denim accessible to all enthusiasts across India, we support Cash on Delivery (COD) on eligible orders:
-        </p>
-        <ul>
-          <li><strong>Pre-Dispatch Verification:</strong> To prevent logistical rejections, COD orders may receive an automated WhatsApp confirmation link or a quick confirmation phone call before parcel generation.</li>
-          <li><strong>Payment Collection:</strong> Please ensure the exact cash amount or active UPI QR scan capability is available upon arrival of the delivery agent. Delivery agents cannot leave parcels without full payment collection.</li>
-        </ul>
-      </>
+      <p>
+        While we make every effort to deliver orders within the estimated timeframe, unforeseen circumstances such as extreme weather conditions, courier delays, public holidays, or high-demand periods may occasionally affect delivery schedules. We appreciate your patience and understanding in such situations.
+      </p>
     ),
   },
   {
-    id: 'packaging-inspection',
-    title: 'Tamper-Evident Packaging & Delivery Inspection',
+    id: 'tracking-your-order',
+    title: 'Tracking your order',
+    number: 5,
     content: (
-      <>
-        <p>
-          All VEYNCORE orders are packaged in durable, custom-sealed, tamper-evident security polybags and protective dust packaging.
-        </p>
-        <p>
-          <strong>Delivery Check:</strong> Before accepting your package from the courier agent, please inspect the outer packaging. If the security seal is broken, torn, or visibly tampered with, please <strong>refuse delivery</strong> and notify our support concierge immediately at +91 94463 91166.
-        </p>
-      </>
+      <p>
+        Once your order has been dispatched, tracking details will be shared with you, wherever available, so you can monitor your shipment until delivery.
+      </p>
     ),
   },
   {
-    id: 'failed-deliveries',
-    title: 'Failed Delivery Attempts & Address Corrections',
+    id: 'questions',
+    title: 'Questions?',
+    number: 6,
     content: (
       <>
         <p>
-          Our courier partners attempt delivery up to <strong>three (3) times</strong> before initiating a Return to Origin (RTO):
-        </p>
-        <ul>
-          <li><strong>Contact Availability:</strong> Ensure your registered contact number is reachable so the delivery partner can coordinate the final doorstep handover.</li>
-          <li><strong>Address Modifications:</strong> If you need to modify your delivery address or contact number, please contact us within 12 hours of placing your order. Once a package is in-transit with the courier, rerouting may incur slight transit delays.</li>
-        </ul>
-      </>
-    ),
-  },
-  {
-    id: 'shipping-support',
-    title: 'Shipping Escalations & Courier Inquiries',
-    content: (
-      <>
-        <p>
-          Have questions regarding an active shipment or need priority courier coordination?
+          If you have any questions or concerns regarding your order, shipping, or delivery, feel free to contact us at <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a> &mdash; We&rsquo;re always happy to help.
         </p>
         <p>
-          <strong>VEYNCORE Logistics Desk</strong><br />
-          WhatsApp Concierge: +91 94463 91166 (Mon – Sat, 10:00 AM – 8:00 PM IST)<br />
+          <strong>VEYNCORE Legal Dept.</strong><br />
           Email: <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a><br />
+          WhatsApp Concierge: +91 94463 91166<br />
           Official Website: <a href="https://veyncore.in" target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in</a>
         </p>
       </>
@@ -141,8 +94,8 @@ const shippingSections = [
 export default function ShippingPolicyPage() {
   return (
     <LegalPage
-      title="SHIPPING & DELIVERY"
-      subtitle="Complete information regarding our complimentary Pan-India shipping, delivery timelines, COD guidelines, and tracking."
+      title="Shipping policy"
+      subtitle="Delivery timeframes, order processing, shipping charges, and tracking guidelines."
       lastUpdated="November 2026"
       sections={shippingSections}
     />

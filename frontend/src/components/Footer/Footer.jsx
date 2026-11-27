@@ -133,12 +133,12 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                     </li>
                     <li>
                       <Link href="/pages/refund-policy" className="modern-footer__accordion-link">
-                        REFUND &amp; CANCELLATION
+                        REFUND POLICY
                       </Link>
                     </li>
                     <li>
                       <Link href="/pages/shipping-policy" className="modern-footer__accordion-link">
-                        SHIPPING &amp; DELIVERY
+                        SHIPPING POLICY
                       </Link>
                     </li>
                   </ul>

@@ -2,165 +2,207 @@ import React from 'react';
 import LegalPage from '@/components/LegalPage/LegalPage';
 
 export const metadata = {
-  title: 'REFUND & CANCELLATION POLICY | VEYNCORE',
+  title: 'Refund policy | VEYNCORE',
   description:
-    'Review the official 7-Day Easy Returns, Exchanges, and Refund Policy for VEYNCORE contemporary raw denim and objects.',
+    'Review the official Refund, Return, Replacement, and Cancellation Policy for VEYNCORE contemporary fashion pieces and objects.',
 };
 
 const refundSections = [
   {
-    id: 'guarantee',
-    title: '7-Day Easy Returns & Exchanges Guarantee',
+    id: 'overview',
+    title: 'Overview',
+    number: false,
     content: (
       <>
+        <p><strong>VEYNCORE has two lines:</strong></p>
         <p>
-          At <strong>VEYNCORE</strong>, our commitment to architectural design, raw denim craftsmanship, and customer satisfaction is paramount. If you are not completely satisfied with the fit, size, or styling of your purchase, you may initiate a return or exchange within <strong>7 days from the verified delivery date</strong>.
+          <strong>VEYN SELECTS:</strong> A carefully curated collection of fashion pieces, handpicked to reflect VEYNCORE&rsquo;s unique vision and creative direction. Every piece is thoughtfully sourced and quality-checked, with a focus on style, individuality, and originality.
         </p>
-        <div className="legal-callout legal-callout--accent">
-          <p className="legal-callout__title">7-Day Window</p>
+        <p>
+          <strong>VEYN OBJECTS:</strong> A curated selection of accessories and everyday essentials, chosen to complement your style and complete your identity. From subtle details to statement pieces, each object brings its own character, adding another dimension to the way you express yourself.
+        </p>
+        <div className="legal-callout legal-callout--accent" style={{ marginTop: '20px' }}>
+          <p className="legal-callout__title">Refund, Return, Replacement and Cancellation Policy</p>
           <p className="legal-callout__text">
-            Returns or size exchanges must be requested within 7 calendar days of delivery. Doorstep reverse pickup is arranged by VEYNCORE at no extra cost across eligible pin codes.
+            We believe every purchase should meet reasonable expectations of quality and presentation. This policy outlines the conditions under which refund, return, replacement, exchange, and cancellation requests may be considered.
           </p>
         </div>
       </>
     ),
   },
   {
-    id: 'eligibility',
-    title: 'Eligibility & Garment Condition Requirements',
+    id: 'general-terms',
+    title: 'General terms',
+    number: 1,
+    content: (
+      <ul>
+        <li>All return, refund, replacement, and exchange requests are subject to review and approval by VEYNCORE.</li>
+        <li>Customers must contact us within 7 days from the date of delivery to report an issue or request a return or exchange.</li>
+        <li>An unboxing video is mandatory for claims involving damaged, defective, incorrect, or missing products.</li>
+        <li>The unboxing video must be continuous and clearly show the sealed package, opening of the package, and the condition of the product.</li>
+        <li>Requests submitted without the required evidence may not be accepted.</li>
+        <li>Return shipping costs are the responsibility of the customer unless the issue is verified to have resulted from an error on our part.</li>
+        <li>Products must be unused, unwashed, undamaged, and returned with their original tags, labels, and packaging.</li>
+        <li>VEYNCORE reserves the right to reject requests that do not meet the eligibility conditions outlined in this policy.</li>
+      </ul>
+    ),
+  },
+  {
+    id: 'damaged-defective-or-incorrect-products',
+    title: 'Damaged, defective or incorrect products',
+    number: 2,
     content: (
       <>
         <p>
-          To qualify for a full refund or size replacement, returned items must meet the following strict standards:
+          If you receive a damaged, defective, or incorrect product, please contact VEYNCORE within 7 days of delivery.
         </p>
         <ul>
-          <li><strong>Unworn &amp; Unwashed:</strong> Garments must be in pristine, brand-new condition without perfumes, odors, makeup marks, body oils, or creasing from prolonged wear.</li>
-          <li><strong>Original Tags Intact:</strong> All original brand tags, woven identity labels, size identifiers, and care instructions must remain securely attached in their original placement.</li>
-          <li><strong>Complete Packaging:</strong> Items must be returned with their original dust bags, protective garment sleeves, and branded polybag packaging.</li>
-          <li><strong>Unaltered Denim:</strong> Hemmed, distressed, or customized denim cannot be returned or exchanged.</li>
+          <li>Customers must provide a complete and continuous unboxing video showing the sealed package, opening process, and the product received.</li>
+          <li>Clear photographs and additional information may be requested to assess the issue.</li>
+          <li>Once the claim has been reviewed and verified, VEYNCORE may arrange a replacement or another appropriate resolution.</li>
+          <li>If the reported issue is confirmed to be caused by VEYNCORE or its fulfilment process, the applicable return or replacement shipping costs will be handled by us.</li>
+        </ul>
+        <p>
+          Claims without sufficient evidence may be declined.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'size-related-returns-and-exchanges',
+    title: 'Size-related returns and exchanges',
+    number: 3,
+    content: (
+      <>
+        <p>
+          Customers are responsible for reviewing the size charts and product measurements provided on the respective product pages before placing an order.
+        </p>
+        <ul>
+          <li>All available sizes and measurements are displayed on the product pages, wherever applicable.</li>
+          <li>Customers are advised to use a measuring tape and compare their measurements with the provided size chart before ordering.</li>
+          <li>Measurements are taken manually, so minor variations may occur.</li>
+          <li>Size-related exchange requests may be considered on a case-by-case basis, subject to product availability and approval by VEYNCORE.</li>
+          <li>Customers are responsible for the return shipping costs associated with approved size-related exchanges.</li>
+          <li>Products must be unused, unwashed, and returned with their original tags and packaging.</li>
+        </ul>
+        <p>
+          A size-related return or exchange is not guaranteed and will depend on the eligibility of the request.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'offer-and-sale-products',
+    title: 'Offer and sale products',
+    number: 4,
+    content: (
+      <>
+        <p>
+          Products purchased during promotional campaigns, discounts, clearance sales, or special offers may be subject to additional return and exchange restrictions.
+        </p>
+        <ul>
+          <li>Sale and promotional products may not be eligible for returns, refunds, or exchanges unless the product is verified to be defective, damaged, incorrect, or otherwise covered by applicable consumer protection laws.</li>
+          <li>Any special restrictions applicable to a particular product or offer will be communicated on the website or at the time of ordering.</li>
+          <li>Customers are advised to review the product description, available sizes, measurements, and applicable offer conditions carefully before confirming their purchase.</li>
         </ul>
       </>
     ),
   },
   {
-    id: 'non-returnable',
-    title: 'Non-Returnable & Final Sale Items',
+    id: 'return-and-exchange-conditions',
+    title: 'Return and exchange conditions',
+    number: 5,
     content: (
       <>
         <p>
-          For hygiene, hygiene seals, and limited-edition authenticity, certain items are non-returnable:
+          To be eligible for an approved return or exchange:
         </p>
         <ul>
-          <li>Intimates, undergarments, and socks.</li>
-          <li>Jewelry, chains, bracelets, and caps with broken hygiene/security seals.</li>
-          <li>Items marked as &ldquo;Final Sale,&rdquo; &ldquo;Archive Drop,&rdquo; or specialized promotional gift sets.</li>
-          <li>Free promotional merchandise or complimentary gifts included with orders.</li>
+          <li>The request must be submitted within 7 days of delivery.</li>
+          <li>The product must be unused, unwashed, and in its original condition.</li>
+          <li>Original tags, labels, and packaging must be retained.</li>
+          <li>The product must not show signs of wear, damage, alteration, or misuse.</li>
+          <li>The return or exchange must be approved by VEYNCORE before the product is shipped back.</li>
+        </ul>
+        <p>
+          Products that fail to meet these conditions may be rejected.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'refund-policy',
+    title: 'Refund policy',
+    number: 6,
+    content: (
+      <>
+        <p>
+          Refunds are not automatically available for every return request.
+        </p>
+        <ul>
+          <li>Refund eligibility will be assessed on a case-by-case basis.</li>
+          <li>Approved refunds will be processed using the original payment method or another mutually agreed method, where applicable.</li>
+          <li>Any applicable refund amount and processing details will be communicated to the customer.</li>
+          <li>Shipping charges, where applicable, may be non-refundable unless the issue is attributable to VEYNCORE or otherwise required by applicable law.</li>
+          <li>Refund processing time may vary depending on the payment method and financial institution.</li>
         </ul>
       </>
     ),
   },
   {
-    id: 'return-process',
-    title: 'Step-by-Step Return Process',
+    id: 'order-cancellation',
+    title: 'Order cancellation',
+    number: 7,
     content: (
       <>
         <p>
-          Initiating a return or exchange with VEYNCORE is effortless:
-        </p>
-        <ol>
-          <li>
-            <strong>Submit Your Request:</strong> Contact our support team via WhatsApp Concierge at <strong>+91 94463 91166</strong> or email <strong>veyncore.in@gmail.com</strong> within 7 days of delivery. State your Order ID and reason for return or preferred replacement size.
-          </li>
-          <li>
-            <strong>Reverse Pickup Scheduled:</strong> Once approved, our courier partner will arrive at your original delivery address within 24 to 48 hours to collect the securely packaged parcel.
-          </li>
-          <li>
-            <strong>Handover &amp; Acknowledgment:</strong> Ensure the courier agent scans and hands over a physical or digital pickup acknowledgment slip for tracking.
-          </li>
-        </ol>
-      </>
-    ),
-  },
-  {
-    id: 'inspection-refunds',
-    title: 'Inspection & Refund Timelines',
-    content: (
-      <>
-        <p>
-          Upon arrival at our fulfillment center, your returned item undergoes a thorough Quality Assurance (QA) inspection within <strong>24 to 48 hours</strong>.
-        </p>
-        <p>
-          Once inspection confirms the item meets our return standards:
+          Since orders are placed and confirmed through WhatsApp, customers are advised to review all product details, sizes, quantities, and delivery information before confirming their order.
         </p>
         <ul>
-          <li><strong>Prepaid Orders (Cards, UPI, Net Banking):</strong> Refunds are processed immediately back to your original payment method. Depending on your issuing bank, the credit reflects in your account within <strong>3 to 5 business days</strong>.</li>
-          <li><strong>Cash on Delivery (COD) Orders:</strong> Refunds are disbursed directly to your verified Bank Account (via NEFT/IMPS) or UPI ID. Our concierge team will reach out to collect your secure transfer details once the item clears inspection.</li>
+          <li>Cancellation requests must be communicated to VEYNCORE as soon as possible.</li>
+          <li>Orders that have not yet been processed or dispatched may be eligible for cancellation.</li>
+          <li>Once an order has been dispatched, cancellation may no longer be possible.</li>
+          <li>Approved cancellations of prepaid orders will be refunded through the applicable payment method, subject to processing requirements.</li>
+          <li>VEYNCORE reserves the right to cancel an order due to product unavailability, pricing errors, or other operational reasons. In such cases, any payment received for the cancelled order will be refunded as applicable.</li>
         </ul>
       </>
     ),
   },
   {
-    id: 'exchanges',
-    title: 'Size & Fit Exchanges',
+    id: 'how-to-request-a-return-replacement-or-exchange',
+    title: 'How to request a return, replacement or exchange',
+    number: 8,
     content: (
       <>
         <p>
-          Need a different waist size, length, or silhouette? We provide <strong>one complimentary size exchange per order</strong>.
-        </p>
-        <p>
-          If your preferred replacement size is out of stock in our active drop, you may opt for:
+          To initiate a request, contact us through our official WhatsApp channel or email with the following details:
         </p>
         <ul>
-          <li>A direct store credit voucher with lifetime validity across any future VEYN-SELECTS or VEYN-OBJECTS drops.</li>
-          <li>A full refund back to your original payment method or bank account.</li>
+          <li>Order reference number.</li>
+          <li>Product name and size.</li>
+          <li>Reason for the request.</li>
+          <li>Relevant photographs or unboxing video, where applicable.</li>
         </ul>
+        <p>
+          Our team will review your request and communicate the next steps. Please do not ship any product back without receiving approval and return instructions from us.
+        </p>
       </>
     ),
   },
   {
-    id: 'damaged-defective',
-    title: 'Damaged, Defective or Incorrect Items',
+    id: 'contact-information',
+    title: 'Contact information',
+    number: 9,
     content: (
       <>
         <p>
-          Each VEYNCORE piece undergoes multiple quality audits before dispatch. In the rare event you receive a damaged, defective, or incorrect product:
-        </p>
-        <ul>
-          <li>Please notify us within <strong>48 hours of delivery</strong> with clear photographs or a short video demonstrating the defect.</li>
-          <li>We will immediately arrange a priority replacement shipment at zero expense, or issue an expedited full refund without delay.</li>
-        </ul>
-      </>
-    ),
-  },
-  {
-    id: 'cancellations',
-    title: 'Order Cancellation Guidelines',
-    content: (
-      <>
-        <p>
-          You may cancel your order free of charge at any time prior to shipment dispatch:
-        </p>
-        <ul>
-          <li><strong>Pre-Dispatch Cancellation:</strong> If your order has not yet been processed by our warehouse, simply message our WhatsApp support or click Cancel in your order overview. Your full payment will be reversed immediately.</li>
-          <li><strong>Post-Dispatch:</strong> Once a parcel is handed over to our courier partner and a tracking AWB is generated, orders cannot be directly cancelled in-transit. You may choose to refuse the delivery upon arrival, and a refund will be processed upon the parcel&rsquo;s return to our hub.</li>
-        </ul>
-      </>
-    ),
-  },
-  {
-    id: 'contact',
-    title: 'Returns Concierge & Inquiries',
-    content: (
-      <>
-        <p>
-          For help initiating a return, checking inspection status, or tracking a refund:
+          For questions or assistance regarding refunds, returns, replacements, exchanges, or cancellations, please contact us at <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a>.
         </p>
         <p>
-          <strong>VEYNCORE Returns &amp; Exchange Desk</strong><br />
-          WhatsApp Concierge: +91 94463 91166 (10:00 AM – 8:00 PM IST)<br />
+          <strong>VEYNCORE Legal Dept.</strong><br />
           Email: <a href="mailto:veyncore.in@gmail.com" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in@gmail.com</a><br />
-          Official Website: <a href="https://veyncore.in" target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in</a><br />
-          Operating Hub: Kerala, India
+          WhatsApp Concierge: +91 94463 91166<br />
+          Official Website: <a href="https://veyncore.in" target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 600 }}>veyncore.in</a>
         </p>
       </>
     ),
@@ -170,8 +212,8 @@ const refundSections = [
 export default function RefundPolicyPage() {
   return (
     <LegalPage
-      title="REFUND & CANCELLATION"
-      subtitle="Everything you need to know about our 7-Day Easy Returns, size exchanges, and transparent refund procedures."
+      title="Refund policy"
+      subtitle="Conditions under which refund, return, replacement, exchange, and cancellation requests may be considered."
       lastUpdated="November 2026"
       sections={refundSections}
     />
