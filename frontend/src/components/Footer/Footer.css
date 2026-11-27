@@ -232,7 +232,7 @@
    -------------------------------------------------------------------------- */
 .modern-footer__nav-wrapper {
   width: 100%;
-  padding: 24px 0 8px;
+  padding: 16px 0 8px;
   background-color: #ffffff;
   border-top: none !important;
 }
@@ -494,6 +494,10 @@
 @media screen and (max-width: 768px) {
   .modern-footer__container {
     padding: 0 16px;
+  }
+
+  .modern-footer__nav-wrapper {
+    padding: 10px 0 8px;
   }
 
   .modern-footer__features-wrapper {

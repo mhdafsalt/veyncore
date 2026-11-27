@@ -263,7 +263,8 @@
   color: #111827;
   text-decoration: none;
   text-transform: uppercase;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  border-left: 3px solid transparent;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .navbar__drawer-link:hover {
@@ -307,8 +308,9 @@
   text-transform: uppercase;
   background: none;
   border: none;
+  border-left: 3px solid transparent;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .navbar__drawer-accordion-header:hover {
@@ -318,6 +320,8 @@
 .navbar__drawer-accordion-header--active {
   font-weight: 700;
   color: #000000;
+  background-color: #f9f9f9;
+  border-left: 3px solid #000000;
 }
 
 .navbar__drawer-chevron {

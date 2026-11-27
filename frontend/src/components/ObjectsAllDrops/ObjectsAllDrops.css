@@ -11,7 +11,7 @@
   background-color: #ffffff;
   color: #111111;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  padding: 24px 0 60px 0;
+  padding: 24px 0 28px 0;
   flex: 1 0 auto;
 }
 
@@ -519,7 +519,7 @@
   display: grid;
   column-gap: 8px;
   row-gap: 28px;
-  margin-bottom: 50px;
+  margin-bottom: 24px;
 }
 
 .obj-all__grid--4col {
@@ -1098,7 +1098,11 @@
 
 @media (max-width: 768px) {
   .obj-all {
-    padding: 16px 0 40px 0;
+    padding: 16px 0 10px 0;
+  }
+
+  .obj-all__grid {
+    margin-bottom: 12px;
   }
 
   .obj-all__header {

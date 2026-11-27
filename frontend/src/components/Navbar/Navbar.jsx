@@ -224,9 +224,9 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
       if (pathname.startsWith('/pages/')) {
         setOpenSubmenu('policies');
       } else if (pathname === '/veyn-objects' || pathname.startsWith('/collections/objects')) {
-        setOpenSubmenu('objects');
+        setOpenSubmenu('veyn-objects');
       } else if (pathname.startsWith('/collections/all')) {
-        setOpenSubmenu('collections');
+        setOpenSubmenu('veyn-selects');
       }
     }
   }, [isMenuOpen, pathname]);
@@ -319,7 +319,15 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
   ];
 
   const toggleSubmenu = (menuName) => {
-    setOpenSubmenu((prev) => (prev === menuName ? null : menuName));
+    setOpenSubmenu((prev) => {
+      const next = prev === menuName ? null : menuName;
+      if (next === 'veyn-selects' && onSelectCategory) {
+        onSelectCategory('VEYN-SELECTS');
+      } else if (next === 'veyn-objects' && onSelectCategory) {
+        onSelectCategory('VEYN-OBJECTS');
+      }
+      return next;
+    });
   };
 
   const handleCategoryClick = (categoryName) => {
@@ -532,54 +540,24 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
 
         <div className="navbar__drawer-body">
           <ul className="navbar__drawer-menu">
-            {/* 1. VEYN-SELECTS */}
-            <li className="navbar__drawer-item">
-              <button
-                type="button"
-                className={`navbar__drawer-link navbar__drawer-link--button ${
-                  activeMainCategory === 'VEYN-SELECTS' && (pathname === '/' || pathname.includes('all-drops'))
-                    ? 'navbar__drawer-link--active'
-                    : ''
-                }`}
-                onClick={() => handleCategoryClick('VEYN-SELECTS')}
-              >
-                VEYN-SELECTS
-              </button>
-            </li>
-
-            {/* 3. VEYN-OBJECTS */}
-            <li className="navbar__drawer-item">
-              <button
-                type="button"
-                className={`navbar__drawer-link navbar__drawer-link--button ${
-                  activeMainCategory === 'VEYN-OBJECTS'
-                    ? 'navbar__drawer-link--active'
-                    : ''
-                }`}
-                onClick={() => handleCategoryClick('VEYN-OBJECTS')}
-              >
-                VEYN-OBJECTS
-              </button>
-            </li>
-
-            {/* 4. Accordion: COLLECTIONS (Dynamic from API / Admin) */}
+            {/* 1. Accordion: VEYN-SELECTS */}
             <li className="navbar__drawer-item navbar__drawer-item--accordion">
               <button
                 type="button"
                 className={`navbar__drawer-accordion-header ${
-                  pathname && pathname.startsWith('/collections/all')
+                  (activeMainCategory === 'VEYN-SELECTS' &&
+                    (pathname === '/' || pathname.startsWith('/collections/all') || pathname === '/collections/launch-sale')) ||
+                  openSubmenu === 'veyn-selects'
                     ? 'navbar__drawer-accordion-header--active'
                     : ''
                 }`}
-                onClick={() => toggleSubmenu('collections')}
-                aria-expanded={openSubmenu === 'collections'}
+                onClick={() => toggleSubmenu('veyn-selects')}
+                aria-expanded={openSubmenu === 'veyn-selects'}
               >
-                <span>COLLECTIONS</span>
+                <span>VEYN-SELECTS</span>
                 <svg
                   className={`navbar__drawer-chevron ${
-                    openSubmenu === 'collections'
-                      ? 'navbar__drawer-chevron--rotated'
-                      : ''
+                    openSubmenu === 'veyn-selects' ? 'navbar__drawer-chevron--rotated' : ''
                   }`}
                   width="10"
                   height="6"
@@ -597,9 +575,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               </button>
               <ul
                 className={`navbar__drawer-submenu ${
-                  openSubmenu === 'collections'
-                    ? 'navbar__drawer-submenu--open'
-                    : ''
+                  openSubmenu === 'veyn-selects' ? 'navbar__drawer-submenu--open' : ''
                 }`}
               >
                 {collectionItems.map((item) => {
@@ -614,7 +590,10 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                         className={`navbar__drawer-sublink ${
                           isItemActive ? 'navbar__drawer-sublink--active' : ''
                         }`}
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => {
+                          if (onSelectCategory) onSelectCategory('VEYN-SELECTS');
+                          setIsMenuOpen(false);
+                        }}
                       >
                         {item.label}
                       </Link>
@@ -625,32 +604,36 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                   <Link
                     href="/collections/all-drops"
                     className="navbar__drawer-sublink navbar__drawer-sublink--view-all"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      if (onSelectCategory) onSelectCategory('VEYN-SELECTS');
+                      setIsMenuOpen(false);
+                    }}
                   >
-                    VIEW ALL COLLECTIONS &rarr;
+                    VIEW ALL SELECTS &rarr;
                   </Link>
                 </li>
               </ul>
             </li>
 
-            {/* 5. Accordion: OBJECTS (Dynamic from API / Admin) */}
+            {/* 2. Accordion: VEYN-OBJECTS */}
             <li className="navbar__drawer-item navbar__drawer-item--accordion">
               <button
                 type="button"
                 className={`navbar__drawer-accordion-header ${
-                  pathname && (pathname === '/veyn-objects' || pathname.startsWith('/collections/objects'))
+                  activeMainCategory === 'VEYN-OBJECTS' ||
+                  pathname === '/veyn-objects' ||
+                  (pathname && pathname.startsWith('/collections/objects')) ||
+                  openSubmenu === 'veyn-objects'
                     ? 'navbar__drawer-accordion-header--active'
                     : ''
                 }`}
-                onClick={() => toggleSubmenu('objects')}
-                aria-expanded={openSubmenu === 'objects'}
+                onClick={() => toggleSubmenu('veyn-objects')}
+                aria-expanded={openSubmenu === 'veyn-objects'}
               >
-                <span>OBJECTS</span>
+                <span>VEYN-OBJECTS</span>
                 <svg
                   className={`navbar__drawer-chevron ${
-                    openSubmenu === 'objects'
-                      ? 'navbar__drawer-chevron--rotated'
-                      : ''
+                    openSubmenu === 'veyn-objects' ? 'navbar__drawer-chevron--rotated' : ''
                   }`}
                   width="10"
                   height="6"
@@ -668,9 +651,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               </button>
               <ul
                 className={`navbar__drawer-submenu ${
-                  openSubmenu === 'objects'
-                    ? 'navbar__drawer-submenu--open'
-                    : ''
+                  openSubmenu === 'veyn-objects' ? 'navbar__drawer-submenu--open' : ''
                 }`}
               >
                 {objectItems.map((item) => {
@@ -685,7 +666,10 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                         className={`navbar__drawer-sublink ${
                           isItemActive ? 'navbar__drawer-sublink--active' : ''
                         }`}
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => {
+                          if (onSelectCategory) onSelectCategory('VEYN-OBJECTS');
+                          setIsMenuOpen(false);
+                        }}
                       >
                         {item.label}
                       </Link>
@@ -696,7 +680,10 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                   <Link
                     href="/collections/objects-drops"
                     className="navbar__drawer-sublink navbar__drawer-sublink--view-all"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      if (onSelectCategory) onSelectCategory('VEYN-OBJECTS');
+                      setIsMenuOpen(false);
+                    }}
                   >
                     VIEW ALL OBJECTS &rarr;
                   </Link>
