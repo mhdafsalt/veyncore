@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { API_BASE_URL } from '@/lib/constants';
+import { API_BASE_URL, WHATSAPP_NUMBER } from '@/lib/constants';
 import './Navbar.css';
 
 export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCategory }) {
@@ -18,6 +18,9 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
   const [searchQuery, setSearchQuery] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [isLogoSmall, setIsLogoSmall] = useState(false);
+
+  // Dynamic Subcategories for Menu Drawer
+  const [dynamicSubcategories, setDynamicSubcategories] = useState([]);
 
   // Dynamic Search States
   const [popularTags, setPopularTags] = useState(['BAGGY', 'BOOTCUT', 'WIDE', 'STRAIGHT', 'CARGO', 'DENIMS', 'TOPS']);
@@ -194,6 +197,126 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
       }, 150);
     }
   }, [isSearchOpen]);
+
+  // Fetch dynamic categories from backend so menu drawer is 100% dynamic
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDrawerCategories = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/content/subcategories?t=${Date.now()}`);
+        const data = await res.json();
+        if (isMounted && res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setDynamicSubcategories(data.data);
+        }
+      } catch (err) {
+        // Fallback silently to defaults
+      }
+    };
+    fetchDrawerCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // When drawer opens, automatically expand matching submenu based on current page
+  useEffect(() => {
+    if (isMenuOpen && pathname) {
+      if (pathname.startsWith('/pages/')) {
+        setOpenSubmenu('policies');
+      } else if (pathname === '/veyn-objects' || pathname.startsWith('/collections/objects')) {
+        setOpenSubmenu('objects');
+      } else if (pathname.startsWith('/collections/all')) {
+        setOpenSubmenu('collections');
+      }
+    }
+  }, [isMenuOpen, pathname]);
+
+  // Dynamic Collections items (VEYN-SELECTS)
+  const collectionItems = useMemo(() => {
+    const defaults = [
+      { id: 'denims', label: 'DENIMS', href: '/collections/all-drops?category=denims' },
+      { id: 'cargo', label: 'CARGO', href: '/collections/all-drops?category=cargo' },
+      { id: 'baggy', label: 'BAGGY', href: '/collections/all-drops?category=baggy' },
+      { id: 'bootcut', label: 'BOOTCUT', href: '/collections/all-drops?category=bootcut' },
+      { id: 'wide', label: 'WIDE', href: '/collections/all-drops?category=wide' },
+      { id: 'straight', label: 'STRAIGHT', href: '/collections/all-drops?category=straight' },
+      { id: 'tops', label: 'TOPS', href: '/collections/all-drops?category=tops' },
+      { id: 'accessories', label: 'ACCESSORIES', href: '/collections/all-drops?category=accessories' },
+    ];
+
+    if (!dynamicSubcategories || dynamicSubcategories.length === 0) {
+      return defaults;
+    }
+
+    const filtered = dynamicSubcategories.filter(
+      (s) =>
+        (s.mainCategory === 'VEYN-SELECTS' || !s.mainCategory) &&
+        s.active !== false &&
+        s.id !== 'home' &&
+        s.id !== 'all-drops' &&
+        s.id !== 'launch-sale'
+    );
+
+    if (filtered.length === 0) return defaults;
+
+    return filtered.map((s) => {
+      const slug = (s.id || s.label || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const href =
+        s.href && !s.href.startsWith('#')
+          ? s.href
+          : `/collections/all-drops?category=${encodeURIComponent(slug)}`;
+      return {
+        id: slug,
+        label: (s.label || slug).toUpperCase(),
+        href,
+      };
+    });
+  }, [dynamicSubcategories]);
+
+  // Dynamic Objects items (VEYN-OBJECTS)
+  const objectItems = useMemo(() => {
+    const defaults = [
+      { id: 'bags', label: 'BAGS', href: '/collections/objects-drops?category=bags' },
+      { id: 'chains', label: 'CHAINS & HARDWARE', href: '/collections/objects-drops?category=chains' },
+      { id: 'caps', label: 'CAPS & HEADWEAR', href: '/collections/objects-drops?category=caps' },
+      { id: 'hardware', label: 'HARDWARE', href: '/collections/objects-drops?category=hardware' },
+    ];
+
+    if (!dynamicSubcategories || dynamicSubcategories.length === 0) {
+      return defaults;
+    }
+
+    const filtered = dynamicSubcategories.filter(
+      (s) =>
+        s.mainCategory === 'VEYN-OBJECTS' &&
+        s.active !== false &&
+        s.id !== 'home' &&
+        s.id !== 'all-drops'
+    );
+
+    if (filtered.length === 0) return defaults;
+
+    return filtered.map((s) => {
+      const slug = (s.id || s.label || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const href =
+        s.href && !s.href.startsWith('#')
+          ? s.href
+          : `/collections/objects-drops?category=${encodeURIComponent(slug)}`;
+      return {
+        id: slug,
+        label: (s.label || slug).toUpperCase(),
+        href,
+      };
+    });
+  }, [dynamicSubcategories]);
+
+  // Policy items list
+  const policyItems = [
+    { label: 'Terms and Conditions', href: '/pages/terms-of-service' },
+    { label: 'Privacy Policy', href: '/pages/privacy-policy' },
+    { label: 'Refund Policy', href: '/pages/refund-policy' },
+    { label: 'Shipping Policy', href: '/pages/shipping-policy' },
+  ];
 
   const toggleSubmenu = (menuName) => {
     setOpenSubmenu((prev) => (prev === menuName ? null : menuName));
@@ -409,21 +532,27 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
 
         <div className="navbar__drawer-body">
           <ul className="navbar__drawer-menu">
+            {/* 1. HOME */}
             <li className="navbar__drawer-item">
               <Link
                 href="/"
-                className="navbar__drawer-link"
+                className={`navbar__drawer-link ${
+                  pathname === '/' && activeMainCategory !== 'VEYN-OBJECTS'
+                    ? 'navbar__drawer-link--active'
+                    : ''
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 HOME
               </Link>
             </li>
 
+            {/* 2. VEYN-SELECTS */}
             <li className="navbar__drawer-item">
               <button
                 type="button"
                 className={`navbar__drawer-link navbar__drawer-link--button ${
-                  activeMainCategory === 'VEYN-SELECTS'
+                  activeMainCategory === 'VEYN-SELECTS' && (pathname === '/' || pathname.includes('all-drops'))
                     ? 'navbar__drawer-link--active'
                     : ''
                 }`}
@@ -433,6 +562,7 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               </button>
             </li>
 
+            {/* 3. VEYN-OBJECTS */}
             <li className="navbar__drawer-item">
               <button
                 type="button"
@@ -447,11 +577,15 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
               </button>
             </li>
 
-            {/* Accordion: COLLECTIONS */}
+            {/* 4. Accordion: COLLECTIONS (Dynamic from API / Admin) */}
             <li className="navbar__drawer-item navbar__drawer-item--accordion">
               <button
                 type="button"
-                className="navbar__drawer-accordion-header"
+                className={`navbar__drawer-accordion-header ${
+                  pathname && pathname.startsWith('/collections/all')
+                    ? 'navbar__drawer-accordion-header--active'
+                    : ''
+                }`}
                 onClick={() => toggleSubmenu('collections')}
                 aria-expanded={openSubmenu === 'collections'}
               >
@@ -483,86 +617,46 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                     : ''
                 }`}
               >
-                <li className="navbar__drawer-subitem">
+                {collectionItems.map((item) => {
+                  const isItemActive =
+                    pathname === '/collections/all-drops' &&
+                    typeof window !== 'undefined' &&
+                    window.location.search.toLowerCase().includes(item.id.toLowerCase());
+                  return (
+                    <li key={item.id} className="navbar__drawer-subitem">
+                      <Link
+                        href={item.href}
+                        className={`navbar__drawer-sublink ${
+                          isItemActive ? 'navbar__drawer-sublink--active' : ''
+                        }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+                <li className="navbar__drawer-subitem navbar__drawer-subitem--view-all">
                   <Link
-                    href="/#denims"
-                    className="navbar__drawer-sublink"
+                    href="/collections/all-drops"
+                    className="navbar__drawer-sublink navbar__drawer-sublink--view-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    DENIMS
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#cargo"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    CARGO
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#baggy"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    BAGGY
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#bootcut"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    BOOTCUT
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#wide"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    WIDE
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#straight"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    STRAIGHT
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#tops"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    TOPS
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/#accessories"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    ACCESSORIES
+                    VIEW ALL COLLECTIONS &rarr;
                   </Link>
                 </li>
               </ul>
             </li>
 
-            {/* Accordion: OBJECTS (Bags, Chains, Belts, Jewelry, etc.) */}
+            {/* 5. Accordion: OBJECTS (Dynamic from API / Admin) */}
             <li className="navbar__drawer-item navbar__drawer-item--accordion">
               <button
                 type="button"
-                className="navbar__drawer-accordion-header"
+                className={`navbar__drawer-accordion-header ${
+                  pathname && (pathname === '/veyn-objects' || pathname.startsWith('/collections/objects'))
+                    ? 'navbar__drawer-accordion-header--active'
+                    : ''
+                }`}
                 onClick={() => toggleSubmenu('objects')}
                 aria-expanded={openSubmenu === 'objects'}
               >
@@ -594,89 +688,100 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                     : ''
                 }`}
               >
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/veyn-objects#bags"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    BAGS
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/veyn-objects#chains"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    CHAINS
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/veyn-objects#headwear"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    HEADWEAR & CAPS
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/veyn-objects#hardware"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    HARDWARE
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
+                {objectItems.map((item) => {
+                  const isItemActive =
+                    pathname === '/collections/objects-drops' &&
+                    typeof window !== 'undefined' &&
+                    window.location.search.toLowerCase().includes(item.id.toLowerCase());
+                  return (
+                    <li key={item.id} className="navbar__drawer-subitem">
+                      <Link
+                        href={item.href}
+                        className={`navbar__drawer-sublink ${
+                          isItemActive ? 'navbar__drawer-sublink--active' : ''
+                        }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+                <li className="navbar__drawer-subitem navbar__drawer-subitem--view-all">
                   <Link
                     href="/collections/objects-drops"
-                    className="navbar__drawer-sublink"
+                    className="navbar__drawer-sublink navbar__drawer-sublink--view-all"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    VIEW ALL DROPS
+                    VIEW ALL OBJECTS &rarr;
                   </Link>
                 </li>
               </ul>
             </li>
 
+            {/* 6. LAUNCH SALE */}
             <li className="navbar__drawer-item">
               <Link
-                href="#flash-sale"
-                className="navbar__drawer-link navbar__drawer-link--highlight"
+                href="/collections/launch-sale"
+                className={`navbar__drawer-link navbar__drawer-link--highlight ${
+                  pathname === '/collections/launch-sale'
+                    ? 'navbar__drawer-link--active'
+                    : ''
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                FLASH SALE ⚡️
+                LAUNCH SALE ⚡️
               </Link>
             </li>
 
+            {/* 7. ALL DROPS */}
             <li className="navbar__drawer-item">
               <Link
                 href="/collections/all-drops"
-                className="navbar__drawer-link navbar__drawer-link--highlight"
+                className={`navbar__drawer-link navbar__drawer-link--highlight ${
+                  pathname === '/collections/all-drops'
+                    ? 'navbar__drawer-link--active'
+                    : ''
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 ALL DROPS ⚡️
               </Link>
             </li>
 
+            {/* 8. TRACK ORDER */}
             <li className="navbar__drawer-item">
-              <Link
-                href="#track-order"
-                className="navbar__drawer-link"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                type="button"
+                className="navbar__drawer-link navbar__drawer-link--button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  if (isAuthenticated) {
+                    openAuthModal('account');
+                  } else {
+                    window.open(
+                      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                        'Hello VEYNCORE, I would like to track my order.'
+                      )}`,
+                      '_blank',
+                      'noopener,noreferrer'
+                    );
+                  }
+                }}
               >
                 TRACK ORDER
-              </Link>
+              </button>
             </li>
 
-            {/* Accordion: POLICIES */}
+            {/* 9. Accordion: POLICIES */}
             <li className="navbar__drawer-item navbar__drawer-item--accordion">
               <button
                 type="button"
-                className="navbar__drawer-accordion-header"
+                className={`navbar__drawer-accordion-header ${
+                  pathname && pathname.startsWith('/pages/')
+                    ? 'navbar__drawer-accordion-header--active'
+                    : ''
+                }`}
                 onClick={() => toggleSubmenu('policies')}
                 aria-expanded={openSubmenu === 'policies'}
               >
@@ -708,49 +813,36 @@ export default function Navbar({ activeMainCategory = 'VEYN-SELECTS', onSelectCa
                     : ''
                 }`}
               >
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/pages/privacy-policy"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/pages/refund-policy"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Refund Policy
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/pages/shipping-policy"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Shipping Policy
-                  </Link>
-                </li>
-                <li className="navbar__drawer-subitem">
-                  <Link
-                    href="/pages/terms-of-service"
-                    className="navbar__drawer-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Terms of Service
-                  </Link>
-                </li>
+                {policyItems.map((policy) => {
+                  const isPolicyActive =
+                    pathname === policy.href ||
+                    (policy.href.includes('terms') && pathname && pathname.startsWith('/pages/terms'));
+                  return (
+                    <li key={policy.href} className="navbar__drawer-subitem">
+                      <Link
+                        href={policy.href}
+                        className={`navbar__drawer-sublink ${
+                          isPolicyActive ? 'navbar__drawer-sublink--active' : ''
+                        }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {policy.label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </li>
 
+            {/* 10. CONTACT US */}
             <li className="navbar__drawer-item">
               <Link
-                href="#contact"
-                className="navbar__drawer-link"
+                href="/pages/contact"
+                className={`navbar__drawer-link ${
+                  pathname === '/pages/contact' || pathname === '/contact' || pathname === '/pages/contact-us'
+                    ? 'navbar__drawer-link--active'
+                    : ''
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 CONTACT US

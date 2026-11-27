@@ -71,13 +71,18 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                       </Link>
                     </li>
                     <li>
-                      <Link href="/#flash-sale" className="modern-footer__accordion-link">
-                        FLASH SALE
+                      <Link href="/collections/launch-sale" className="modern-footer__accordion-link">
+                        LAUNCH SALE
                       </Link>
                     </li>
                     <li>
                       <Link href="/collections/all-drops" className="modern-footer__accordion-link">
                         NEW DROPS
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/pages/contact" className="modern-footer__accordion-link">
+                        CONTACT US
                       </Link>
                     </li>
                     <li>
