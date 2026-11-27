@@ -635,7 +635,7 @@ export default function CartDrawer() {
         ) : (
           <div className="cart-drawer__empty-footer">
             <span className="cart-drawer__empty-shipping-note">
-              FREE SHIPPING ALL OVER INDIA
+              Free Shipping in Select Locations
             </span>
             <Link
               href="/collections/all-drops"

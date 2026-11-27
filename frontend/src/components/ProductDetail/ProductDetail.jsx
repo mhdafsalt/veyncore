@@ -328,7 +328,7 @@ export default function ProductDetail({ product, activeLaunchSale = null }) {
       productUrl ? `  Product Link: ${productUrl}` : '',
       '--------------------------------',
       `*Total Amount:* Rs. ${itemTotal.toLocaleString('en-IN')}.00 INR`,
-      '*Shipping:* Free Shipping All Over India',
+      '*Shipping:* Free Shipping in Select Locations',
       '--------------------------------',
       'Please confirm my order and share payment instructions. Thank you!'
     ].filter(Boolean);
@@ -556,7 +556,7 @@ export default function ProductDetail({ product, activeLaunchSale = null }) {
 
               {/* Taxes & Shipping Note */}
               <p className="product-details__tax-note">
-                Tax included. Free shipping across India.
+                Tax included. Free Shipping in Select Locations
               </p>
 
               <hr className="product-details__divider" />
@@ -839,7 +839,7 @@ export default function ProductDetail({ product, activeLaunchSale = null }) {
             </svg>
             <div>
               <h4 className="product-highlights__title">FREE SHIPPING</h4>
-              <p className="product-highlights__desc">Complimentary shipping across India</p>
+              <p className="product-highlights__desc">Free Shipping in Select Locations</p>
             </div>
           </div>
 
