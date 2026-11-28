@@ -48,11 +48,19 @@ const evaluateDiscount = (code, subtotal) => {
 };
 
 /**
- * Generate a guaranteed unique order reference
+ * Strict format pattern for valid VEYNCORE order references: VC-YYYYMMDD-XXXX (4 numeric digits)
+ */
+const VC_ORDER_FORMAT = /^VC-\d{8}-\d{4}$/;
+
+/**
+ * Generate a guaranteed unique order reference.
+ * Authoritative: Validates format and checks for collisions in MongoDB.
+ * Rejects manipulated, invalid, or duplicate client references and falls back
+ * to server-side generated unique VC-YYYYMMDD-XXXX format.
  */
 const generateUniqueOrderNumber = async (requestedRef = '') => {
   const cleanRequested = String(requestedRef || '').trim().toUpperCase();
-  if (cleanRequested && cleanRequested.startsWith('VC-')) {
+  if (cleanRequested && VC_ORDER_FORMAT.test(cleanRequested)) {
     const exists = await Order.exists({ orderNumber: cleanRequested });
     if (!exists) return cleanRequested;
   }
@@ -64,7 +72,8 @@ const generateUniqueOrderNumber = async (requestedRef = '') => {
     const exists = await Order.exists({ orderNumber: candidate });
     if (!exists) return candidate;
   }
-  return `VC-${dateStr}-${Date.now().toString().slice(-4)}`;
+  const timeSuffix = String(Date.now() % 10000).padStart(4, '0');
+  return `VC-${dateStr}-${timeSuffix}`;
 };
 
 /**
