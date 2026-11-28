@@ -75,6 +75,7 @@ export const getAllLaunchSales = async (req, res) => {
  */
 export const getActiveLaunchSales = async (req, res) => {
   try {
+    await connectDB();
     const now = new Date();
 
     const sales = await LaunchSale.find({
@@ -121,6 +122,7 @@ export const getActiveLaunchSales = async (req, res) => {
         };
       });
 
+    res.set('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=60');
     return res.status(200).json({
       success: true,
       count: activeValid.length,
@@ -142,14 +144,30 @@ export const getActiveLaunchSales = async (req, res) => {
  */
 export const getLaunchSaleByProductId = async (req, res) => {
   try {
+    await connectDB();
     const { productIdOrHandle } = req.params;
     let product = null;
+    const rawParam = String(productIdOrHandle).trim();
+    let decodedParam = rawParam;
+    try {
+      decodedParam = decodeURIComponent(rawParam).trim();
+    } catch (e) {}
 
-    if (mongoose.Types.ObjectId.isValid(productIdOrHandle)) {
-      product = await Product.findById(productIdOrHandle).lean();
+    if (mongoose.Types.ObjectId.isValid(rawParam)) {
+      product = await Product.findById(rawParam).lean();
+    } else if (mongoose.Types.ObjectId.isValid(decodedParam)) {
+      product = await Product.findById(decodedParam).lean();
     }
+
     if (!product) {
-      product = await Product.findOne({ handle: productIdOrHandle.toLowerCase() }).lean();
+      product = await Product.findOne({
+        $or: [
+          { handle: rawParam.toLowerCase() },
+          { handle: decodedParam.toLowerCase() },
+          { handle: new RegExp(`^${String(rawParam).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+          { handle: new RegExp(`^${String(decodedParam).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+        ],
+      }).lean();
     }
 
     if (!product) {
@@ -168,6 +186,7 @@ export const getLaunchSaleByProductId = async (req, res) => {
     }).lean();
 
     if (!activeSale) {
+      res.set('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=60');
       return res.status(200).json({
         success: true,
         hasActiveSale: false,
@@ -178,6 +197,7 @@ export const getLaunchSaleByProductId = async (req, res) => {
     const originalPrice = Number(product.price) || 0;
     const discountedPrice = calculateDiscountedPrice(originalPrice, activeSale.discountPercentage);
 
+    res.set('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=60');
     return res.status(200).json({
       success: true,
       hasActiveSale: true,

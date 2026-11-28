@@ -81,9 +81,18 @@ app.use(async (req, res, next) => {
 
   // Ensure database is connected before handling database-dependent routes
   try {
-    const conn = await connectDB();
+    let conn = await connectDB();
     if (conn && mongoose.connection.readyState === 1) {
       return next();
+    }
+
+    // Graceful cold-start retry: if connection is handshaking, wait briefly and retry once
+    if (mongoose.connection.readyState !== 1) {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      conn = await connectDB();
+      if (conn && mongoose.connection.readyState === 1) {
+        return next();
+      }
     }
 
     return res.status(503).json({

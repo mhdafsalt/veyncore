@@ -134,7 +134,7 @@ function LaunchSaleCard({ saleItem, onExpire }) {
       {/* Media Zone */}
       <div className="all-drops-card__media">
         <Link
-          href={`/products/${saleItem.handle}`}
+          href={`/products/${saleItem.handle || saleItem.productId || saleItem._id}`}
           className="all-drops-card__image-link"
           aria-label={saleItem.title}
         >
@@ -268,7 +268,10 @@ function LaunchSaleCard({ saleItem, onExpire }) {
 
       {/* Product Meta Info (Title & Pricing matching AllDrops) */}
       <div className="all-drops-card__info">
-        <Link href={`/products/${saleItem.handle}`} className="all-drops-card__title-link">
+        <Link
+          href={`/products/${saleItem.handle || saleItem.productId || saleItem._id}`}
+          className="all-drops-card__title-link"
+        >
           <h2 className="all-drops-card__title">{saleItem.title}</h2>
         </Link>
         <div className="all-drops-card__price-row">
@@ -293,36 +296,97 @@ function LaunchSaleCard({ saleItem, onExpire }) {
   );
 }
 
+// Module-level in-memory cache for fast transitions without re-fetching flashes
+let memoryLaunchSales = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60000; // 60 seconds TTL
+
 /**
  * Main Storefront Launch Sale Collection Component
  * Strict layout and architecture parity with AllDrops
  */
 export default function LaunchSale() {
-  const [saleProducts, setSaleProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [saleProducts, setSaleProducts] = useState(() => memoryLaunchSales || []);
+  const [loading, setLoading] = useState(() => !memoryLaunchSales || memoryLaunchSales.length === 0);
+  const [loadError, setLoadError] = useState(false);
+  const abortControllerRef = useRef(null);
 
-  const fetchActiveSales = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/launch-sales/active?t=${Date.now()}`, {
-        cache: 'no-store',
-      });
-      const data = await res.json();
-      if (res.ok && data.success && Array.isArray(data.data)) {
-        setSaleProducts(data.data);
+  const fetchActiveSales = useCallback(async (isManualRefresh = false) => {
+    // If not manual refresh and recent cache is valid, reuse immediately
+    if (!isManualRefresh && memoryLaunchSales && Date.now() - lastFetchTime < CACHE_TTL_MS) {
+      setSaleProducts(memoryLaunchSales);
+      setLoading(false);
+      setLoadError(false);
+      return;
+    }
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    const maxAttempts = 3;
+    const delays = [800, 1600, 2500];
+    let succeeded = false;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      if (abortController.signal.aborted) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/launch-sales/active?t=${Date.now()}`, {
+          cache: 'no-store',
+          signal: abortController.signal,
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.data)) {
+            memoryLaunchSales = data.data;
+            lastFetchTime = Date.now();
+            setSaleProducts(data.data);
+            setLoadError(false);
+            setLoading(false);
+            succeeded = true;
+            break;
+          }
+        }
+
+        // Retry if 503, 500, or temporary connection delay
+        if (attempt < maxAttempts && !abortController.signal.aborted) {
+          await new Promise((r) => setTimeout(r, delays[attempt - 1]));
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        if (attempt < maxAttempts && !abortController.signal.aborted) {
+          await new Promise((r) => setTimeout(r, delays[attempt - 1]));
+        }
       }
-    } catch (err) {
-      console.warn('[LaunchSale] Failed to load active sales:', err);
-    } finally {
+    }
+
+    if (!succeeded && !abortController.signal.aborted) {
+      // If we already have cached items, keep showing them rather than showing a blank state
+      if (!memoryLaunchSales || memoryLaunchSales.length === 0) {
+        setLoadError(true);
+      }
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchActiveSales();
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchActiveSales]);
 
   const handleProductExpire = useCallback((saleId) => {
-    setSaleProducts((prev) => prev.filter((item) => String(item._id) !== String(saleId)));
+    setSaleProducts((prev) => {
+      const updated = prev.filter((item) => String(item._id) !== String(saleId));
+      memoryLaunchSales = updated;
+      return updated;
+    });
   }, []);
 
   return (
@@ -332,7 +396,7 @@ export default function LaunchSale() {
         <header className="all-drops__header launch-sale__header">
           <div className="all-drops__header-title-row">
             <h1 className="all-drops__title">LAUNCH SALE</h1>
-            {!loading && (
+            {!loading && !loadError && (
               <span className="all-drops__count-badge">
                 {saleProducts.length} {saleProducts.length === 1 ? 'PRODUCT' : 'PRODUCTS'}
               </span>
@@ -351,6 +415,24 @@ export default function LaunchSale() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : loadError && saleProducts.length === 0 ? (
+          <div className="all-drops__empty">
+            <h2 className="all-drops__empty-title">UNABLE TO LOAD LAUNCH SALES</h2>
+            <p className="all-drops__empty-text">
+              We encountered a temporary connection delay while retrieving active promotional drops.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoading(true);
+                setLoadError(false);
+                fetchActiveSales(true);
+              }}
+              className="all-drops__empty-btn"
+            >
+              TRY AGAIN
+            </button>
           </div>
         ) : saleProducts.length > 0 ? (
           <div className="all-drops__grid all-drops__grid--4col all-drops__grid--m2col">

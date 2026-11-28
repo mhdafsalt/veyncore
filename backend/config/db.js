@@ -62,7 +62,8 @@ export const connectDB = async () => {
   const opts = {
     dbName: 'veyncore', // Guarantee target database name even if omitted from connection string
     bufferCommands: false, // Do NOT buffer queries when disconnected; fail fast instead
-    serverSelectionTimeoutMS: 5000, // 5 seconds max to find a server
+    serverSelectionTimeoutMS: 15000, // 15 seconds to accommodate multi-shard cold-start handshakes
+    connectTimeoutMS: 15000, // 15 seconds connection timeout
     maxPoolSize: 10, // Maintain bounded pool size appropriate for serverless execution
     minPoolSize: 0, // Never keep idle connection floors in ephemeral serverless containers
     maxIdleTimeMS: 30000, // Close idle connections after 30s to prevent Atlas connection exhaustion

@@ -176,14 +176,46 @@ export const getProductByHandleOrId = async (req, res) => {
     }
 
     let product = null;
-    const cleanHandle = String(handleOrId).trim();
-
-    if (mongoose.Types.ObjectId.isValid(cleanHandle)) {
-      product = await Product.findById(cleanHandle).lean();
+    const rawParam = String(handleOrId).trim();
+    let decodedParam = rawParam;
+    try {
+      decodedParam = decodeURIComponent(rawParam).trim();
+    } catch (e) {
+      // Keep rawParam if decoding fails
     }
 
+    // 1. Try finding by MongoDB ObjectId if valid
+    if (mongoose.Types.ObjectId.isValid(rawParam)) {
+      product = await Product.findById(rawParam).lean();
+    } else if (mongoose.Types.ObjectId.isValid(decodedParam)) {
+      product = await Product.findById(decodedParam).lean();
+    }
+
+    // 2. Try finding by handle (exact, lowercase, or case-insensitive regex)
     if (!product) {
-      product = await Product.findOne({ handle: cleanHandle.toLowerCase() }).lean();
+      product = await Product.findOne({
+        $or: [
+          { handle: rawParam.toLowerCase() },
+          { handle: decodedParam.toLowerCase() },
+          { handle: new RegExp(`^${escapeRegex(rawParam)}$`, 'i') },
+          { handle: new RegExp(`^${escapeRegex(decodedParam)}$`, 'i') },
+        ],
+      }).lean();
+    }
+
+    // 3. Fallback: Try slugified title or direct title match (handles spaces, hyphens, underscores)
+    if (!product) {
+      const slugifiedRaw = rawParam.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const slugifiedDecoded = decodedParam.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const titleClean = decodedParam.replace(/[-_]/g, ' ').trim();
+
+      product = await Product.findOne({
+        $or: [
+          { handle: slugifiedRaw },
+          { handle: slugifiedDecoded },
+          { title: new RegExp(`^${escapeRegex(titleClean)}$`, 'i') },
+        ],
+      }).lean();
     }
 
     if (!product) {
