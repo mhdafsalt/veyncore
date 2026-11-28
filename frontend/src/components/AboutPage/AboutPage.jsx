@@ -88,9 +88,9 @@ export default function AboutPage() {
         '@type': 'AboutPage',
         '@id': 'https://veyncore.in/pages/about#webpage',
         url: 'https://veyncore.in/pages/about',
-        name: 'About VEYNCORE | Contemporary Streetwear & Curated Fashion',
+        name: 'About VEYNCORE | IDENTITY RUNS DEEP',
         description:
-          'Discover VEYNCORE: contemporary streetwear, oversized T-shirts, baggy pants, and curated fashion pieces via VEYN-SELECTS. Built for individuality and modern style.',
+          'VEYNCORE is an independent online fashion store in India, bringing together contemporary streetwear, everyday essentials and carefully curated fashion pieces. Built around individuality, self-expression and modern aesthetics.',
         inLanguage: 'en-IN',
         isPartOf: {
           '@type': 'WebSite',
@@ -181,14 +181,13 @@ export default function AboutPage() {
             </span>
             <h1 className="about-hero__title">ABOUT VEYNCORE</h1>
             <p className="about-hero__statement">
-              Modern silhouettes, intentional proportions, and curated fashion
-              crafted for personal identity.
+              IDENTITY RUNS DEEP.
             </p>
             <p className="about-hero__desc">
-              VEYNCORE is an independent online streetwear store designed for
-              those who view clothing as a medium of self-expression. We blend
-              relaxed tailoring, oversized silhouettes, and disciplined curation
-              to deliver modern wardrobe essentials that effortlessly stand out.
+              VEYNCORE is an independent online fashion store in India, bringing together contemporary streetwear, everyday essentials and carefully curated fashion pieces. Built around individuality, self-expression and modern aesthetics, we aim to make distinctive fashion accessible to those who define their own style.
+            </p>
+            <p className="about-hero__desc" style={{ marginTop: '-18px' }}>
+              From oversized T-shirts and baggy jeans to relaxed-fit clothing, denim and lifestyle accessories, our collections are thoughtfully selected to reflect the evolving world of streetwear and contemporary fashion.
             </p>
 
             {/* Quick Metrics & Architecture Strip */}
@@ -214,56 +213,40 @@ export default function AboutPage() {
         </section>
 
         {/* =================================================================
-            2. ABOUT VEYNCORE (AEO DIRECT DEFINITION)
+            2. OUR APPROACH
             ================================================================= */}
-        <section className="about-section about-intro" aria-labelledby="heading-about">
+        <section className="about-section about-intro" aria-labelledby="heading-approach">
           <div className="about-container">
             <div className="about-section-header">
-              <span className="about-section-tag">BRAND IDENTITY</span>
-              <h2 id="heading-about" className="about-section-title">
-                What Is VEYNCORE?
+              <span className="about-section-tag">BRAND PHILOSOPHY</span>
+              <h2 id="heading-approach" className="about-section-title">
+                OUR APPROACH
               </h2>
             </div>
 
             <div className="about-intro__content">
               <p className="about-intro__lead">
-                <strong>VEYNCORE</strong> is a contemporary streetwear brand and
-                curated online clothing store focused on modern fashion, relaxed
-                silhouettes, and distinctive aesthetic direction.
+                At <strong>VEYNCORE</strong>, we believe fashion is more than just clothing. It’s a reflection of personality, attitude and individuality. Our focus is on discovering and curating fashion pieces that combine everyday comfort, distinctive style and versatility.
               </p>
               <p className="about-text">
-                Born out of an appreciation for modern street culture and minimal
-                editorial design, VEYNCORE provides thoughtfully assembled drops
-                that challenge rigid fashion categories. Rather than chasing
-                transient micro-trends, our collections emphasize balanced
-                proportions, durable fabric hand-feel, and versatile staples that
-                integrate seamlessly into daily streetwear rotation.
-              </p>
-              <p className="about-text">
-                Every drop reflects our dedication to individuality: whether it
-                is the precise drop of an oversized shoulder seam, the stack of
-                wide-leg denim over sneakers, or the subtle accent of a curated
-                lifestyle accessory, VEYNCORE offers pieces designed to be styled
-                distinctly by every wearer.
+                Every collection reflects our creative direction, with an emphasis on modern silhouettes, relaxed fits and timeless streetwear influences.
               </p>
             </div>
           </div>
         </section>
 
         {/* =================================================================
-            3. OUR FASHION & COLLECTIONS
+            3. OUR COLLECTIONS
             ================================================================= */}
         <section className="about-section about-collections" aria-labelledby="heading-collections">
           <div className="about-container">
             <div className="about-section-header">
               <span className="about-section-tag">OUR WARDROBE</span>
               <h2 id="heading-collections" className="about-section-title">
-                Our Fashion & Streetwear Collections
+                OUR COLLECTIONS
               </h2>
               <p className="about-section-desc">
-                Engineered with deliberate cuts and relaxed dimensions, our
-                collections cover essential streetwear categories built for modern
-                living.
+                Explore a curated selection of oversized T-shirts, baggy pants, denim, streetwear essentials and lifestyle accessories. Through VEYN-SELECTS and VEYN-OBJECTS, we bring together fashion and everyday essentials that complement individual style.
               </p>
             </div>
 
@@ -424,18 +407,20 @@ export default function AboutPage() {
         </section>
 
         {/* =================================================================
-            5. WHY CHOOSE VEYNCORE?
+            5. SHOP WITH VEYNCORE
             ================================================================= */}
         <section className="about-section about-why" aria-labelledby="heading-why">
           <div className="about-container">
             <div className="about-section-header">
-              <span className="about-section-tag">VERIFIED ADVANTAGES</span>
+              <span className="about-section-tag">CUSTOMER EXPERIENCE</span>
               <h2 id="heading-why" className="about-section-title">
-                Why Choose VEYNCORE?
+                SHOP WITH VEYNCORE
               </h2>
               <p className="about-section-desc">
-                Clear, honest features based entirely on our actual website
-                operations and verified customer services.
+                Discover contemporary clothing and streetwear through our online store. We offer shipping across India, with free shipping available in selected areas. For product inquiries, sizing assistance and orders, connect with us directly through WhatsApp.
+              </p>
+              <p className="about-section-desc" style={{ marginTop: '12px', color: '#334155' }}>
+                Whether you’re looking for oversized fits, relaxed denim or everyday streetwear, VEYNCORE brings together pieces that let you express your identity.
               </p>
             </div>
 
@@ -630,19 +615,18 @@ export default function AboutPage() {
         <section className="about-cta" aria-label="Connect with VEYNCORE">
           <div className="about-container">
             <div className="about-cta__card">
-              <span className="about-cta__tag">READY TO EXPLORE?</span>
-              <h2 className="about-cta__title">DISCOVER THE LATEST DROPS</h2>
+              <span className="about-cta__tag">VEYNCORE &mdash; IDENTITY RUNS DEEP.</span>
+              <h2 className="about-cta__title">EXPLORE THE COLLECTIONS. DEFINE YOUR OWN STYLE.</h2>
               <p className="about-cta__desc">
-                Explore our curated streetwear catalog, check size guides, or
-                connect directly with our WhatsApp concierge for tailored assistance.
+                Discover contemporary clothing and streetwear through our online store. Connect with us directly through WhatsApp for sizing and orders.
               </p>
               <div className="about-cta__actions">
                 <Link href="/collections/all-drops" className="about-btn about-btn--white">
-                  SHOP ALL DROPS
+                  EXPLORE COLLECTIONS
                 </Link>
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-                    'Hello VEYNCORE, I would like to learn more about your latest drops.'
+                    'Hello VEYNCORE, I would like to learn more about your latest collections.'
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

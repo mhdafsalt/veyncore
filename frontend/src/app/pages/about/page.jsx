@@ -2,19 +2,21 @@ import React from 'react';
 import AboutPage from '@/components/AboutPage/AboutPage';
 
 export const metadata = {
-  title: 'About VEYNCORE | Contemporary Streetwear & Curated Fashion',
+  title: 'About VEYNCORE | IDENTITY RUNS DEEP',
   description:
-    'Discover VEYNCORE, an online contemporary streetwear brand offering modern oversized T-shirts, baggy pants, denim, and curated fashion pieces through VEYN-SELECTS.',
+    'VEYNCORE is an independent online fashion store in India, bringing together contemporary streetwear, everyday essentials and carefully curated fashion pieces. Built around individuality, self-expression and modern aesthetics.',
   keywords: [
     'VEYNCORE',
+    'IDENTITY RUNS DEEP',
     'VEYNCORE streetwear',
     'VEYNCORE clothing',
     'online streetwear store',
-    'contemporary streetwear',
+    'contemporary streetwear India',
     'oversized T-shirts',
-    'baggy pants',
+    'baggy jeans',
+    'relaxed-fit clothing',
     'denim streetwear',
-    'modern streetwear fashion',
+    'lifestyle accessories',
     'curated fashion collections',
     'VEYN-SELECTS',
     'VEYN-OBJECTS',
@@ -24,9 +26,9 @@ export const metadata = {
     canonical: 'https://veyncore.in/pages/about',
   },
   openGraph: {
-    title: 'About VEYNCORE | Contemporary Streetwear & Curated Fashion',
+    title: 'About VEYNCORE | IDENTITY RUNS DEEP',
     description:
-      'Discover VEYNCORE, an online contemporary streetwear brand offering modern oversized T-shirts, baggy pants, denim, and curated fashion pieces through VEYN-SELECTS.',
+      'VEYNCORE is an independent online fashion store in India, bringing together contemporary streetwear, everyday essentials and carefully curated fashion pieces.',
     url: 'https://veyncore.in/pages/about',
     siteName: 'VEYNCORE',
     locale: 'en_IN',
@@ -36,15 +38,15 @@ export const metadata = {
         url: 'https://veyncore.in/images/veyncoreLogo_black.svg',
         width: 1200,
         height: 630,
-        alt: 'About VEYNCORE - Contemporary Streetwear & Curated Fashion',
+        alt: 'About VEYNCORE - IDENTITY RUNS DEEP',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About VEYNCORE | Contemporary Streetwear & Curated Fashion',
+    title: 'About VEYNCORE | IDENTITY RUNS DEEP',
     description:
-      'Discover VEYNCORE, an online contemporary streetwear brand offering modern oversized T-shirts, baggy pants, denim, and curated fashion pieces through VEYN-SELECTS.',
+      'VEYNCORE is an independent online fashion store in India, bringing together contemporary streetwear, everyday essentials and carefully curated fashion pieces.',
     images: ['https://veyncore.in/images/veyncoreLogo_black.svg'],
   },
   robots: {
