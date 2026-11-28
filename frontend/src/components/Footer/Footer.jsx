@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { FaInstagram, FaPinterestP, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
+import { FaInstagram, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import './Footer.css';
 
@@ -205,7 +205,9 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                       aria-label="Pinterest"
                       title="Pinterest"
                     >
-                      <FaPinterestP size={17} aria-hidden="true" />
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.377-.291 1.199-.332 1.366-.053.225-.177.271-.409.165-1.523-.71-2.474-2.937-2.474-4.73 0-3.854 2.8-7.396 8.077-7.396 4.241 0 7.537 3.023 7.537 7.063 0 4.215-2.657 7.608-6.347 7.608-1.239 0-2.404-.645-2.803-1.408l-.763 2.909c-.275 1.058-1.02 2.384-1.522 3.193C9.914 23.86 10.938 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" />
+                      </svg>
                     </a>
                     <a
                       href="https://wa.me/919446391166"
