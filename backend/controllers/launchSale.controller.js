@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import connectDB from '../config/db.js';
 import LaunchSale from '../models/launchSale.model.js';
 import Product from '../models/product.model.js';
 
@@ -19,6 +20,7 @@ export const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
  */
 export const getAllLaunchSales = async (req, res) => {
   try {
+    await connectDB();
     const sales = await LaunchSale.find()
       .populate('productId')
       .sort({ displayPriority: 1, createdAt: -1 })
@@ -229,6 +231,7 @@ export const getLaunchSaleByProductId = async (req, res) => {
  */
 export const createLaunchSale = async (req, res) => {
   try {
+    await connectDB();
     const {
       productId,
       discountPercentage,
@@ -345,6 +348,7 @@ export const createLaunchSale = async (req, res) => {
  */
 export const updateLaunchSale = async (req, res) => {
   try {
+    await connectDB();
     const { id } = req.params;
     const {
       productId,
@@ -455,6 +459,7 @@ export const updateLaunchSale = async (req, res) => {
  */
 export const toggleLaunchSaleStatus = async (req, res) => {
   try {
+    await connectDB();
     const { id } = req.params;
     const sale = await LaunchSale.findById(id);
 
@@ -506,6 +511,7 @@ export const toggleLaunchSaleStatus = async (req, res) => {
  */
 export const deleteLaunchSale = async (req, res) => {
   try {
+    await connectDB();
     const { id } = req.params;
     const sale = await LaunchSale.findById(id);
 
