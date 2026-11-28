@@ -50,15 +50,21 @@ const evaluateDiscount = (code, subtotal) => {
 /**
  * Generate a guaranteed unique order reference
  */
-const generateUniqueOrderNumber = async () => {
+const generateUniqueOrderNumber = async (requestedRef = '') => {
+  const cleanRequested = String(requestedRef || '').trim().toUpperCase();
+  if (cleanRequested && cleanRequested.startsWith('VC-')) {
+    const exists = await Order.exists({ orderNumber: cleanRequested });
+    if (!exists) return cleanRequested;
+  }
+
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   for (let attempt = 0; attempt < 10; attempt++) {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const candidate = `FS-${dateStr}-${randomSuffix}`;
+    const candidate = `VC-${dateStr}-${randomSuffix}`;
     const exists = await Order.exists({ orderNumber: candidate });
     if (!exists) return candidate;
   }
-  return `FS-${dateStr}-${Date.now().toString().slice(-4)}`;
+  return `VC-${dateStr}-${Date.now().toString().slice(-4)}`;
 };
 
 /**
@@ -196,7 +202,8 @@ export const createOrder = async (req, res) => {
     const totalAmount = Math.max(0, calculatedSubtotal - discountAmount + shippingFee);
 
     // 8. Generate Guaranteed Unique Order Number
-    const orderNumber = await generateUniqueOrderNumber();
+    const requestedRef = req.body.orderNumber || req.body.orderRef || '';
+    const orderNumber = await generateUniqueOrderNumber(requestedRef);
 
     // 9. Persist Order Record in MongoDB
     const newOrder = await Order.create({

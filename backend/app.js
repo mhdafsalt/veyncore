@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -10,6 +11,21 @@ import notFoundHandler from './middleware/notFoundHandler.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
+
+// Trust reverse proxy hops (e.g. Vercel, AWS) so rate-limiter and req.ip accurately read real client IP
+app.set('trust proxy', 1);
+
+// Baseline Security Headers via Helmet
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Managed at frontend edge / allows external Cloudinary and WhatsApp origins
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Crucial so frontend can load assets / APIs across domains
+    crossOriginEmbedderPolicy: false,
+    frameguard: { action: 'deny' }, // X-Frame-Options: DENY
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }, // Referrer-Policy
+    noSniff: true, // X-Content-Type-Options: nosniff
+  })
+);
 
 // Dynamic CORS configuration supporting production domains, Vercel deployments, and local development
 const allowedOrigins = [

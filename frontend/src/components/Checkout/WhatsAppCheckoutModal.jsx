@@ -96,12 +96,12 @@ const getShippingDetails = (pincode) => {
 };
 
 /**
- * Generate a clean, unique order reference ID (e.g. FS-20261123-8472)
+ * Generate a clean, unique order reference ID (e.g. VC-20261128-8472)
  */
 const generateOrderReference = () => {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  return `FS-${dateStr}-${randomSuffix}`;
+  return `VC-${dateStr}-${randomSuffix}`;
 };
 
 export default function WhatsAppCheckoutModal() {
@@ -431,6 +431,8 @@ export default function WhatsAppCheckoutModal() {
         })),
         discountCode: appliedDiscount?.code || '',
         source: checkoutSource || 'whatsapp_checkout',
+        orderNumber: currentRef,
+        orderRef: currentRef,
       };
 
       // 2. Persist Order in MongoDB before WhatsApp Redirection
