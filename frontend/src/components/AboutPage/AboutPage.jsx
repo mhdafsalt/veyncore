@@ -27,49 +27,49 @@ const FAQS = [
     id: 'faq-1',
     question: 'What is VEYNCORE?',
     answer:
-      'VEYNCORE is an independent contemporary streetwear brand and online clothing store based in India. The brand specializes in modern apparel, relaxed silhouettes, and curated fashion pieces designed for individuals seeking authentic style and personal expression.',
+      'VEYNCORE is an independent online fashion store in India, bringing together contemporary streetwear, everyday essentials and carefully curated fashion pieces. Built around individuality, self-expression and modern aesthetics, we aim to make distinctive fashion accessible to those who define their own style.',
   },
   {
     id: 'faq-2',
     question: 'What type of clothing does VEYNCORE offer?',
     answer:
-      'VEYNCORE offers a focused collection of contemporary streetwear garments including heavyweight oversized T-shirts, relaxed baggy pants, straight-fit denim, bootcut trousers, and thoughtfully sourced fashion pieces through VEYN-SELECTS, as well as everyday lifestyle accessories in VEYN-OBJECTS.',
+      'VEYNCORE offers a curated selection of contemporary streetwear and everyday fashion, featuring oversized T-shirts, relaxed-fit baggy pants, straight-fit denim, bootcut trousers and other distinctive clothing pieces. Through VEYN-SELECTS, we bring together thoughtfully sourced fashion finds, while VEYN-OBJECTS features lifestyle accessories and everyday essentials designed to complement your personal style.',
   },
   {
     id: 'faq-3',
     question: 'Where can I shop VEYNCORE collections?',
     answer:
-      'You can explore and shop all official VEYNCORE collections online directly through our website at veyncore.in. Customers can browse drops, review accurate size charts, and place orders through the online cart or via our official WhatsApp concierge.',
+      'You can explore the latest VEYNCORE collections directly through our official online store at veyncore.in. Browse our curated selection of streetwear, oversized T-shirts, baggy pants, denim and lifestyle accessories, check product details and size guides, and place your order conveniently through our official WhatsApp ordering channel. Shop the latest collections and discover fashion that reflects your individuality.',
   },
   {
     id: 'faq-4',
     question: 'What is VEYN-SELECTS?',
     answer:
-      'VEYN-SELECTS is VEYNCORE’s dedicated curation line. It features handpicked denim and statement fashion pieces selected to reflect the brand’s creative direction, relaxed drape, and distinctive streetwear aesthetic, with each piece thoroughly quality-checked before dispatch.',
+      'VVEYN-SELECTS is VEYNCORE’s dedicated curated fashion collection, featuring carefully handpicked denim, distinctive streetwear and statement clothing pieces. Each selection reflects our creative direction, with a focus on contemporary style, relaxed silhouettes, individuality and quality. Every piece is thoughtfully sourced and quality-checked before dispatch to maintain our standards.',
   },
   {
     id: 'faq-5',
     question: 'How can I place an order with VEYNCORE?',
     answer:
-      'You can place an order directly on our website by adding products to your bag and checking out, or by using our direct WhatsApp ordering channel (+91 94463 91166). The WhatsApp concierge offers real-time sizing assistance, order confirmation, and personalized support.',
+      'Shopping with VEYNCORE is simple and convenient. Explore our latest collections at veyncore.in, select your preferred products and check the available sizes and product details. To place an order, connect with us directly through our official WhatsApp channel at +91 94463 91166. Our team will assist you with product inquiries, sizing guidance, availability confirmation and order processing to ensure a smooth shopping experience.',
   },
   {
     id: 'faq-6',
     question: 'Does VEYNCORE offer online shopping?',
     answer:
-      'Yes, VEYNCORE operates primarily as a digital-first streetwear store serving customers throughout India with nationwide door-to-door courier delivery and live order tracking.',
+      'Yes, VEYNCORE is an online fashion store offering a convenient way to explore and shop contemporary streetwear and curated fashion collections from anywhere in India. Customers can browse our latest collections, explore product details and size guides, and place orders directly through our official WhatsApp ordering channel. We offer delivery across India, making VEYNCORE collections accessible to customers nationwide.',
   },
   {
     id: 'faq-7',
     question: 'How can I contact VEYNCORE?',
     answer:
-      'You can contact VEYNCORE through our official WhatsApp concierge at +91 94463 91166 (available Monday to Saturday, 10:00 AM – 8:00 PM IST), via email at veyncore.in@gmail.com, or through the contact message form on our website.',
+      'You can reach VEYNCORE through our official customer support channels for assistance with product inquiries, sizing, orders and general questions. Connect with our team directly via WhatsApp at +91 94463 91166, email us at veyncore.in@gmail.com, or submit your message through the contact form on our official website. We’re here to help make your shopping experience smooth and convenient.  Customer Support Hours: Monday – Saturday, 10:00 AM – 8:00 PM IST',
   },
   {
     id: 'faq-8',
     question: 'Where can I find shipping and return information?',
     answer:
-      'Official shipping and return policies are accessible in our website footer. Orders are typically delivered within 3–7 working days from dispatch. We provide a 7-day issue reporting window from delivery for verified damaged, defective, or incorrect products (a continuous unboxing video is required).',
+      'You can find VEYNCORE’s official shipping, return and exchange policies in the footer section of our website. Orders are generally delivered within 3–7 working days from dispatch, depending on the delivery location. If you receive a damaged, defective or incorrect product, you can report the issue within 7 days of delivery, subject to our return policy conditions. To support your claim, a continuous, unedited unboxing video showing the entire process from start to finish, without any cuts, pauses or interruptions, is mandatory. We recommend reviewing our policies before placing an order for complete information about delivery, returns and exchanges.',
   },
 ];
 
