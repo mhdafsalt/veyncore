@@ -5,20 +5,20 @@ import './ProductCardSkeleton.css';
 
 /**
  * Individual Product Card Skeleton Placeholder
- * Follows exact VEYNCORE product card layout:
- * - 3:4 aspect-ratio media box
- * - title line (72%)
- * - price line (42%)
- * - secondary fit/badge indicator (26%)
+ * Exact match to LAUNCH SALE page skeleton:
+ * - .all-drops-card.all-drops-card--skeleton
+ * - .all-drops-card__media (3:4 ratio with shimmer)
+ * - .all-drops-card__info
+ * - .all-drops-card__skeleton-title (75% bar)
+ * - .all-drops-card__skeleton-price (40% bar)
  */
 export function ProductCardSkeleton() {
   return (
-    <article className="veyn-product-skeleton-card" aria-hidden="true">
-      <div className="veyn-product-skeleton-card__media" />
-      <div className="veyn-product-skeleton-card__info">
-        <div className="veyn-product-skeleton-card__title" />
-        <div className="veyn-product-skeleton-card__price" />
-        <div className="veyn-product-skeleton-card__sub" />
+    <article className="all-drops-card all-drops-card--skeleton" aria-hidden="true">
+      <div className="all-drops-card__media" />
+      <div className="all-drops-card__info">
+        <div className="all-drops-card__skeleton-title" />
+        <div className="all-drops-card__skeleton-price" />
       </div>
     </article>
   );
@@ -26,9 +26,9 @@ export function ProductCardSkeleton() {
 
 /**
  * Reusable Category Product Grid Skeleton
- * Matches the responsive layout:
- * - 4 columns or 2 columns on desktop
- * - 2 columns or 1 column on mobile (defaults to 2 columns on mobile as requested)
+ * Matches exact LAUNCH SALE grid layout:
+ * - Desktop: 4 columns or 2 columns
+ * - Mobile: 2 columns
  */
 export default function ProductGridSkeleton({
   count = 12,
