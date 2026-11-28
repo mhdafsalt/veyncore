@@ -1,0 +1,113 @@
+/* ==========================================================================
+   ProductCardSkeleton.css
+   Premium Category-Only Skeleton Loading Animation for VEYNCORE
+   Clean, minimal luxury streetwear aesthetic matching reference image
+   ========================================================================== */
+
+@keyframes veyn-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.veyn-product-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+/* 1. Large Rectangular Image Placeholder (Maintains 3:4 aspect ratio) */
+.veyn-product-skeleton-card__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: #f0f0f0;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e4e4e4 50%, #f0f0f0 100%);
+  background-size: 200% 100%;
+  animation: veyn-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* 2. Product Meta Info Area */
+.veyn-product-skeleton-card__info {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 3. Small Rectangular Placeholder for Product Name */
+.veyn-product-skeleton-card__title {
+  width: 72%;
+  height: 13px;
+  background-color: #f0f0f0;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e6e6e6 50%, #f0f0f0 100%);
+  background-size: 200% 100%;
+  animation: veyn-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+/* 4. Medium Rectangular Placeholder for Price */
+.veyn-product-skeleton-card__price {
+  width: 42%;
+  height: 12px;
+  background-color: #f0f0f0;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e6e6e6 50%, #f0f0f0 100%);
+  background-size: 200% 100%;
+  animation: veyn-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+/* 5. Small Placeholder for Secondary Info (Fit / Edition / Badge) */
+.veyn-product-skeleton-card__sub {
+  width: 26%;
+  height: 9px;
+  background-color: #f3f3f3;
+  background: linear-gradient(90deg, #f3f3f3 0%, #eaeaea 50%, #f3f3f3 100%);
+  background-size: 200% 100%;
+  animation: veyn-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 2px;
+  margin-top: 2px;
+}
+
+/* Stagger shimmer slightly across consecutive cards for organic fluidity */
+.veyn-product-skeleton-card:nth-child(2n) .veyn-product-skeleton-card__media,
+.veyn-product-skeleton-card:nth-child(2n) .veyn-product-skeleton-card__title,
+.veyn-product-skeleton-card:nth-child(2n) .veyn-product-skeleton-card__price,
+.veyn-product-skeleton-card:nth-child(2n) .veyn-product-skeleton-card__sub {
+  animation-delay: 0.15s;
+}
+
+.veyn-product-skeleton-card:nth-child(3n) .veyn-product-skeleton-card__media,
+.veyn-product-skeleton-card:nth-child(3n) .veyn-product-skeleton-card__title,
+.veyn-product-skeleton-card:nth-child(3n) .veyn-product-skeleton-card__price,
+.veyn-product-skeleton-card:nth-child(3n) .veyn-product-skeleton-card__sub {
+  animation-delay: 0.3s;
+}
+
+.veyn-product-skeleton-card:nth-child(4n) .veyn-product-skeleton-card__media,
+.veyn-product-skeleton-card:nth-child(4n) .veyn-product-skeleton-card__title,
+.veyn-product-skeleton-card:nth-child(4n) .veyn-product-skeleton-card__price,
+.veyn-product-skeleton-card:nth-child(4n) .veyn-product-skeleton-card__sub {
+  animation-delay: 0.45s;
+}
+
+/* Accessibility: Respect user motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .veyn-product-skeleton-card__media,
+  .veyn-product-skeleton-card__title,
+  .veyn-product-skeleton-card__price,
+  .veyn-product-skeleton-card__sub {
+    animation: none !important;
+    background: #ececec !important;
+  }
+}

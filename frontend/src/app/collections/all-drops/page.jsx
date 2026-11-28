@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import AllDrops from '@/components/AllDrops/AllDrops';
+import ProductGridSkeleton from '@/components/ProductCardSkeleton/ProductCardSkeleton';
 import '@/components/AllDrops/AllDrops.css';
 
 export const metadata = {
@@ -19,17 +20,7 @@ function AllDropsFallback() {
             <h1 className="all-drops__title">ALL DROPS</h1>
           </div>
         </div>
-        <div className="all-drops__grid all-drops__grid--4col all-drops__grid--m2col">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((n) => (
-            <div key={n} className="all-drops-card all-drops-card--skeleton">
-              <div className="all-drops-card__media" />
-              <div className="all-drops-card__info">
-                <div className="all-drops-card__skeleton-title" />
-                <div className="all-drops-card__skeleton-price" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProductGridSkeleton count={12} desktopColumns="4" mobileColumns="2" />
       </div>
     </div>
   );

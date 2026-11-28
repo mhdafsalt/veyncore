@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import ObjectsAllDrops from '@/components/ObjectsAllDrops/ObjectsAllDrops';
+import ProductGridSkeleton from '@/components/ProductCardSkeleton/ProductCardSkeleton';
 import '@/components/ObjectsAllDrops/ObjectsAllDrops.css';
 
 export const metadata = {
@@ -19,17 +20,7 @@ function ObjectsDropsFallback() {
             <h1 className="obj-all__title">OBJECT DROPS</h1>
           </div>
         </div>
-        <div className="obj-all__grid obj-all__grid--4col obj-all__grid--m2col">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((n) => (
-            <div key={n} className="obj-drop-card obj-drop-card--skeleton">
-              <div className="obj-drop-card__gallery" style={{ aspectRatio: '3 / 4' }} />
-              <div className="obj-drop-card__details" style={{ padding: '12px 2px' }}>
-                <div style={{ width: '70%', height: '14px', background: '#f3f3f3', borderRadius: '2px', marginBottom: '6px' }} />
-                <div style={{ width: '40%', height: '12px', background: '#f3f3f3', borderRadius: '2px' }} />
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProductGridSkeleton count={12} desktopColumns="4" mobileColumns="2" />
       </div>
     </section>
   );

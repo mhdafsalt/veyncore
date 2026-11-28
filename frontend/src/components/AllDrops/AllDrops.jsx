@@ -11,6 +11,7 @@ import { API_BASE_URL } from '@/lib/constants';
 import { matchProductCategory } from '@/lib/categoryFilterUtils';
 import { optimizeImageUrl } from '@/lib/imageUtils';
 import { fetchProductsWithRetry, getCachedProducts, invalidateProductsCache } from '@/lib/productsApi';
+import ProductGridSkeleton from '@/components/ProductCardSkeleton/ProductCardSkeleton';
 import './AllDrops.css';
 
 /**
@@ -322,13 +323,34 @@ function AllDropsContent() {
   const categoryParam = searchParams ? searchParams.get('category')?.toLowerCase().trim() || '' : '';
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
 
+  // Category-specific loading & transition state management
+  const [isCategoryTransitioning, setIsCategoryTransitioning] = useState(false);
+  const prevCategoryRef = useRef(categoryParam || 'all');
+  const categoryTransitionTokenRef = useRef(0);
+
   useEffect(() => {
     const cat = searchParams ? searchParams.get('category')?.toLowerCase().trim() || '' : '';
     if (cat === 'launch-sale' || cat === 'launch') {
       router.replace('/collections/launch-sale');
       return;
     }
-    setSelectedCategory(cat);
+    const currentCat = cat || 'all';
+    if (prevCategoryRef.current !== currentCat) {
+      prevCategoryRef.current = currentCat;
+      const transitionToken = ++categoryTransitionTokenRef.current;
+      setIsCategoryTransitioning(true);
+
+      const timer = setTimeout(() => {
+        if (transitionToken === categoryTransitionTokenRef.current) {
+          setIsCategoryTransitioning(false);
+        }
+      }, 260);
+
+      setSelectedCategory(cat);
+      return () => clearTimeout(timer);
+    } else {
+      setSelectedCategory(cat);
+    }
   }, [searchParams, router]);
 
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -532,12 +554,25 @@ function AllDropsContent() {
   // Handle category change and reflect in URL query params
   const handleCategoryChange = (catId) => {
     const cleanId = (catId || '').toLowerCase().trim();
-    if (!cleanId || cleanId === 'all') {
-      setSelectedCategory('all');
-      router.replace('/collections/all-drops', { scroll: false });
-    } else {
-      setSelectedCategory(cleanId);
-      router.replace(`/collections/all-drops?category=${encodeURIComponent(cleanId)}`, { scroll: false });
+    const targetCat = (!cleanId || cleanId === 'all') ? 'all' : cleanId;
+    if (targetCat !== (selectedCategory || 'all')) {
+      const transitionToken = ++categoryTransitionTokenRef.current;
+      setIsCategoryTransitioning(true);
+      prevCategoryRef.current = targetCat;
+
+      if (targetCat === 'all') {
+        setSelectedCategory('all');
+        router.replace('/collections/all-drops', { scroll: false });
+      } else {
+        setSelectedCategory(cleanId);
+        router.replace(`/collections/all-drops?category=${encodeURIComponent(cleanId)}`, { scroll: false });
+      }
+
+      setTimeout(() => {
+        if (transitionToken === categoryTransitionTokenRef.current) {
+          setIsCategoryTransitioning(false);
+        }
+      }, 260);
     }
   };
 
@@ -581,12 +616,20 @@ function AllDropsContent() {
 
   // Reset Filters
   const handleResetFilters = () => {
+    const transitionToken = ++categoryTransitionTokenRef.current;
+    setIsCategoryTransitioning(true);
+    prevCategoryRef.current = 'all';
     setSelectedCategory('all');
     setSelectedAvailability([]);
     setMinPrice('');
     setMaxPrice('');
     setSortBy('date-desc');
     router.push('/collections/all-drops', { scroll: false });
+    setTimeout(() => {
+      if (transitionToken === categoryTransitionTokenRef.current) {
+        setIsCategoryTransitioning(false);
+      }
+    }, 260);
   };
 
   const hasActiveFilters =
@@ -1151,20 +1194,12 @@ function AllDropsContent() {
         </div>
 
         {/* Product Grid */}
-        {isLoading && productsList.length === 0 ? (
-          <div
-            className={`all-drops__grid all-drops__grid--${desktopColumns}col all-drops__grid--m${mobileColumns}col`}
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((n) => (
-              <div key={n} className="all-drops-card all-drops-card--skeleton">
-                <div className="all-drops-card__media" />
-                <div className="all-drops-card__info">
-                  <div className="all-drops-card__skeleton-title" />
-                  <div className="all-drops-card__skeleton-price" />
-                </div>
-              </div>
-            ))}
-          </div>
+        {(isLoading || isCategoryTransitioning) ? (
+          <ProductGridSkeleton
+            count={12}
+            desktopColumns={desktopColumns}
+            mobileColumns={mobileColumns}
+          />
         ) : fetchError && productsList.length === 0 ? (
           <div className="all-drops__empty">
             <h2 className="all-drops__empty-title">Couldn&apos;t load products</h2>

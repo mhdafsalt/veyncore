@@ -2,12 +2,23 @@ import React, { Suspense } from 'react';
 import StoreHeader from '@/components/StoreHeader/StoreHeader';
 import Footer from '@/components/Footer/Footer';
 import AllDrops from '@/components/AllDrops/AllDrops';
+import ProductGridSkeleton from '@/components/ProductCardSkeleton/ProductCardSkeleton';
 
 export const metadata = {
   title: 'ALL COLLECTIONS | VEYNCORE - Contemporary Raw Denim & Streetwear',
   description:
     'Explore all exclusive denim drops by VEYNCORE. Structured silhouettes, baggy jeans, semi bootcut cuts, and premium streetwear denim craftsmanship.'
 };
+
+function AllCollectionsFallback() {
+  return (
+    <div className="all-drops">
+      <div className="all-drops__container">
+        <ProductGridSkeleton count={12} desktopColumns="4" mobileColumns="2" />
+      </div>
+    </div>
+  );
+}
 
 export default function AllCollectionsPage() {
   return (
@@ -16,7 +27,7 @@ export default function AllCollectionsPage() {
       <StoreHeader initialCategory="VEYN-SELECTS" />
 
       {/* 2. Collection View */}
-      <Suspense fallback={<div className="all-drops-loading" style={{ minHeight: '60vh' }} />}>
+      <Suspense fallback={<AllCollectionsFallback />}>
         <AllDrops />
       </Suspense>
 
