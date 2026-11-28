@@ -8,7 +8,7 @@ export function resolveApiUrl(endpoint) {
     return endpoint;
   }
 
-  const base = (API_BASE_URL || 'https://veyncore.vercel.app').replace(/\/+$/, '');
+  const base = (API_BASE_URL || 'https://api.veyncore.in').replace(/\/+$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
   // If requesting the root endpoint

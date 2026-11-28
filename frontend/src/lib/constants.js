@@ -16,7 +16,7 @@ export const getApiBaseUrl = () => {
   }
 
   // 3. In production (Vercel / deployed), default to production backend
-  return 'https://veyncore.vercel.app';
+  return 'https://api.veyncore.in';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

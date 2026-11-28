@@ -407,7 +407,7 @@ function AllDropsContent() {
           forceRefresh: reloadKey > 0,
           retryOnEmpty: true,
           signal: abortController.signal,
-          fallbackUrl: `https://veyncorein.vercel.app/api/products?category=VEYN-SELECTS&limit=100`,
+          fallbackUrl: `https://api.veyncore.in/api/products?category=VEYN-SELECTS&limit=100`,
         });
 
         if (isMounted) {

@@ -117,7 +117,7 @@ function SubCategoriesInner({ activeMainCategory = 'VEYN-SELECTS' }) {
         const url = `${API_BASE_URL}/api/products?category=${activeMainCategory}&limit=100`;
         const data = await fetchProductsWithRetry(url, {
           signal: abortController.signal,
-          fallbackUrl: `https://veyncorein.vercel.app/api/products?category=${activeMainCategory}&limit=100`,
+          fallbackUrl: `https://api.veyncore.in/api/products?category=${activeMainCategory}&limit=100`,
         });
         if (isMounted && Array.isArray(data) && data.length > 0) {
           cachedSubcategoriesCatalog = data;

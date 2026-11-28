@@ -19,7 +19,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: (process.env.NEXT_PUBLIC_API_URL || 'https://veyncore.vercel.app') + '/api/:path*',
+        destination: (process.env.NEXT_PUBLIC_API_URL || 'https://api.veyncore.in') + '/api/:path*',
       },
     ];
   },
