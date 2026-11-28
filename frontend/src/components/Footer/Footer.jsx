@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { FaInstagram, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
+import { FaInstagram, FaPinterestP, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import ImageBanner from '@/components/ImageBanner/ImageBanner';
 import './Footer.css';
 
@@ -188,7 +188,7 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                 <div className="modern-footer__accordion-content">
                   <div className="modern-footer__channels-icons" role="list">
                     <a
-                      href="https://instagram.com"
+                      href="https://www.instagram.com/veyncore.in"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="modern-footer__channel-icon-btn"
@@ -196,6 +196,16 @@ export default function Footer({ showBanner = false, activeMainCategory = 'VEYN-
                       title="Instagram"
                     >
                       <FaInstagram size={18} aria-hidden="true" />
+                    </a>
+                    <a
+                      href="https://pin.it/1bxJr9Grd"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="modern-footer__channel-icon-btn"
+                      aria-label="Pinterest"
+                      title="Pinterest"
+                    >
+                      <FaPinterestP size={17} aria-hidden="true" />
                     </a>
                     <a
                       href="https://wa.me/919446391166"

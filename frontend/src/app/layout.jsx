@@ -138,7 +138,10 @@ export default function RootLayout({ children }) {
                     '@type': 'ImageObject',
                     url: 'https://veyncore.in/images/veyncoreLogo_black.svg',
                   },
-                  sameAs: ['https://www.instagram.com/veyncore'],
+                  sameAs: [
+                    'https://www.instagram.com/veyncore.in',
+                    'https://pin.it/1bxJr9Grd',
+                  ],
                   contactPoint: {
                     '@type': 'ContactPoint',
                     telephone: '+91-8848419616',
