@@ -56,14 +56,23 @@ const refundSections = [
         <p>
           If you receive a damaged, defective, or incorrect product, please contact VEYNCORE within 7 days of delivery.
         </p>
-        <ul>
-          <li>Customers must provide a complete and continuous unboxing video showing the sealed package, opening process, and the product received.</li>
-          <li>Clear photographs and additional information may be requested to assess the issue.</li>
-          <li>Once the claim has been reviewed and verified, VEYNCORE may arrange a replacement or another appropriate resolution.</li>
-          <li>If the reported issue is confirmed to be caused by VEYNCORE or its fulfilment process, the applicable return or replacement shipping costs will be handled by us.</li>
-        </ul>
+        <p style={{ fontWeight: 700, margin: '20px 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#0f172a' }}>
+          MANDATORY UNBOXING VIDEO REQUIREMENT
+        </p>
         <p>
-          Claims without sufficient evidence may be declined.
+          Customers must provide a complete, continuous and unedited unboxing video showing the sealed package, the entire opening process and the product received. The video must be recorded in one uninterrupted take from start to finish. No cuts, edits, pauses, transitions or interruptions are permitted. The recording must begin before opening the package and clearly document the complete unboxing process.
+        </p>
+        <p>
+          Clear photographs and additional information may also be requested to assess the reported issue.
+        </p>
+        <p>
+          Once the claim has been reviewed and verified, VEYNCORE may arrange a replacement or another appropriate resolution.
+        </p>
+        <p>
+          If the reported issue is confirmed to have been caused by VEYNCORE or its fulfilment process, the applicable return or replacement shipping costs will be handled by us.
+        </p>
+        <p>
+          Claims submitted without a valid, complete and uninterrupted unboxing video, or with insufficient supporting evidence, may be declined.
         </p>
       </>
     ),
